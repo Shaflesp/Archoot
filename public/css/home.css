@@ -1,0 +1,8 @@
+#play-button {
+    background-image: url(../images/ui/boutonSolo.png);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    height: 10px;
+    width: 10px;
+    border: none;
+}

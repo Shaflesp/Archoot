@@ -8,12 +8,22 @@
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/canvas.css">
 
-        <script type="module" src="/src/main.ts"></script>
+        <script type="module" src="client/src/main.ts"></script>
     </head>
 
     <body>
-        <h1>Hello world!</h1>
+        <div id="home-screen">
+            <h1>Home</h1>
+            <a class="play-button"><img src="./images/ui/boutonSolo.png"></a>
+        </div>
 
-        <canvas class="gameCanvas" width="800" height="800"></canvas>
+        <div id="game-screen">
+            <h1>Game</h1>
+            <canvas class="gameCanvas" width="800" height="800"></canvas>
+        </div>
+
+        <div id="leaderboard-screen">
+            <h1>Leaderboard</h1>
+        </div>
     </body>
 </html>
