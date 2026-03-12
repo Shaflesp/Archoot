@@ -1,7 +1,7 @@
 {
     "name": "archoot",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "server/index.ts",
     "private": true,
     "type": "module",
     "description": "Le jeu incroyable de l'équipe 5",
@@ -9,14 +9,19 @@
     "homepage": "https://gitlab.univ-lille.fr/jsae/2025-2026/projets/groupe-i/equipe-5/archoot",
     "license": "UNLICENSED",
     "scripts": {
-      "start": "vite --port=8000",
-      "build": "tsc && vite build",
-      "preview": "vite preview"
+        "client:start": "vite --port=8000",
+        "client:build": "tsc && vite build",
+        "client:preview": "vite preview",
+        "server": "node .",
+        "server:watch": "node --watch ."
     },
     "devDependencies": {
-      "prettier": "^3.8.1",
-      "typescript": "~5.9.3",
-      "vite": "^7.3.1"
+        "prettier": "^3.8.1",
+        "typescript": "~5.9.3",
+        "vite": "^7.3.1"
+    },
+    "dependencies": {
+        "socket.io": "^4.8.3",
+        "socket.io-client": "^4.8.3"
     }
-  }
-  
+}
