@@ -10,7 +10,7 @@ body{
     background-size:cover; 
 }
 
-.parchemin{
+.credits-screen{
     width:420px;
     height:620px;
     background-image:url("../images/parchemin.png");

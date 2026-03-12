@@ -3,12 +3,27 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* overflow: hidden; */
+    background-color: #f4e4bc; /* à changer par img*/
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    overflow: hidden; /* à voir si on laisse */
 }
 
 h1 {
-    font-weight: 100;
+    color: #79443B;
+    font-size: 3.5em;
+    text-align: center;
+    font-weight: bolder;
+    letter-spacing: 3px;
 }
 
 .screen {
     display: none;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
+

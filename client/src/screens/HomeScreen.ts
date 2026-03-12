@@ -5,7 +5,7 @@ export class HomeScreen implements Screen {
 	element = document.getElementById('home-screen')!;
 
 	constructor(sm: ScreenManager) {
-		document.querySelector('.play-button')?.addEventListener('click', () => {
+		document.querySelector('.bottom-menu .play-button')?.addEventListener('click', () => {
 			console.log('correct');
 			sm.show('game-screen');
 		});
