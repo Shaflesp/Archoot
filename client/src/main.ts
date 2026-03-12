@@ -1,21 +1,12 @@
-const home = document.getElementById('home-screen')!;
-const game = document.getElementById('game-screen')!;
-const leaderboard = document.getElementById('leaderboard-screen')!;
+import { ScreenManager } from './ScreenManager.ts';
+import { HomeScreen } from './screens/HomeScreen.ts';
+import { GameScreen } from './screens/GameScreen.ts';
+import { LeaderboardScreen } from './screens/LeaderboardScreen.ts';
 
-function showHome() {
-	home.style.display = 'block';
-	game.style.display = 'none';
-	leaderboard.style.display = 'none';
-}
+const sm = new ScreenManager();
 
-function showGame() {
-	home.style.display = 'none';
-	game.style.display = 'block';
-	leaderboard.style.display = 'none';
-}
+sm.add('home-screen', new HomeScreen(sm));
+sm.add('game-screen', new GameScreen(sm));
+sm.add('leaderboard-screen', new LeaderboardScreen(sm));
 
-function showLeaderboard() {
-	home.style.display = 'none';
-	game.style.display = 'none';
-	leaderboard.style.display = 'block';
-}
+sm.show('home-screen');
