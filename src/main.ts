@@ -5,7 +5,7 @@ const canvas = document.querySelector<HTMLCanvasElement>('.gameCanvas')!,
 
 const image = new Image();
 image.src = '/images/cobaye.png';
-image.addEventListener('load', event => {
+image.addEventListener('load', () => {
 	context.drawImage(
 		image,
 		canvas.width / 2 - image.width / 2,
