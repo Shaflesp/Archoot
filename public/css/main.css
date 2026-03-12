@@ -4,7 +4,10 @@ body {
     align-items: center;
     justify-content: center;
     /* overflow: hidden; */
-    background-color: #f4e4bc; /* à changer par img*/
+    background-image: url("../images/fondHome.gif");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     overflow: hidden; /* à voir si on laisse */
 }
