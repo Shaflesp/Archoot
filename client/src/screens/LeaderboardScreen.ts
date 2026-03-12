@@ -7,7 +7,7 @@ export class LeaderboardScreen implements Screen {
 	constructor(sm: ScreenManager) {}
 
 	show(): void {
-		this.element.style.display = 'block';
+		this.element.style.display = 'flex';
 	}
 
 	hide(): void {

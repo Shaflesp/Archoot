@@ -7,7 +7,8 @@ export class GameScreen implements Screen {
 	constructor(sm: ScreenManager) {}
 
 	show(): void {
-		this.element.style.display = 'block';
+		console.log("GameScreen appelé");
+		this.element.style.display = 'flex';
 	}
 
 	hide(): void {

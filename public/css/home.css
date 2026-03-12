@@ -8,7 +8,7 @@
 }
 
 #home-screen {
-    display: flex !important;
+    display: flex;
     position: relative;
 }
 
