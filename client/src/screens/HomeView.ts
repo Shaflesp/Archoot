@@ -5,20 +5,23 @@ export class HomeView implements View {
 	element = document.getElementById('home-screen')!;
 
 	constructor(sm: ViewManager) {
-		const buttons =
+		/* Gestion des boutons de jeu (solo/multi) */
+		const buttonsPlay =
 			this.element.querySelectorAll<HTMLAnchorElement>('.play-button');
 
-		buttons.forEach((btn: HTMLAnchorElement) => {
+		buttonsPlay.forEach((btn: HTMLAnchorElement) => {
 			btn.addEventListener('click', (event: MouseEvent) => {
 				event.preventDefault();
 				console.log('Bouton de jeu cliqué');
 				sm.show('game-screen');
 			});
-			// btn.addEventListener('click', (event) => {
-			// event.preventDefault();
-			// console.log('Bouton cliqué');
-			// sm.show('game-screen');
-			// });
+		});
+
+		/* Gestion du bouton crédits */
+		const buttonCredits = this.element.querySelector<HTMLAnchorElement>('.credits-button');
+		buttonCredits?.addEventListener('click', () => {
+			console.log('Bouton des crédits cliqué');
+			sm.show('credits-screen');
 		});
 	}
 
