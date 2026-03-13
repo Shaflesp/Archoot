@@ -6,13 +6,18 @@ body {
     margin: 0;
     padding: 50px 0;
     font-family: sans-serif;
+    background-color: rgb(253, 244, 201);
 }
 
 .last {
     background-color: lightgray;
 
-    width: 1000px;
+    width: 800px;
     padding: 20px;
+    border-radius: 30px;
+    opacity: 75%;
+    font-weight: bold;
+    color: black;
 }
 
 #podium {
