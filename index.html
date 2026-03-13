@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="/css/home.css">
         <link rel="stylesheet" href="/css/canvas.css">
         <link rel="stylesheet" href="/css/credits.css">
+        <link rel="stylesheet" href="/css/leaderboard.css">
         
         <script type="module" src="client/src/main.ts"></script>
     </head>
@@ -29,11 +30,37 @@
 
         <div id="game-screen" class="screen">
             <h1>Game</h1>
+            <a class="back-button home-button"><img src="./images/ui/retour.png"></a>  
             <canvas class="gameCanvas" width="500" height="500"></canvas>
         </div>
 
         <div id="leaderboard-screen" class="screen">
             <h1>Leaderboard</h1>
+
+            <a class="back-button home-button"><img src="./images/ui/retour.png"></a>  
+
+
+            <div class="podium">
+                <div class="place second">
+                    <p>Deuxième</p>
+                </div>
+                <div class="place first">
+                    <p>Premier</p>
+                </div>
+                <div class="place third">
+                    <p>Troisième</p>
+                </div>
+            </div>
+
+            <div class="last">
+                <p> 4</p>
+                <p> 5</p>
+                <p> 6</p>
+                <p> 7</p>
+                <p> 8</p>
+                <p> 9</p>
+                <p> 10</p>
+            </div>
         </div>
 
         <div id="credits-screen" class="screen">

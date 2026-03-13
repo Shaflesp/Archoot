@@ -1,5 +1,5 @@
 /* Corps centré */
-body {
+/* body {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -7,7 +7,7 @@ body {
     padding: 50px 0;
     font-family: sans-serif;
     background-color: rgb(253, 244, 201);
-}
+} */
 
 .last {
     background-color: lightgray;
@@ -20,7 +20,11 @@ body {
     color: black;
 }
 
-#podium {
+.last p {
+    font-size: 1.5rem;
+}
+
+.podium {
     background-image: url("../images/leaderboard/leaderboard.png");
     width: 500px;
     height: 250px;
@@ -29,28 +33,41 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: 140px;
+    /* gap: 50px; */
     text-align: center;
-    margin-top: 50px;
+    margin-top: 140px;
 }
 
 .place {
-    font-size: 24px;
+    /* font-size: 24px; */
     font-weight: bold;
-    color: black;
+    color: white;
+    margin-right: 50px;
 }
 
 .first {
     position: relative;
-    bottom: 200px;
+    bottom: 230px;
+}
+
+.first p {
+    font-size: 3rem;
 }
 
 .second {
     position: relative;
-    bottom: 150px;
+    bottom: 180px;
+}
+
+.second p {
+    font-size: 2.5rem;
 }
 
 .third {
     position: relative;
-    bottom: 115px;
+    bottom: 145px;
+}
+
+.third p {
+    font-size: 2rem;
 }
