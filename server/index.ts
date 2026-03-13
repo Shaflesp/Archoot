@@ -13,5 +13,5 @@ httpServer.listen(port, () => {
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
 io.on('connection', socket => {
-	socket.on('keypress', event => console.log(event));
+	socket.on('keypress', event => console.log(`${event} de ${socket.id}`));
 });
