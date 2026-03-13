@@ -10,12 +10,13 @@ body {
 
 .last {
     background-color: lightgray;
+
     width: 1000px;
     padding: 20px;
 }
 
 #podium {
-    background-image: url("../images/ui/leaderbord.png");
+    background-image: url("../images/leaderboard/leaderbord.png");
     width: 500px;
     height: 250px;
     background-repeat:no-repeat;
