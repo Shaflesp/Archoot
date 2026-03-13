@@ -1,4 +1,4 @@
-export interface Screen {
+export interface View {
 	show(): void;
 	hide(): void;
 }

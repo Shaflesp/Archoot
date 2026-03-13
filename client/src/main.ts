@@ -1,12 +1,12 @@
-import { ScreenManager } from './ScreenManager.ts';
-import { HomeScreen } from './screens/HomeScreen.ts';
-import { GameScreen } from './screens/GameScreen.ts';
-import { LeaderboardScreen } from './screens/LeaderboardScreen.ts';
+import { ViewManager } from './ViewManager.ts';
+import { HomeView } from './screens/HomeView.ts';
+import { GameView } from './screens/GameView.ts';
+import { LeaderboardView } from './screens/LeaderboardView.ts';
 
-const sm = new ScreenManager();
+const sm = new ViewManager();
 
-sm.add('home-screen', new HomeScreen(sm));
-sm.add('game-screen', new GameScreen(sm));
-sm.add('leaderboard-screen', new LeaderboardScreen(sm));
+sm.add('home-screen', new HomeView(sm));
+sm.add('game-screen', new GameView(sm));
+sm.add('leaderboard-screen', new LeaderboardView(sm));
 
 sm.show('home-screen');

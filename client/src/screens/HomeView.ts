@@ -1,25 +1,25 @@
-import type { ScreenManager } from '../ScreenManager.ts';
-import type { Screen } from './Screen.ts';
+import type { ViewManager } from '../ViewManager.ts';
+import type { View } from './View.ts';
 
-export class HomeScreen implements Screen {
+export class HomeView implements View {
 	element = document.getElementById('home-screen')!;
 
-	constructor(sm: ScreenManager) {
-		const buttons = this.element.querySelectorAll<HTMLAnchorElement>('.play-button');
-		
+	constructor(sm: ViewManager) {
+		const buttons =
+			this.element.querySelectorAll<HTMLAnchorElement>('.play-button');
+
 		buttons.forEach((btn: HTMLAnchorElement) => {
 			btn.addEventListener('click', (event: MouseEvent) => {
 				event.preventDefault();
-				console.log("Bouton de jeu cliqué");
+				console.log('Bouton de jeu cliqué');
 				sm.show('game-screen');
-			})
+			});
 			// btn.addEventListener('click', (event) => {
 			// event.preventDefault();
 			// console.log('Bouton cliqué');
 			// sm.show('game-screen');
-		// });
+			// });
 		});
-		
 	}
 
 	show(): void {

@@ -1,10 +1,10 @@
-import type { Screen } from './screens/Screen';
+import type { View } from './screens/View';
 
-export class ScreenManager {
-	screens: Map<string, Screen> = new Map();
-	current?: Screen;
+export class ViewManager {
+	screens: Map<string, View> = new Map();
+	current?: View;
 
-	add(name: string, sc: Screen) {
+	add(name: string, sc: View) {
 		this.screens.set(name, sc);
 	}
 
