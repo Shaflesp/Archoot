@@ -24,6 +24,14 @@ export class HomeView implements View {
 			console.log('Bouton des crédits cliqué');
 			sm.show('credits-screen');
 		});
+
+		/* Gestion du bouton leaderboard */
+		const buttonLeaderBoard = this.element.querySelector<HTMLAnchorElement>('.leaderboard-button');
+		buttonLeaderBoard?.addEventListener('click', (event) => {
+			event.preventDefault();
+			console.log('Bouton du leaderboard cliqué');
+			sm.show('leaderboard-screen');
+		});
 	}
 
 	show(): void {
