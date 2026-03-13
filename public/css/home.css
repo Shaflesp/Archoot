@@ -12,6 +12,40 @@
     position: relative;
 }
 
+.username-field {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 10;
+    background-color: rgba(139, 151, 158, 0.8);
+    border-radius: 30px;
+    padding: 5px;
+}
+
+.username-field img {
+    width: 90px;
+}
+
+.username-field input {
+    background: none;
+    border: none;
+    outline: none;
+    width: 200px;
+    padding: 5px 5px;
+    font-size: 1.5rem;
+    color: #451110;
+    border-bottom: 2px solid #451110;
+}
+
+.username-field input::placeholder {
+    color: #451110;
+    opacity: 50%;
+}
+
 .credits-button {
     position: absolute;
     top: 30px;
