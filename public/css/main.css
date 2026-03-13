@@ -30,4 +30,26 @@ h1 {
     justify-content: center;
 }
 
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 100px;
+    z-index: 10;
+    cursor: pointer;
+    width: 300px;
+    height: auto;
+    display: inline-block;
+}
+
+.back-button img {
+   width: 100%;
+   display: block;
+   transition: transform 0.5s ease-in-out;
+}
+
+.back-button:hover{
+        transform:scale(1.1);
+}
+
+
 

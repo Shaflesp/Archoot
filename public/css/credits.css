@@ -1,24 +1,43 @@
-body{
-    margin:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    overflow:hidden;
-    font-family:serif;
-    background-image:url("../images/credits/fondCredit.jpg");
-    background-size:cover; 
-}
-
-.credits-screen{
-    width:420px;
-    height:620px;
-    background-image:url("../images/credits/parchemin.png");
-    background-size:contain;
-    background-repeat:no-repeat;
-    background-position:center;
+#credits-screen{
     padding:120px 60px 40px 60px;
     text-align:center;
+    position: relative;
+    display: none;
+}
+
+.logo-credits {
+    display: block;
+    max-width: 200px;
+    height: auto;
+    margin: 0%;
+    z-index: 2;
+    margin-top: -50px;
+}
+
+.parchemin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left:50%;
+    z-index: 1; /* pour mettre derrière le texte de nos crédits (les class personnes) */
+}
+
+.credits-content {
+    position: relative;
+    z-index: 2; /* Devant l'img */
+    text-align: center;
+    margin-top: 30px;
+}
+
+.liste-personnes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.personne{
+    margin-bottom:25px;
 }
 
 h1{
@@ -26,14 +45,15 @@ h1{
     margin-bottom:30px;
 }
 
-.personne{
-    margin-bottom:25px;
-}
-
 h2{
     margin-bottom:5px;
+    color: #451110;
+    font-size: 1.4rem;
+    margin-bottom: 5px;
 }
 
 p{
     margin:2px;
+    font-size: 1.2rem;
 }
+
