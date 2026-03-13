@@ -43,3 +43,13 @@
     width: auto;
     cursor: pointer;
 }
+
+.home-button {
+    transition: transform 50ms ease-in-out;
+}
+
+.home-button:hover {
+    transform:scale(1.1);
+}
+
+
