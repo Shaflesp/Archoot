@@ -19,7 +19,8 @@ export class HomeView implements View {
 
 		/* Gestion du bouton crédits */
 		const buttonCredits = this.element.querySelector<HTMLAnchorElement>('.credits-button');
-		buttonCredits?.addEventListener('click', () => {
+		buttonCredits?.addEventListener('click', (event) => {
+			event.preventDefault();
 			console.log('Bouton des crédits cliqué');
 			sm.show('credits-screen');
 		});

@@ -1,7 +1,7 @@
 import type { ViewManager } from '../ViewManager.ts';
 import type { View } from './View.ts';
 
-export class GameView implements View {
+export class CreditsView implements View {
     element = document.getElementById('credits-screen')!;
 
     constructor(sm: ViewManager) {}

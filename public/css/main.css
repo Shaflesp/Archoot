@@ -13,13 +13,6 @@ body {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-body::before{
-    content: "";
-    position: fixed;
-    inset: 0;
-    backdrop-filter: blur(3px);
-}
-
 h1 {
     color: #451110;
     font-size: 3.5em;
