@@ -9,7 +9,7 @@
     "homepage": "https://gitlab.univ-lille.fr/jsae/2025-2026/projets/groupe-i/equipe-5/archoot",
     "license": "UNLICENSED",
     "scripts": {
-        "client:start": "vite --port=8000",
+        "client:start": "vite --port=8000 --host 0.0.0.0",
         "client:build": "tsc && vite build",
         "client:preview": "vite preview",
         "server": "node .",
