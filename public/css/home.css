@@ -25,9 +25,16 @@
     cursor: pointer;
 }
 
+.logo-home {
+    display: block;
+    max-width: 200px;
+    height: auto;
+    margin: 1%;
+}
+
 .character {
     display: block;
-    max-width: 400px;
+    max-width: 350px;
     height: auto;
 }
 
