@@ -16,7 +16,7 @@ httpServer.listen(port, () => {
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
 io.on('connection', socket => {
-	players.set(socket.id, new Player());
+	players.set(socket.id, new Player(socket.id));
 
 	socket.on('keypress', event => {
 		console.log(`${event} de ${socket.id}`);
@@ -27,4 +27,18 @@ io.on('connection', socket => {
 			player.move(event);
 		}
 	});
+
+	socket.on('disconnect', () => {
+		players.delete(socket.id);
+	});
 });
+
+setInterval(() => {
+	const playerInfo: any = {};
+
+	players.forEach(p => {
+		playerInfo[p.identifier] = p.getAsJson();
+	});
+
+	io.emit('playerInfo', playerInfo);
+}, 1000 / 120);

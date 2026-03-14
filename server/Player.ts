@@ -3,12 +3,14 @@ export class Player {
 	x: number;
 	y: number;
 	username: string;
+	identifier: string;
 
-	constructor() {
+	constructor(id: string) {
 		this.movementSpeed = 5;
 		this.x = 0;
 		this.y = 0;
 		this.username = 'placeholder';
+		this.identifier = id;
 	}
 
 	move(direction: string) {
@@ -26,5 +28,13 @@ export class Player {
 				this.x = this.x + this.movementSpeed;
 				break;
 		}
+	}
+
+	getAsJson() {
+		return {
+			identifier: this.identifier,
+			x: this.x,
+			y: this.y,
+		};
 	}
 }
