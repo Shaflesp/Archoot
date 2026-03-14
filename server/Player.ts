@@ -5,11 +5,11 @@ export class Player {
 	username: string;
 	identifier: string;
 
-	constructor(id: string) {
+	constructor(id: string, username: string) {
 		this.movementSpeed = 5;
 		this.x = 0;
 		this.y = 0;
-		this.username = 'placeholder';
+		this.username = username? 'placeholder' : username;
 		this.identifier = id;
 	}
 

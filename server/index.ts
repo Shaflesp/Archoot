@@ -1,6 +1,6 @@
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
-import { Player } from './Player.ts';
+import { Player } from './Player.ts'
 
 const httpServer = http.createServer((_req, res) => {
 	res.statusCode = 200;
@@ -16,20 +16,40 @@ httpServer.listen(port, () => {
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
 io.on('connection', socket => {
-	players.set(socket.id, new Player(socket.id));
+	socket.on('register', (data: { username: string }) => {
+		const username = data.username?.trim();
 
-	socket.on('keypress', event => {
-		console.log(`${event} de ${socket.id}`);
+		if (!username || username.length < 2) {
+			socket.emit('register_error', 'Invalid username.');
+			return;
+		}
+
+		players.set(socket.id, new Player(socket.id, username));
+		console.log(`Player registered: ${username} (${socket.id})`);
+	});
+
+	socket.on('keypress', direction => {
+		console.log(`Keypress received: ${direction}`);          // Is the event reaching the server?
 
 		const player = players.get(socket.id);
+		console.log(`Player found: ${!!player}`);                // Is the player in the map?
 
-		if (player) {
-			player.move(event);
+		if (!player) {
+			console.log(`No player for socket: ${socket.id}`);
+			socket.emit('game_error', 'You must register before playing.');
+			return;
 		}
+
+		player.move(direction);
+		console.log(`${player.username} moved ${direction} → (${player.x}, ${player.y})`);
 	});
 
 	socket.on('disconnect', () => {
-		players.delete(socket.id);
+		const player = players.get(socket.id);
+		if (player) {
+			console.log(`${player.username} disconnected.`);
+			players.delete(socket.id);
+		}
 	});
 });
 
