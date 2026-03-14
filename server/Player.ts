@@ -9,7 +9,7 @@ export class Player {
 		this.movementSpeed = 5;
 		this.x = 0;
 		this.y = 0;
-		this.username = username? username : 'placeholder';
+		this.username = username ? username : 'placeholder';
 		this.identifier = id;
 	}
 
