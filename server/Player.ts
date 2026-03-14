@@ -2,11 +2,13 @@ export class Player {
 	movementSpeed: number;
 	x: number;
 	y: number;
+	username: string;
 
 	constructor() {
 		this.movementSpeed = 5;
 		this.x = 0;
 		this.y = 0;
+		this.username = 'placeholder';
 	}
 
 	move(direction: string) {
