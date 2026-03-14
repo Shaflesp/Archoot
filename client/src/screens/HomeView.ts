@@ -4,9 +4,15 @@ import { Socket } from 'socket.io-client';
 
 export class HomeView implements View {
 
+	socket:Socket;
+	sm:ViewManager;
+
 	element = document.getElementById('home-screen')!;
 
 	constructor(sm: ViewManager, socket: Socket) {
+		this.socket = socket;
+		this.sm = sm;
+
 		/* Gestion des boutons de jeu (solo/multi) */
 		const buttonsPlay =
 			this.element.querySelectorAll<HTMLAnchorElement>('.play-button');
@@ -25,10 +31,15 @@ export class HomeView implements View {
 				}
 
 				socket.emit('register', { username });
-
-				console.log('Bouton de jeu cliqué');
-				sm.show('game-screen');
 			});
+		});
+
+		this.socket.on('register_success', () => {
+			this.sm.show('game-screen');
+		});
+
+		this.socket.on('register_error', (message: string) => {
+			console.error('Registration failed:', message);
 		});
 
 		/* Gestion du bouton crédits */

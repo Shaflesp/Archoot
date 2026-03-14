@@ -24,15 +24,24 @@ io.on('connection', socket => {
 			return;
 		}
 
+		const isTaken = Array.from(players.values()).some(
+			p => p.username === username
+		);
+		if (isTaken) {
+			socket.emit('register_error', 'Username already taken.');
+			return;
+		}
+
 		players.set(socket.id, new Player(socket.id, username));
 		console.log(`Player registered: ${username} (${socket.id})`);
+		socket.emit('register_success');
 	});
 
 	socket.on('keypress', direction => {
-		console.log(`Keypress received: ${direction}`);          // Is the event reaching the server?
+		console.log(`Keypress received: ${direction}`);
 
 		const player = players.get(socket.id);
-		console.log(`Player found: ${!!player}`);                // Is the player in the map?
+		console.log(`Player found: ${!!player}`);
 
 		if (!player) {
 			console.log(`No player for socket: ${socket.id}`);

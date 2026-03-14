@@ -6,12 +6,15 @@ export class GameView implements View {
 	element = document.getElementById('game-screen')!;
 	canvas = this.element.querySelector<HTMLCanvasElement>('.gameCanvas')!;
 	ctx = this.canvas.getContext('2d')!;
-	socket;
+
+	socket:Socket;
+	sm:ViewManager;
 
 	playerInfo: any = {};
 
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
+		this.sm = sm;
 
 		/* Gestion du retour accueil */
 		this.element
