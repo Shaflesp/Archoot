@@ -1,4 +1,3 @@
-import type { Socket } from 'socket.io';
 import type { ViewManager } from '../ViewManager.ts';
 import type { View } from './View.ts';
 import { io } from 'socket.io-client';
