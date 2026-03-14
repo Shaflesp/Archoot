@@ -7,14 +7,14 @@ import { CreditsView } from "./screens/CreditsView.ts";
 
 const sm = new ViewManager();
 
-sm.add('home-screen', new HomeView(sm));
-sm.add('game-screen', new GameView(sm));
+const socket = io(window.location.hostname + ':8080');
+
+sm.add('home-screen', new HomeView(sm,socket));
+sm.add('game-screen', new GameView(sm,socket));
 sm.add('leaderboard-screen', new LeaderboardView(sm));
 sm.add('credits-screen', new CreditsView(sm));
 
 sm.show('home-screen');
-
-const socket = io(window.location.hostname + ':8080');
 
 window.addEventListener('keydown', e => {
 	switch (e.key) {
