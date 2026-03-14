@@ -33,16 +33,18 @@
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    /* gap: 50px; */
+    gap: 140px;
     text-align: center;
     margin-top: 140px;
+    margin-right: 30px;
 }
 
 .place {
-    /* font-size: 24px; */
     font-weight: bold;
     color: white;
-    margin-right: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .first {
@@ -51,7 +53,7 @@
 }
 
 .first p {
-    font-size: 3rem;
+    font-size: 2rem;
 }
 
 .second {
@@ -60,7 +62,7 @@
 }
 
 .second p {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
 }
 
 .third {
@@ -69,5 +71,5 @@
 }
 
 .third p {
-    font-size: 2rem;
+    font-size: 1.5rem;
 }
