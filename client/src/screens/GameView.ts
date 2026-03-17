@@ -7,8 +7,8 @@ export class GameView implements View {
 	canvas = this.element.querySelector<HTMLCanvasElement>('.gameCanvas')!;
 	ctx = this.canvas.getContext('2d')!;
 
-	socket:Socket;
-	sm:ViewManager;
+	socket: Socket;
+	sm: ViewManager;
 
 	playerInfo: any = {};
 
@@ -22,7 +22,7 @@ export class GameView implements View {
 			?.addEventListener('click', () => {
 				console.log('Bouton retour cliqué (via Game)');
 
-				socket.emit('player:leave');   
+				socket.emit('player:leave');
 				sm.show('home-screen');
 			});
 	}
@@ -74,6 +74,9 @@ export class GameView implements View {
 			image.src = '/images/cobaye.png';
 
 			this.ctx.drawImage(image, p.x, p.y, 30, 30);
+
+			this.ctx.font = '12px';
+			this.ctx.fillText(p.username, p.x, p.y - 10);
 		}
 	}
 }
