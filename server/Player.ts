@@ -44,6 +44,7 @@ export class Player {
 	getAsJson() {
 		return {
 			identifier: this.identifier,
+			username: this.username,
 			x: this.x,
 			y: this.y,
 		};

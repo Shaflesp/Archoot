@@ -29,7 +29,6 @@ export class HomeView implements View {
 				if (username.length < 2) {
 					return;
 				}
-
 				socket.emit('register', { username });
 			});
 		});

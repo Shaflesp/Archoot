@@ -21,12 +21,14 @@ io.on('connection', socket => {
 
 		if (!username || username.length < 2) {
 			socket.emit('register_error', 'Invalid username.');
+			console.log('length')
 			return;
 		}
 
 		const isTaken = Array.from(players.values()).some(
 			p => p.username === username
 		);
+		console.log('testdupe')
 		if (isTaken) {
 			socket.emit('register_error', 'Username already taken.');
 			return;
