@@ -20,7 +20,9 @@ export class GameView implements View {
 		this.element
 			.querySelector<HTMLAnchorElement>('.back-button')
 			?.addEventListener('click', () => {
-				console.log('Bouton retour cliqué (via Credits)');
+				console.log('Bouton retour cliqué (via Game)');
+
+				socket.emit('player:leave');   
 				sm.show('home-screen');
 			});
 	}

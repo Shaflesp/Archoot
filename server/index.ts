@@ -53,6 +53,14 @@ io.on('connection', socket => {
 		console.log(`${player.username} moved ${direction} → (${player.x}, ${player.y})`);
 	});
 
+	socket.on('player-leave', () => {
+		const player = players.get(socket.id);
+		if (player) {
+			console.log(`${player.username} disconnected.`);
+			players.delete(socket.id);
+		}
+	});
+
 	socket.on('disconnect', () => {
 		const player = players.get(socket.id);
 		if (player) {
