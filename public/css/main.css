@@ -42,7 +42,7 @@ h1 {
 }
 
 .back-button img {
-   width: 100%;
+   width: 65%;
    display: block;
    transition: transform 0.5s ease-in-out;
 }
