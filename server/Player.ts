@@ -14,19 +14,30 @@ export class Player {
 	}
 
 	move(direction: string) {
+		let newx = this.x;
+		let newy = this.y;
+
 		switch (direction) {
 			case 'up':
-				this.y = this.y - this.movementSpeed;
+				newy = this.y - this.movementSpeed;
 				break;
 			case 'down':
-				this.y = this.y + this.movementSpeed;
+				newy = this.y + this.movementSpeed;
 				break;
 			case 'left':
-				this.x = this.x - this.movementSpeed;
+				newx = this.x - this.movementSpeed;
 				break;
 			case 'right':
-				this.x = this.x + this.movementSpeed;
+				newx = this.x + this.movementSpeed;
 				break;
+		}
+
+		if (newx >= 0 && newx <= 470) {
+			this.x = newx;
+		}
+
+		if (newy >= 0 && newy <= 470) {
+			this.y = newy;
 		}
 	}
 
