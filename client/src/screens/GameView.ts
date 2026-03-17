@@ -22,7 +22,7 @@ export class GameView implements View {
 			?.addEventListener('click', () => {
 				console.log('Bouton retour cliqué (via Game)');
 
-				socket.emit('player:leave');
+				socket.emit('player-leave');
 				sm.show('home-screen');
 			});
 	}

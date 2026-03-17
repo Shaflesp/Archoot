@@ -21,14 +21,13 @@ io.on('connection', socket => {
 
 		if (!username || username.length < 2) {
 			socket.emit('register_error', 'Invalid username.');
-			console.log('length')
 			return;
 		}
 
 		const isTaken = Array.from(players.values()).some(
-			p => p.username === username
+			p => p.identifier === socket.id
 		);
-		console.log('testdupe')
+
 		if (isTaken) {
 			socket.emit('register_error', 'Username already taken.');
 			return;
@@ -58,7 +57,7 @@ io.on('connection', socket => {
 	socket.on('player-leave', () => {
 		const player = players.get(socket.id);
 		if (player) {
-			console.log(`${player.username} disconnected.`);
+			console.log(`${player.username} player left the room.`);
 			players.delete(socket.id);
 		}
 	});
