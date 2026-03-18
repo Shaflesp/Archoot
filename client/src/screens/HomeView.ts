@@ -8,7 +8,7 @@ export class HomeView implements View {
 	sm:ViewManager;
 
 	element = document.getElementById('home-screen')!;
-	const pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
+	pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
 
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
@@ -23,7 +23,7 @@ export class HomeView implements View {
 				event.preventDefault();
 
 				
-				const username = pseudoInput.value.trim();
+				const username = this.pseudoInput.value.trim();
 
 				if (username.length < 2) {
 					return;

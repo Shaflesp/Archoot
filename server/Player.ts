@@ -60,6 +60,8 @@ export class Player {
 			username: this.username,
 			x: this.x,
 			y: this.y,
+			width: this.width,
+			height: this.height,
 		};
 	}
 }
