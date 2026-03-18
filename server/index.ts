@@ -25,7 +25,7 @@ io.on('connection', socket => {
 		}
 
 		const isTaken = Array.from(players.values()).some(
-			p => p.identifier === socket.id
+			p => p.username === username
 		);
 
 		if (isTaken) {
@@ -36,47 +36,52 @@ io.on('connection', socket => {
 		players.set(socket.id, new Player(socket.id, username));
 		console.log(`Player registered: ${username} (${socket.id})`);
 		socket.emit('register_success');
+		broadcast();
 	});
 
 	socket.on('keypress', direction => {
-		console.log(`Keypress received: ${direction}`);
-
 		const player = players.get(socket.id);
-		console.log(`Player found: ${!!player}`);
 
 		if (!player) {
-			console.log(`No player for socket: ${socket.id}`);
 			socket.emit('game_error', 'You must register before playing.');
 			return;
 		}
 
+		const prevX = player.x;
+    	const prevY = player.y;
+
 		player.move(direction);
 		console.log(`${player.username} moved ${direction} → (${player.x}, ${player.y})`);
-	});
 
-	socket.on('player-leave', () => {
-		const player = players.get(socket.id);
-		if (player) {
-			console.log(`${player.username} player left the room.`);
-			players.delete(socket.id);
+		const collides = Array.from(players.values()).some(
+			other => other.identifier !== player.identifier && player.collidesWith(other)
+		);
+	
+		if (collides) {
+			player.x = prevX;
+			player.y = prevY;
+		}
+
+		if (player.x !== prevX || player.y !== prevY) {
+			broadcast();
 		}
 	});
 
-	socket.on('disconnect', () => {
-		const player = players.get(socket.id);
+	function removePlayer(socketId: string) {
+		const player = players.get(socketId);
 		if (player) {
-			console.log(`${player.username} disconnected.`);
-			players.delete(socket.id);
+			console.log(`${player.username} left.`);
+			players.delete(socketId);
+			broadcast();
 		}
-	});
+	}
+
+	socket.on('player-leave', () => removePlayer(socket.id));
+	socket.on('disconnect', () => removePlayer(socket.id));
 });
 
-setInterval(() => {
-	const playerInfo: any = {};
-
-	players.forEach(p => {
-		playerInfo[p.identifier] = p.getAsJson();
-	});
-
-	io.emit('playerInfo', playerInfo);
-}, 1000 / 120);
+function broadcast() {
+    const playerInfo: Map<string, object> = new Map();
+    players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
+    io.emit('playerInfo', Object.fromEntries(playerInfo));
+}

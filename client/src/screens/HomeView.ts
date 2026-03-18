@@ -1,6 +1,6 @@
 import type { ViewManager } from '../ViewManager.ts';
 import type { View } from './View.ts';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 export class HomeView implements View {
 
@@ -8,6 +8,7 @@ export class HomeView implements View {
 	sm:ViewManager;
 
 	element = document.getElementById('home-screen')!;
+	const pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
 
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
@@ -21,9 +22,7 @@ export class HomeView implements View {
 			btn.addEventListener('click', (event: MouseEvent) => {
 				event.preventDefault();
 
-				const pseudoInput = document.getElementById(
-					'pseudo'
-				) as HTMLInputElement;
+				
 				const username = pseudoInput.value.trim();
 
 				if (username.length < 2) {
@@ -33,13 +32,6 @@ export class HomeView implements View {
 			});
 		});
 
-		this.socket.on('register_success', () => {
-			this.sm.show('game-screen');
-		});
-
-		this.socket.on('register_error', (message: string) => {
-			console.error('Registration failed:', message);
-		});
 
 		/* Gestion du bouton crédits */
 		const buttonCredits =
@@ -63,9 +55,21 @@ export class HomeView implements View {
 
 	show(): void {
 		this.element.style.display = 'flex';
+		this.socket.on('register_success', this.onRegisterSuccess);
+    	this.socket.on('register_error', this.onRegisterError);
 	}
 
 	hide(): void {
 		this.element.style.display = 'none';
+		this.socket.off('register_success', this.onRegisterSuccess);
+    	this.socket.off('register_error', this.onRegisterError);
 	}
+
+	private onRegisterSuccess = () => {
+		this.sm.show('game-screen');
+	};
+	
+	private onRegisterError = (message: string) => {
+		console.error('Registration failed:', message);
+	};
 }

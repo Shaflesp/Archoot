@@ -2,6 +2,8 @@ export class Player {
 	movementSpeed: number;
 	x: number;
 	y: number;
+	width: number;
+    height: number;
 	username: string;
 	identifier: string;
 
@@ -9,6 +11,8 @@ export class Player {
 		this.movementSpeed = 5;
 		this.x = 0;
 		this.y = 0;
+		this.width = 30; //a ajuster selon la taille que l'on veut pour la hitbox
+        this.height = 30; //Pour le moment j'ai mis pareil que le sprite (voir GameView)
 		this.username = username ? username : 'placeholder';
 		this.identifier = id;
 	}
@@ -40,6 +44,15 @@ export class Player {
 			this.y = newy;
 		}
 	}
+
+	collidesWith(other: Player): boolean {
+        return (
+            this.x < other.x + other.width &&
+            this.x + this.width > other.x &&
+            this.y < other.y + other.height &&
+            this.y + this.height > other.y
+        );
+    }
 
 	getAsJson() {
 		return {
