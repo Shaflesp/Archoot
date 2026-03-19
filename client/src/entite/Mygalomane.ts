@@ -1,6 +1,6 @@
 import type { Entite } from "./Entite";
 
-export default class Darognee implements Entite{
+export default class Mygalomane implements Entite{
     identifier: string=""; 
     username:string="Darognée";
     x: number=900
