@@ -1,12 +1,17 @@
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
-import { Player } from './Player.ts'
+import { Player } from './Entity/Player.ts'
+import { BulletPool } from './Entity/Bullet.ts';
 
 const httpServer = http.createServer((_req, res) => {
 	res.statusCode = 200;
 });
 
+const boundWidth: number = 1680;
+const boundHeight: number = 800;
+
 const players = new Map<string, Player>();
+const bulletPool = new BulletPool(100, boundWidth, boundHeight);
 
 const port = 8080;
 httpServer.listen(port, () => {
@@ -33,7 +38,7 @@ io.on('connection', socket => {
 			return;
 		}
 
-		players.set(socket.id, new Player(socket.id, username));
+		players.set(socket.id, new Player(socket.id, username, boundWidth, boundHeight));
 		console.log(`Player registered: ${username} (${socket.id})`);
 		socket.emit('register_success');
 		broadcast();
@@ -67,6 +72,25 @@ io.on('connection', socket => {
 		}
 	});
 
+	socket.on('shoot', (data: { dx: number; dy: number }) => {
+		const player = players.get(socket.id);
+		if (!player) return;
+
+		const bullet = bulletPool.acquire();
+		if (!bullet) return;
+
+		bullet.fire(
+			player.x + player.width / 2,
+			player.y + player.height / 2,
+			data.dx,
+			data.dy,
+			player.identifier
+		);
+
+		broadcast();
+	});
+
+
 	function removePlayer(socketId: string) {
 		const player = players.get(socketId);
 		if (player) {
@@ -83,5 +107,25 @@ io.on('connection', socket => {
 function broadcast() {
     const playerInfo: Map<string, object> = new Map();
     players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
-    io.emit('playerInfo', Object.fromEntries(playerInfo));
+    io.emit('playerInfo', {
+			players: Object.fromEntries(playerInfo),
+			bullets: bulletPool.getActive().map(b => b.getAsJson()),
+		});
 }
+
+setInterval(() => {
+	bulletPool.updateAll();
+
+	bulletPool.getActive().forEach(bullet => {
+		players.forEach(player => {
+			if (player.identifier === bullet.ownerId) return;
+			if (player.collidesWith(bullet)) {
+				bullet.active = false;
+			}
+		});
+	});
+
+	if (bulletPool.getActive().length > 0) {
+		broadcast();
+	}
+}, 1000 / 60);
