@@ -114,18 +114,23 @@ function broadcast() {
 }
 
 setInterval(() => {
+	const activeBefore = bulletPool.getActive().length;
+
 	bulletPool.updateAll();
+
+	let changed = activeBefore !== bulletPool.getActive().length;
 
 	bulletPool.getActive().forEach(bullet => {
 		players.forEach(player => {
 			if (player.identifier === bullet.ownerId) return;
 			if (player.collidesWith(bullet)) {
 				bullet.active = false;
+				changed = true;
 			}
 		});
 	});
 
-	if (bulletPool.getActive().length > 0) {
+	if (changed) {
 		broadcast();
 	}
 }, 1000 / 60);

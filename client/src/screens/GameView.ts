@@ -138,9 +138,6 @@ export class GameView extends CanvasView implements View{
 
 		this.bulletInfo.forEach((b: BulletData) => {
 			this.ctx.drawImage(this.bulletImage, b.x, b.y, b.width, b.height);
-			this.ctx.beginPath();
-			this.ctx.arc(b.x, b.y, 5, 0, Math.PI * 2);
-			this.ctx.fill();
 		});
 	}
 }
