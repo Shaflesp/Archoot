@@ -3,6 +3,7 @@
     text-align:center;
     position: relative;
     display: none;
+    box-sizing: border-box;
 }
 
 .logo-credits {
@@ -20,6 +21,9 @@
     top: 50%;
     left:50%;
     z-index: 1; /* pour mettre derrière le texte de nos crédits (les class personnes) */
+    max-width: 90%; 
+    max-height: 90%;
+    object-fit: contain;
 }
 
 .credits-content {
