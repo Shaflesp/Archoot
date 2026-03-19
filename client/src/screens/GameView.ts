@@ -75,15 +75,19 @@ export class GameView extends CanvasView implements View{
 	private onKeyDown = (e: KeyboardEvent) => {
 		switch (e.key) {
 			case 'ArrowUp':
+				case 'z':
 				this.socket.emit('keypress', 'up');
 				break;
 			case 'ArrowDown':
+				case 's':
 				this.socket.emit('keypress', 'down');
 				break;
 			case 'ArrowLeft':
+				case 'q': 
 				this.socket.emit('keypress', 'left');
 				break;
 			case 'ArrowRight':
+				case 'd': 
 				this.socket.emit('keypress', 'right');
 				break;
 		}
