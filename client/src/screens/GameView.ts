@@ -20,15 +20,34 @@ interface BulletData {
 	active: boolean;
 }
 
+interface EnemyData {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    speed: number;
+	imageIndex: number;
+}
+
 export class GameView extends CanvasView implements View{
 	socket: Socket;
 	sm: ViewManager;
 
 	playerInfo: Map<string, PlayerData> = new Map();
 	bulletInfo: Array<BulletData> = [];
+	enemies: EnemyData[] = [];
+
 
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
+	private enemyImages: HTMLImageElement[] = [];
+
+	private readonly enemySrcs: string[] = [
+		'/images/sprites/pie.gif',
+		'/images/sprites/galinette.png',
+		'/images/sprites/spider1.png',
+		'/images/sprites/spider2.png'
+	];
 
 	private running: boolean = false;
 
@@ -44,6 +63,12 @@ export class GameView extends CanvasView implements View{
 		this.bulletImage = new Image();
 		this.bulletImage.src = '/images/Arrow.png';
 
+		this.enemySrcs.forEach(src => {
+			const img = new Image();
+			img.src = src;
+			this.enemyImages.push(img);
+		});
+
 		/* Gestion du retour accueil */
 		this.element
 			.querySelector<HTMLAnchorElement>('.back-button')
@@ -53,7 +78,22 @@ export class GameView extends CanvasView implements View{
 				socket.emit('player-leave');
 				sm.show('home-screen');
 			});
+			setInterval(() => {
+				if (this.running) this.spawnEnemy();
+			}, 1500);
 	}
+
+	private spawnEnemy() {
+		const randomImageIndex = Math.floor(Math.random() * this.enemyImages.length);
+        this.enemies.push({
+            x: this.canvas.width,
+            y: Math.random() * (this.canvas.height - 60),
+            width: 50,
+            height: 50,
+            speed: 3 + Math.random() * 4,
+			imageIndex: randomImageIndex,
+        });
+    }
 
 	show(): void {
 		this.element.style.display = 'flex';
@@ -133,6 +173,15 @@ export class GameView extends CanvasView implements View{
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		if (!this.playerImage.complete) return;
+
+		this.enemies.forEach((en, index) => {
+			en.x -= en.speed;
+			const img = this.enemyImages[en.imageIndex];
+			this.ctx.drawImage(img, en.x, en.y, en.width, en.height);
+			if (en.x + en.width < 0) {
+				this.enemies.splice(index, 1);
+			}
+		});
 
 		this.playerInfo.forEach((p: PlayerData) => {
 			this.ctx.drawImage(this.playerImage, p.x, p.y, p.width, p.height);
