@@ -1,76 +1,32 @@
-// import Entite from "./Entite";
-//
-// export default class RucheHour extends Entite {
-//     identifier: string;
-//     username: string;
-//     x: number;
-//     y: number;
-//     movementSpeed: number;
-//     health: number;
-//     damage: number;
-//     shootSpeed: number;
-//
-//     constructor(){
-//         this.identifier="";
-//         this.username="Ruche Hour";
-//         this.x=900;
-//         this.y=400;
-//         this.movementSpeed=3;
-//         this.health=25;
-//         this.damage=1;
-//         this.shootSpeed=4;
-//     }
-//
-//     move(direction: string): void {
-//         let newx = this.x;
-// 		let newy = this.y;
-//
-// 		switch (direction) {
-// 			case 'up':
-// 				newy = this.y - this.movementSpeed;
-// 				break;
-// 			case 'down':
-// 				newy = this.y + this.movementSpeed;
-// 				break;
-// 			case 'left':
-// 				newx = this.x - this.movementSpeed;
-// 				break;
-// 			case 'right':
-// 				newx = this.x + this.movementSpeed;
-// 				break;
-// 		}
-// 		if (newx >= 0 && newx <= 470) {
-// 			this.x = newx;
-// 		}
-//
-// 		if (newy >= 0 && newy <= 470) {
-// 			this.y = newy;
-// 		}
-//     }
-//
-//     getAsJson(): string {
-//         return {
-//             identifier
-//         }
-//     }
-//     takeDamage(): void {
-//         throw new Error("Method not implemented.");
-//     }
-//     healing(heart: number): void {
-//         throw new Error("Method not implemented.");
-//     }
-//     changeShootSpeed(newSpeed: number): void {
-//         throw new Error("Method not implemented.");
-//     }
-//     changeMovementSpeed(speedBonus: number): void {
-//         throw new Error("Method not implemented.");
-//     }
-//     changeDamage(damageBonus: number): void {
-//         throw new Error("Method not implemented.");
-//     }
-//
-//     toString(): string {
-//
-//     }
-//
-// }
+import { IEntite } from "./IEntite";
+
+export default class RucheHour implements IEntite {
+    identifier: string = ""; // à remplir
+    username: string = "Ruche Hour";
+    x: number = 900;
+    y: number = 400;
+    movementSpeed: number = 3;
+    health: number = 30;
+    damage: number = 1;
+    shootSpeed: number = 4;
+
+    move(): void {
+       // à remplir
+    }
+    takeDamage(amount: number): void {
+        this.health -= amount;
+        if (this.health < 0) this.health = 0; // à modif pour display le mob + compter points 
+    }
+
+    getAsJson(): string {
+        return JSON.stringify({
+            id: this.identifier,
+            name: this.username,
+            pos: { x: this.x, y: this.y },
+            hp: this.health
+        });
+    }
+    toString(): string {
+        return `${this.username} [HP: ${this.health}] is at ${this.x},${this.y}`;
+    }
+}
