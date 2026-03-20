@@ -1,6 +1,6 @@
 import type { Entite } from "./Entite";
 
-export default class Spider implements Entite {
+export default class Galinette implements Entite {
     width: number= 50;
     height: number= 50;
     speed: number = 2;

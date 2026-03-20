@@ -2,7 +2,7 @@ import http from 'http';
 import { Server as IOServer } from 'socket.io';
 import { Player } from './Entity/Player.ts'
 import { BulletPool } from './Entity/Bullet.ts';
-import spider from '../client/src/entite/spider.ts';
+import Spider from '../client/src/entite/spider.ts';
 import pie from '../client/src/entite/pie.ts';
 import galinette from '../client/src/entite/galinette.ts';
 import type { Entite } from '../client/src/entite/Entite.ts';
@@ -17,7 +17,7 @@ const boundHeight: number = 800;
 const players = new Map<string, Player>();
 const bulletPool = new BulletPool(100, boundWidth, boundHeight);
 
-const mobsTypes = [spider, pie, galinette];
+const mobsTypes = ['spider', 'pie', 'galinette'];
 const mobsList:Entite[] = [];
 
 const port = 8080;
@@ -145,8 +145,15 @@ setInterval(() => {
 function spawnMobs(){
 	const randomMobs = Math.floor(Math.random()*mobsTypes.length);
 
-	case 
-
-	const mob:Entite = new randomMobs(); 
-	mobsList.push(mob); 
+	switch(mobsTypes[randomMobs]){
+		case 'spider':
+			mobsList.push(new Spider()); 
+		case 'pie':
+			mobsList.push(new pie());
+		case 'galinette':
+			mobsList.push(new galinette());
+		default:
+			mobsList.push(new Spider());
+	} 
 }
+setInterval(spawnMobs, 2000); 
