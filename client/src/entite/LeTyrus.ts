@@ -1,6 +1,9 @@
 import type { Entite } from "./Entite";
 
 export default class LeTyrus implements Entite{
+    width: number = 50;
+    height: number = 50;
+    speed: number = 1;
     identifier: string=""; 
     username:string="Le Tyrus";
     x: number=900
@@ -11,7 +14,7 @@ export default class LeTyrus implements Entite{
     shootSpeed: number=3;
 
     move(): void {
-        
+        this.x-=this.speed;
     }
     
     takeDamage(amount: number): void {

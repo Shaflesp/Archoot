@@ -8,6 +8,7 @@ export interface Entite {
     health: number;
     damage: number;
     shootSpeed: number;
+    speed:number;
 
     move(): void;
     getAsJson(): string;

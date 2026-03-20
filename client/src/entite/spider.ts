@@ -1,4 +1,3 @@
-import { flushCompileCache } from "module";
 import type { Entite } from "./Entite";
 
 export default class Spider implements Entite {
@@ -11,10 +10,9 @@ export default class Spider implements Entite {
     damage: number = 1;
     shootSpeed: number = 0;
     climb:boolean=false; // à modifier 
-
-    constructor(){
-        // mettre en place un random pour mettre 1 des 4 araignées dans img
-    }
+    width: number = 50;
+    height: number = 50;
+    speed: number = 0;
 
     move(): void {
                 if(!this.climb){

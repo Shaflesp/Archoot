@@ -1,6 +1,7 @@
 import type { Entite } from "./Entite";
 
 export default class RucheHour implements Entite {
+    speed: number = 0;
     width: number=100;
     height: number=100;
     identifier: string = ""; // à remplir
@@ -13,7 +14,7 @@ export default class RucheHour implements Entite {
     shootSpeed: number = 4;
 
     move(): void {
-       // à remplir
+        this.x-=this.speed;
     }
     takeDamage(amount: number): void {
         this.health -= amount;

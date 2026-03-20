@@ -1,6 +1,9 @@
 import type { Entite } from "./Entite";
 
 export default class Spider implements Entite {
+    width: number = 50;
+    height: number = 50;
+    speed: number = 1;
     identifier: string = "";
     username: string = "pie";
     x: number = 0;
@@ -10,7 +13,9 @@ export default class Spider implements Entite {
     damage: number = 1;
     shootSpeed: number = 0; // à modifier 
 
-    move(): void {}
+    move(): void {
+        this.x-=this.speed;
+    }
     takeDamage(amount: number): void { this.health -= amount; }
     
     getAsJson(): string {         
