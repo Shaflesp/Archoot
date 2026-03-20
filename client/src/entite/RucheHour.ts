@@ -1,6 +1,8 @@
-import { IEntite } from "./IEntite";
+import type { Entite } from "./Entite";
 
-export default class RucheHour implements IEntite {
+export default class RucheHour implements Entite {
+    width: number=100;
+    height: number=100;
     identifier: string = ""; // à remplir
     username: string = "Ruche Hour";
     x: number = 900;

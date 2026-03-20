@@ -2,6 +2,8 @@ export interface Entite {
     identifier: string;
     x: number;
     y: number;
+    width:number;
+    height:number;
     movementSpeed: number;
     health: number;
     damage: number;
