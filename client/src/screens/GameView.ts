@@ -9,6 +9,7 @@ interface PlayerData {
     y: number;
     width: number;
     height: number;
+	lives : number;
 }
 
 interface BulletData {
@@ -42,6 +43,7 @@ export class GameView extends CanvasView implements View{
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
+	private coeurImage: HTMLImageElement;
 
 	private readonly mobsSrcs: string[] = [
 		'/images/sprites/pie.gif',
@@ -60,6 +62,9 @@ export class GameView extends CanvasView implements View{
 
 		this.playerImage = new Image();
 		this.playerImage.src = '/images/cobaye.png';
+
+		this.coeurImage = new Image();
+        this.coeurImage.src = '/images/coeur.png';
 
 		this.bulletImage = new Image();
 		this.bulletImage.src = '/images/Arrow.png';
@@ -190,6 +195,9 @@ export class GameView extends CanvasView implements View{
 			this.ctx.drawImage(this.playerImage, p.x, p.y, p.width, p.height);
 			this.ctx.font = '12px Arial';
 			this.ctx.fillText(p.username, p.x, p.y - 10);
+			for(let i = 0; i < 3 /*à changer plus tard*/ ; i++ ){
+                this.ctx.drawImage(this.coeurImage, this.canvas.width-40-(i*40), 0, 40, 40);
+			}
 		});
 
 		this.bulletInfo.forEach((b: BulletData) => {
