@@ -10,10 +10,6 @@ export default class Spider implements Entite {
     damage: number = 1;
     shootSpeed: number = 0; // à modifier 
 
-    constructor(){
-        // mettre en place un random pour mettre 1 des 4 araignées dans img
-    }
-
     move(): void {}
     takeDamage(amount: number): void { this.health -= amount; }
     

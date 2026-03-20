@@ -2,6 +2,10 @@ import http from 'http';
 import { Server as IOServer } from 'socket.io';
 import { Player } from './Entity/Player.ts'
 import { BulletPool } from './Entity/Bullet.ts';
+import spider from '../client/src/entite/spider.ts';
+import pie from '../client/src/entite/pie.ts';
+import galinette from '../client/src/entite/galinette.ts';
+import type { Entite } from '../client/src/entite/Entite.ts';
 
 const httpServer = http.createServer((_req, res) => {
 	res.statusCode = 200;
@@ -12,6 +16,9 @@ const boundHeight: number = 800;
 
 const players = new Map<string, Player>();
 const bulletPool = new BulletPool(100, boundWidth, boundHeight);
+
+const mobsTypes = [spider, pie, galinette];
+const mobsList:Entite[] = [];
 
 const port = 8080;
 httpServer.listen(port, () => {
@@ -134,3 +141,12 @@ setInterval(() => {
 		broadcast();
 	}
 }, 1000 / 60);
+
+function spawnMobs(){
+	const randomMobs = Math.floor(Math.random()*mobsTypes.length);
+
+	case 
+
+	const mob:Entite = new randomMobs(); 
+	mobsList.push(mob); 
+}
