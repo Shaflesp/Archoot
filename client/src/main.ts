@@ -4,6 +4,7 @@ import { HomeView } from './screens/HomeView.ts';
 import { GameView } from './screens/GameView.ts';
 import { LeaderboardView } from './screens/LeaderboardView.ts';
 import { CreditsView } from './screens/CreditsView.ts';
+import { RoomsView } from './screens/RoomsView.ts';
 
 const sm = new ViewManager();
 
@@ -13,5 +14,6 @@ sm.add('home-screen', new HomeView(sm, socket));
 sm.add('game-screen', new GameView(sm, socket));
 sm.add('leaderboard-screen', new LeaderboardView(sm));
 sm.add('credits-screen', new CreditsView(sm));
+sm.add('search-room', new RoomsView(sm, socket));
 
 sm.show('home-screen');

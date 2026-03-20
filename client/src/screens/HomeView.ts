@@ -16,21 +16,29 @@ export class HomeView implements View {
 		this.sm = sm;
 
 		/* Gestion des boutons de jeu (solo/multi) */
-		const buttonsPlay =
-			this.element.querySelectorAll<HTMLAnchorElement>('.play-button');
+		const buttonSingleplayer =
+			this.element.querySelector<HTMLElement>('.play-button-solo')!;
 
-		buttonsPlay.forEach((btn: HTMLAnchorElement) => {
-			btn.addEventListener('click', (event: MouseEvent) => {
-				event.preventDefault();
+		buttonSingleplayer.addEventListener('click', (event: MouseEvent) => {
+			event.preventDefault();
 
-				const username = this.pseudoInput.value.trim();
+			const username = this.pseudoInput.value.trim();
 
-				if (username.length < 2) {
-					this.usernamePopup.show();
-					return;
-				}
-				socket.emit('register', { username });
-			});
+			if (username.length < 2) {
+				this.usernamePopup.show();
+				return;
+			}
+
+			socket.emit('register', { username });
+		});
+
+		const buttonMultiplayer =
+			this.element.querySelector<HTMLElement>('.play-button-multi')!;
+
+		buttonMultiplayer.addEventListener('click', event => {
+			event.preventDefault();
+
+			sm.show('search-room');
 		});
 
 		/* Gestion du bouton crédits */
