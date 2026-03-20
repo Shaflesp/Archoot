@@ -1,6 +1,7 @@
 import type { ViewManager } from '../ViewManager.ts';
 import type { View } from './View.ts';
 import type { Socket } from 'socket.io-client';
+import { Popup } from './Popup.ts';
 
 export class HomeView implements View {
 	socket: Socket;
@@ -8,6 +9,7 @@ export class HomeView implements View {
 
 	element = document.getElementById('home-screen')!;
 	pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
+	usernamePopup = new Popup('.username');
 
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
@@ -24,7 +26,7 @@ export class HomeView implements View {
 				const username = this.pseudoInput.value.trim();
 
 				if (username.length < 2) {
-					alert('Votre pseudonyme est trop court!');
+					this.usernamePopup.show();
 					return;
 				}
 				socket.emit('register', { username });
