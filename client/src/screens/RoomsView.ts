@@ -13,6 +13,8 @@ export class RoomsView implements View {
 	usernamePopup = new Popup('.username');
 	roomListHtml = document.querySelector<HTMLElement>('.room-list')!;
 
+	searchInput = document.querySelector('.search-room')!;
+
 	roomList: Room[] = [];
 
 	constructor(sm: ViewManager, socket: Socket) {
