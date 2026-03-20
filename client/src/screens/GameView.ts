@@ -22,12 +22,13 @@ interface BulletData {
 }
 
 interface MobsData {
+	name:string;
     x: number;
     y: number;
     width: number;
     height: number;
     speed: number;
-	imageIndex: number;
+	// image: HTMLImageElement;
 }
 
 export class GameView extends CanvasView implements View{
@@ -47,7 +48,9 @@ export class GameView extends CanvasView implements View{
 		'/images/sprites/pie.gif',
 		'/images/sprites/galinette.png',
 		'/images/sprites/spider1.png',
-		'/images/sprites/spider2.png'
+		'/images/sprites/spider2.png',
+		'/images/sprites/spider3.png',
+		'/images/sprites/spider4.png'
 	];
 
 	private running: boolean = false;
@@ -158,9 +161,22 @@ export class GameView extends CanvasView implements View{
 	};
 
 	private onMobsInfo = (info: { mobs: Array<MobsData> }) => {
-		console.log('infos mobs : ', info.mobs );
 		this.mobsInfo = info.mobs;
 	};
+
+	private getMobImage(name:string):HTMLImageElement {
+		switch (name) {
+			case 'pie':
+				return this.mobsImages[0];
+			case 'galinette cendrée':
+				return this.mobsImages[1];
+			case 'spider':
+				const index = Math.random() * (5-2)+2;
+				return this.mobsImages[index];
+			default:
+				return this.mobsImages[3];
+		}
+	}
 
 	private gameLoop = () => {
 		if (!this.running) return;
@@ -174,7 +190,7 @@ export class GameView extends CanvasView implements View{
 		if (!this.playerImage.complete) return;
 
 		this.mobsInfo.forEach((m: MobsData) => {
-			this.ctx.drawImage(this.mobsImages[0], m.x, m.y,m.width ,m.height);
+			this.ctx.drawImage(this.getMobImage(m.name), m.x, m.y,m.width ,m.height);
 		});
 
 		this.playerInfo.forEach((p: PlayerData) => {

@@ -5,8 +5,8 @@ export default class Galinette implements Entite {
     height: number= 50;
     speed: number = 2;
     name: string = "galinette cendrée";
-    x: number = 1600;
-    y: number = Math.random()*600;
+    x: number = 1680;
+    y: number = Math.random()*800;
     movementSpeed: number = 2;
     health: number = 5;
     damage: number = 1;

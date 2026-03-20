@@ -5,8 +5,8 @@ export default class Pie implements Entite {
     height: number = 50;
     speed: number = 1;
     name: string = "pie";
-    x: number = 0;
-    y: number = 0;
+    x: number = Math.random()*1600;
+    y: number = Math.random()*700;
     movementSpeed: number = 2;
     health: number = 5;
     damage: number = 1;
