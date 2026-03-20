@@ -170,8 +170,8 @@ export class GameView extends CanvasView implements View{
 				return this.mobsImages[0];
 			case 'galinette cendrée':
 				return this.mobsImages[1];
-			case 'spider':
-				const index = Math.random() * (5-2)+2;
+			case 'araignée':
+				const index = Math.floor(Math.random() * (5-2)+3);
 				return this.mobsImages[index];
 			default:
 				return this.mobsImages[3];
