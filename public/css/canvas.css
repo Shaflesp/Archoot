@@ -1,4 +1,7 @@
 .gameCanvas {
-    background-color: lightgray;
     border: 3px solid gray;
+    box-sizing: border-box;
+    width: 80%;
+    height: 80%;
+    box-shadow: 6px 6px 25px rgba(0, 0, 0, 0.5);
 }
