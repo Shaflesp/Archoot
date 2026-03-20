@@ -37,8 +37,6 @@ export class GameView extends CanvasView implements View{
 	playerInfo: Map<string, PlayerData> = new Map();
 	bulletInfo: Array<BulletData> = [];
 	mobsInfo:Array<MobsData> = [];
-	// enemies: EnemyData[] = [];
-
 
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
@@ -88,18 +86,6 @@ export class GameView extends CanvasView implements View{
 			// 	if (this.running) this.spawnMobs();
 			// }, 1500);
 	}
-
-	// private spawnEnemy() {
-	// 	const randomImageIndex = Math.floor(Math.random() * this.enemyImages.length);
-    //     this.enemies.push({
-    //         x: this.canvas.width,
-    //         y: Math.random() * (this.canvas.height - 60),
-    //         width: 50,
-    //         height: 50,
-    //         speed: 3 + Math.random() * 4,
-	// 		imageIndex: randomImageIndex,
-    //     });
-    // }
 
 	show(): void {
 		this.element.style.display = 'flex';

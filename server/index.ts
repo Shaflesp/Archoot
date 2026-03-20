@@ -170,8 +170,12 @@ function broadcastMob(){
 }
 
 setInterval(() => {
-    mobsList.forEach(m => {
-        if (typeof m.move === 'function') m.move();
-    });
-    broadcastMob();
+    spawnMobs();
 }, 2000); 
+
+setInterval(() => {
+    if (mobsList.length > 0) {
+        mobsList.forEach(m => m.move());
+        broadcastMob();
+    }
+}, 1000 / 60);
