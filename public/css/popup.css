@@ -1,0 +1,38 @@
+.popup {
+    position:fixed;
+    display:flex;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: -1;
+    backdrop-filter: blur(10px);
+
+    &.visible {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn .3s cubic-bezier(0.19, 1, 0.22, 1);
+        animation-fill-mode: both;
+    }
+
+    .popupContent {
+        animation: slideUp .4s cubic-bezier(0.19, 1, 0.22, 1);
+        animation-fill-mode: both;
+        background: white;
+        border-radius: 4px;
+        color: black;
+        margin: 0 100px;
+        max-width: 500px;
+        position: relative;
+        padding: 10px 50px 20px;
+
+        .closeButton {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            padding: 10px;
+            border-style: outset;
+        }
+    }
+}

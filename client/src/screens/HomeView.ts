@@ -3,9 +3,8 @@ import type { View } from './View.ts';
 import type { Socket } from 'socket.io-client';
 
 export class HomeView implements View {
-
-	socket:Socket;
-	sm:ViewManager;
+	socket: Socket;
+	sm: ViewManager;
 
 	element = document.getElementById('home-screen')!;
 	pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
@@ -22,16 +21,15 @@ export class HomeView implements View {
 			btn.addEventListener('click', (event: MouseEvent) => {
 				event.preventDefault();
 
-				
 				const username = this.pseudoInput.value.trim();
 
 				if (username.length < 2) {
+					alert('Votre pseudonyme est trop court!');
 					return;
 				}
 				socket.emit('register', { username });
 			});
 		});
-
 
 		/* Gestion du bouton crédits */
 		const buttonCredits =
@@ -56,19 +54,19 @@ export class HomeView implements View {
 	show(): void {
 		this.element.style.display = 'flex';
 		this.socket.on('register_success', this.onRegisterSuccess);
-    	this.socket.on('register_error', this.onRegisterError);
+		this.socket.on('register_error', this.onRegisterError);
 	}
 
 	hide(): void {
 		this.element.style.display = 'none';
 		this.socket.off('register_success', this.onRegisterSuccess);
-    	this.socket.off('register_error', this.onRegisterError);
+		this.socket.off('register_error', this.onRegisterError);
 	}
 
 	private onRegisterSuccess = () => {
 		this.sm.show('game-screen');
 	};
-	
+
 	private onRegisterError = (message: string) => {
 		console.error('Registration failed:', message);
 	};
