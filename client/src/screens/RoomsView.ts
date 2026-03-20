@@ -21,7 +21,7 @@ export class RoomsView implements View {
 
 		const lambdaRoom: Room = {
 			capacityMax: 1,
-			currentPlayers: 0,
+			currentPlayers: 1,
 			roomName: 'test',
 			roomId: 1,
 		};
@@ -54,6 +54,7 @@ export class RoomsView implements View {
 
 		if (room.currentPlayers >= room.capacityMax) {
 			button = `<button type="button" disabled>Rejoindre</button>`;
+			console.log(`Room ${room.roomId} (${room.roomName}) is full.`);
 		}
 		button = `<button type="button">Rejoindre</button>`;
 
