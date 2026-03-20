@@ -2,6 +2,7 @@ import type { ViewManager } from '../ViewManager.ts';
 import type { View } from './View.ts';
 import type { Socket } from 'socket.io-client';
 import { Popup } from './Popup.ts';
+import type { Room } from './Room.ts';
 
 export class RoomsView implements View {
 	socket: Socket;
@@ -10,29 +11,68 @@ export class RoomsView implements View {
 	element = document.getElementById('room-select-screen')!;
 	pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
 	usernamePopup = new Popup('.username');
+	roomListHtml = document.querySelector<HTMLElement>('.room-list')!;
+
+	roomList: Room[] = [];
 
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
 		this.sm = sm;
+
+		const lambdaRoom: Room = {
+			capacityMax: 1,
+			currentPlayers: 0,
+			roomName: 'test',
+			roomId: 1,
+		};
+
+		this.roomList.push(lambdaRoom);
+
+		this.fillRooms();
+
+		socket.on('update-rooms', data => {
+			this.roomList = data.rooms;
+			this.fillRooms();
+		});
 	}
 
 	show(): void {
 		this.element.style.display = 'flex';
-		this.socket.on('register_success', this.onRegisterSuccess);
-		this.socket.on('register_error', this.onRegisterError);
+	}
+
+	clearRooms(): void {
+		this.roomListHtml.innerHTML =
+			'<tr>' +
+			'<th>Nom de salle</th>' +
+			'<th>Capacité</th>' +
+			'<th>Rejoindre</th>' +
+			'</tr>';
+	}
+
+	roomToHtml(room: Room): string {
+		let button = '';
+
+		if (room.currentPlayers >= room.capacityMax) {
+			button = `<button type="button" disabled>Rejoindre</button>`;
+		}
+		button = `<button type="button">Rejoindre</button>`;
+
+		return (
+			`<tr>` +
+			`<td>${room.roomName}</td>` +
+			`<td>${room.currentPlayers}/${room.capacityMax}</td>` +
+			`<th>${button}</th>` +
+			`</tr>`
+		);
+	}
+
+	fillRooms() {
+		this.roomList.forEach(room => {
+			this.roomListHtml.innerHTML += this.roomToHtml(room);
+		});
 	}
 
 	hide(): void {
 		this.element.style.display = 'none';
-		this.socket.off('register_success', this.onRegisterSuccess);
-		this.socket.off('register_error', this.onRegisterError);
 	}
-
-	private onRegisterSuccess = () => {
-		this.sm.show('game-screen');
-	};
-
-	private onRegisterError = (message: string) => {
-		console.error('Registration failed:', message);
-	};
 }
