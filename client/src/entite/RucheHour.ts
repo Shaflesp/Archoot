@@ -4,8 +4,7 @@ export default class RucheHour implements Entite {
     speed: number = 0;
     width: number=100;
     height: number=100;
-    identifier: string = ""; // à remplir
-    username: string = "Ruche Hour";
+    name: string = "Ruche Hour";
     x: number = 900;
     y: number = 400;
     movementSpeed: number = 3;
@@ -21,15 +20,16 @@ export default class RucheHour implements Entite {
         if (this.health < 0) this.health = 0; // à modif pour display le mob + compter points 
     }
 
-    getAsJson(): string {
-        return JSON.stringify({
-            id: this.identifier,
-            name: this.username,
-            pos: { x: this.x, y: this.y },
-            hp: this.health
-        });
+    getAsJson() {
+       return {
+			name: this.name,
+			x: this.x,
+			y: this.y,
+			width: this.width,
+			height: this.height,
+		};
     }
     toString(): string {
-        return `${this.username} [HP: ${this.health}] is at ${this.x},${this.y}`;
+        return `${this.name} [HP: ${this.health}] is at ${this.x},${this.y}`;
     }
 }

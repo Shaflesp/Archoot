@@ -1,5 +1,5 @@
 export interface Entite {
-    identifier: string;
+    name: string;
     x: number;
     y: number;
     width:number;
@@ -11,7 +11,7 @@ export interface Entite {
     speed:number;
 
     move(): void;
-    getAsJson(): string;
+    getAsJson():any;
     takeDamage(amount: number): void;
     // healing(heart: number): void;
     // changeShootSpeed(newSpeed: number): void;

@@ -3,8 +3,8 @@ import { Server as IOServer } from 'socket.io';
 import { Player } from './Entity/Player.ts'
 import { BulletPool } from './Entity/Bullet.ts';
 import Spider from '../client/src/entite/spider.ts';
-import pie from '../client/src/entite/pie.ts';
-import galinette from '../client/src/entite/galinette.ts';
+import Pie from '../client/src/entite/pie.ts';
+import Galinette from '../client/src/entite/galinette.ts';
 import type { Entite } from '../client/src/entite/Entite.ts';
 
 const httpServer = http.createServer((_req, res) => {
@@ -149,11 +149,19 @@ function spawnMobs(){
 		case 'spider':
 			mobsList.push(new Spider()); 
 		case 'pie':
-			mobsList.push(new pie());
+			mobsList.push(new Pie());
 		case 'galinette':
-			mobsList.push(new galinette());
+			mobsList.push(new Galinette());
 		default:
 			mobsList.push(new Spider());
 	} 
 }
 setInterval(spawnMobs, 2000); 
+
+function broadcastMob(){
+	const mobsInfo: object[] = [];
+	mobsList.forEach(m => mobsInfo.push(m.getAsJson()));
+	io.emit('mobsInfo', {
+		mobs: mobsInfo
+	});
+}

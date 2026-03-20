@@ -4,8 +4,7 @@ export default class Galinette implements Entite {
     width: number= 50;
     height: number= 50;
     speed: number = 2;
-    identifier: string = "";
-    username: string = "galinette cendrée";
+    name: string = "galinette cendrée";
     x: number = 0;
     y: number = 0;
     movementSpeed: number = 2;
@@ -18,14 +17,15 @@ export default class Galinette implements Entite {
     }
     takeDamage(amount: number): void { this.health -= amount; }
     
-    getAsJson(): string {         
-         return JSON.stringify({
-            id: this.identifier,
-            name: this.username,
-            pos: { x: this.x, y: this.y },
-            hp: this.health
-        });
+    getAsJson() {         
+        return {
+			name: this.name,
+			x: this.x,
+			y: this.y,
+			width: this.width,
+			height: this.height,
+		};
     }
 
-    toString(): string { return `${this.username} (HP: ${this.health})`; }
+    toString(): string { return `${this.name} (HP: ${this.health})`; }
 }

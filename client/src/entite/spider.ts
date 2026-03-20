@@ -1,8 +1,7 @@
 import type { Entite } from "./Entite";
 
 export default class Spider implements Entite {
-    identifier: string = "";
-    username: string = "araignée";
+    name: string = "araignée";
     x: number = Math.random()*1600;
     y: number = 0;
     movementSpeed: number = 2;
@@ -31,14 +30,15 @@ export default class Spider implements Entite {
     }
     takeDamage(amount: number): void { this.health -= amount; }
     
-    getAsJson(): string {         
-         return JSON.stringify({
-            id: this.identifier,
-            name: this.username,
-            pos: { x: this.x, y: this.y },
-            hp: this.health
-        });
+    getAsJson() {         
+        return {
+			name: this.name,
+			x: this.x,
+			y: this.y,
+			width: this.width,
+			height: this.height,
+		};
     }
 
-    toString(): string { return `${this.username} (HP: ${this.health})`; }
+    toString(): string { return `${this.name} (HP: ${this.health})`; }
 }
