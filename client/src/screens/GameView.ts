@@ -79,9 +79,9 @@ export class GameView extends CanvasView implements View{
 				socket.emit('player-leave');
 				sm.show('home-screen');
 			});
-			setInterval(() => {
-				if (this.running) this.spawnMobs();
-			}, 1500);
+			// setInterval(() => {
+			// 	if (this.running) this.spawnMobs();
+			// }, 1500);
 	}
 
 	// private spawnEnemy() {
@@ -99,6 +99,7 @@ export class GameView extends CanvasView implements View{
 	show(): void {
 		this.element.style.display = 'flex';
 		this.socket.on('playerInfo', this.onPlayerInfo);
+		this.socket.on('mobsInfo', this.onMobsInfo);
 		window.addEventListener('keydown', this.onKeyDown);
 		this.canvas.addEventListener('click', this.onMouseClick);
 		this.running = true;
@@ -108,6 +109,7 @@ export class GameView extends CanvasView implements View{
 	hide(): void {
 		this.element.style.display = 'none';
 		this.socket.off('playerInfo', this.onPlayerInfo);
+		this.socket.off('mobsInfo', this.onMobsInfo);
 		window.removeEventListener('keydown', this.onKeyDown);
 		this.canvas.removeEventListener('click', this.onMouseClick);
 		this.running = false;
@@ -164,6 +166,11 @@ export class GameView extends CanvasView implements View{
 			this.bulletInfo = info.bullets;
 	};
 
+	private onMobsInfo = (info: { mobs: Array<MobsData> }) => {
+		console.log('infos mobs : ', info.mobs );
+		this.mobsInfo = info.mobs;
+	};
+
 	private gameLoop = () => {
 		if (!this.running) return;
 		this.draw();
@@ -175,13 +182,8 @@ export class GameView extends CanvasView implements View{
 
 		if (!this.playerImage.complete) return;
 
-		this.mobsInfo.forEach((en, index) => {
-			en.x -= en.speed;
-			const img = this.mobsImages[en.imageIndex];
-			this.ctx.drawImage(img, en.x, en.y, en.width, en.height);
-			if (en.x + en.width < 0) {
-				this.mobsInfo.splice(index, 1);
-			}
+		this.mobsInfo.forEach((m: MobsData) => {
+			this.ctx.drawImage(this.mobsImages[0], m.x, m.y,m.width ,m.height);
 		});
 
 		this.playerInfo.forEach((p: PlayerData) => {

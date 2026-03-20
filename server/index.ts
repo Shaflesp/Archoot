@@ -148,15 +148,18 @@ function spawnMobs(){
 	switch(mobsTypes[randomMobs]){
 		case 'spider':
 			mobsList.push(new Spider()); 
+			break;
 		case 'pie':
 			mobsList.push(new Pie());
+			break;
 		case 'galinette':
 			mobsList.push(new Galinette());
+			break;
 		default:
 			mobsList.push(new Spider());
+			break
 	} 
 }
-setInterval(spawnMobs, 2000); 
 
 function broadcastMob(){
 	const mobsInfo: object[] = [];
@@ -165,3 +168,10 @@ function broadcastMob(){
 		mobs: mobsInfo
 	});
 }
+
+setInterval(() => {
+    mobsList.forEach(m => {
+        if (typeof m.move === 'function') m.move();
+    });
+    broadcastMob();
+}, 2000); 
