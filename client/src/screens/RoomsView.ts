@@ -52,11 +52,12 @@ export class RoomsView implements View {
 	roomToHtml(room: Room): string {
 		let button = '';
 
+		button = `<button type="button">Rejoindre</button>`;
+
 		if (room.currentPlayers >= room.capacityMax) {
 			button = `<button type="button" disabled>Rejoindre</button>`;
 			console.log(`Room ${room.roomId} (${room.roomName}) is full.`);
 		}
-		button = `<button type="button">Rejoindre</button>`;
 
 		return (
 			`<tr>` +
