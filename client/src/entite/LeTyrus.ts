@@ -1,4 +1,4 @@
-import { Entite } from './Entite';
+import { Entite } from './Entite.ts';
 
 export default class LeTyrus extends Entite {
 	name = 'Le Tyrus';
@@ -14,5 +14,12 @@ export default class LeTyrus extends Entite {
 
 	move(): void {
 		this.x -= this.speed;
+	}
+
+	reset(): void {
+		this.x = 900;
+		this.y = 400;
+		this.health = 25;
+		this.active = true;
 	}
 }

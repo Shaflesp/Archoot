@@ -1,4 +1,4 @@
-import { Entite } from './Entite';
+import { Entite } from './Entite.ts';
 
 export default class Pie extends Entite {
 	name = 'pie';
@@ -14,5 +14,12 @@ export default class Pie extends Entite {
 
 	move(): void {
 		this.x -= this.speed;
+	}
+
+	reset(): void {
+		this.x = Math.random() * 1600;
+		this.y = Math.random() * 700;
+		this.health = 5;
+		this.active = true;
 	}
 }

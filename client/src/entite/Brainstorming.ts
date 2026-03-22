@@ -1,4 +1,4 @@
-import { Entite } from './Entite';
+import { Entite } from './Entite.ts';
 
 export default class Brainstorming extends Entite {
 	name = 'Brainstorming';
@@ -14,5 +14,12 @@ export default class Brainstorming extends Entite {
 
 	move(): void {
 		this.x -= this.speed;
+	}
+
+	reset(): void {
+		this.x = 0;
+		this.y = 0;
+		this.health = 15;
+		this.active = true;
 	}
 }

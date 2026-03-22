@@ -1,4 +1,4 @@
-import { Entite } from './Entite';
+import { Entite } from './Entite.ts'
 
 export default class Spider extends Entite {
 	name = 'araignée';
@@ -27,5 +27,13 @@ export default class Spider extends Entite {
 				this.climbing = false;
 			}
 		}
+	}
+
+	reset(): void {
+		this.x = Math.random() * 1600;
+		this.y = 0;
+		this.health = 5;
+		this.active = true;
+		this.climbing = false;
 	}
 }

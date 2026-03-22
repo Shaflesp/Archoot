@@ -13,7 +13,7 @@ export class Bullet implements Collidable {
 	active: boolean;
 	speed: number;
 
-	constructor(width:number, height:number) {
+	constructor(width: number, height: number) {
 		this.bounds = { width, height };
 
 		this.x = 0;
@@ -61,28 +61,13 @@ export class Bullet implements Collidable {
 			active: this.active,
 		};
 	}
-}
 
-export class BulletPool {
-	pool: Array<Bullet>;
-
-	constructor(size: number, width: number, height: number) {
-		this.pool = [];
-		for (let i: number = 0; i < size; i++) {
-			this.pool.push(new Bullet(width, height));
-		}
-	}
-
-	acquire(): Bullet | null {
-		const bullet = this.pool.find(b => !b.active);
-		return bullet != null ? bullet : null;
-	}
-
-	updateAll() {
-		this.pool.forEach(b => b.update());
-	}
-
-	getActive(): Array<Bullet> {
-		return this.pool.filter(b => b.active);
+	reset(): void {
+		this.x = 0;
+		this.y = 0;
+		this.dx = 0;
+		this.dy = 0;
+		this.ownerId = '';
+		this.active = false;
 	}
 }

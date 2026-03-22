@@ -1,4 +1,4 @@
-import { Entite } from './Entite';
+import { Entite } from './Entite.ts';
 
 export default class Galinette extends Entite {
 	name = 'galinette cendrée';
@@ -14,5 +14,12 @@ export default class Galinette extends Entite {
 
 	move(): void {
 		this.x -= this.speed;
+	}
+
+	reset(): void {
+		this.x = 1680;
+		this.y = Math.random() * 800;
+		this.health = 5;
+		this.active = true;
 	}
 }

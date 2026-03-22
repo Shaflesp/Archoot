@@ -9,7 +9,7 @@ interface PlayerData {
     y: number;
     width: number;
     height: number;
-	lives : number;
+	  lives : number;
 }
 
 interface BulletData {

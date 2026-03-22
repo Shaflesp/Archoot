@@ -11,16 +11,22 @@ export class Player {
 	username: string;
 	identifier: string;
 
+	lives: number;
+	invincibleUntil: number;
+
 	constructor(id: string, username: string, width: number, height: number) {
 		this.bounds = { width, height };
 
 		this.movementSpeed = 5;
 		this.x = 0;
 		this.y = 0;
-		this.width = 100; //a ajuster selon la taille que l'on veut pour la hitbox
-		this.height = 100; //Pour le moment j'ai mis pareil que le sprite (voir GameView)
+		this.width = 100; //a ajuster selon la taille que l'on veut pour la hitbox /Sprite
+		this.height = 100;
 		this.username = username ? username : 'placeholder';
 		this.identifier = id;
+
+		this.lives = 3;
+		this.invincibleUntil = 0;
 	}
 
 	move(direction: string) {
@@ -60,6 +66,17 @@ export class Player {
 		);
 	}
 
+	takeDamage(amount: number): void {
+		if (Date.now() < this.invincibleUntil) return;
+		this.lives -= amount;
+		if (this.lives < 0) this.lives = 0;
+		this.invincibleUntil = Date.now() + 1500;
+	}
+
+	isDead(): boolean {
+		return this.lives <= 0;
+	}
+
 	getAsJson() {
 		return {
 			identifier: this.identifier,
@@ -68,6 +85,7 @@ export class Player {
 			y: this.y,
 			width: this.width,
 			height: this.height,
+			lives: this.lives,
 		};
 	}
 }

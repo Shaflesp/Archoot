@@ -1,11 +1,13 @@
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
 import { Player } from './Entity/Player.ts'
-import { BulletPool } from './Entity/Bullet.ts';
+import { Bullet } from './Entity/Bullet.ts';
+import { Pool } from './Entity/Pool.ts';
+
+import type { Entite } from '../client/src/entite/Entite.ts';
 import Spider from '../client/src/entite/spider.ts';
 import Pie from '../client/src/entite/pie.ts';
 import Galinette from '../client/src/entite/galinette.ts';
-import type { Entite } from '../client/src/entite/Entite.ts';
 
 const httpServer = http.createServer((_req, res) => {
 	res.statusCode = 200;
@@ -15,10 +17,12 @@ const boundWidth: number = 1680;
 const boundHeight: number = 800;
 
 const players = new Map<string, Player>();
-const bulletPool = new BulletPool(100, boundWidth, boundHeight);
+const bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
 
 const mobsTypes = ['spider', 'pie', 'galinette'];
-const mobsList:Entite[] = [];
+const galinettePool = new Pool(() => new Galinette(),20)
+const spiderPool = new Pool(() => new Spider(), 20);
+const piePool = new Pool(() => new Pie(), 20);
 
 const port = 8080;
 httpServer.listen(port, () => {
@@ -111,6 +115,23 @@ io.on('connection', socket => {
 	socket.on('disconnect', () => removePlayer(socket.id));
 });
 
+function getAllActiveMobs(): Array<Entite> {
+	return ([] as Array<Entite>)
+		.concat(spiderPool.getActive())
+		.concat(piePool.getActive())
+		.concat(galinettePool.getActive());
+}
+
+function spawnMobs() {
+	const roll = Math.floor(Math.random() * mobsTypes.length);
+	switch (roll) {
+		case 0: galinettePool.acquire(); break;
+		case 1: spiderPool.acquire(); break;
+		case 2: piePool.acquire(); break;
+		default: break;
+	}
+}
+
 function broadcast() {
     const playerInfo: Map<string, object> = new Map();
     players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
@@ -120,30 +141,55 @@ function broadcast() {
 		});
 }
 
+function broadcastMob() {
+	const mobsInfo: object[] = [];
+	getAllActiveMobs().forEach(m => mobsInfo.push(m.getAsJson()));
+	io.emit('mobsInfo', { mobs: mobsInfo });
+}
+
 setInterval(() => {
+	const activeMobs = getAllActiveMobs();
 
 	// --- Bullets ---
 	const activeBefore = bulletPool.getActive().length;
 	bulletPool.updateAll();
-
-	let bulletsChanged = activeBefore !== bulletPool.getActive().length;
+	let changed = activeBefore !== bulletPool.getActive().length;
 
 	bulletPool.getActive().forEach(bullet => {
 		players.forEach(player => {
 			if (player.identifier === bullet.ownerId) return;
 			if (player.collidesWith(bullet)) {
+				player.takeDamage(1);
 				bullet.active = false;
-				bulletsChanged = true;
+				changed = true;
+
+				if (player.isDead()) {
+					console.log(`${player.username} was eliminated.`);
+				}
+			}
+		});
+
+		activeMobs.forEach( mob => {
+			if (mob.collidesWith(bullet)) {
+				mob.takeDamage(1);
+				bullet.active = false;
+				changed = true;
+				console.log(`${mob.name} hit, HP: ${mob.health}`);
+
+				if (mob.isDead()) {
+					console.log(`${mob.name} eliminated.`);
+					mob.active = false;
+				}
 			}
 		});
 	});
 
 	// --- Mobs ---
-	if (mobsList.length > 0) {
-		mobsList.forEach(m => m.move());
+	if (activeMobs.length > 0) {
+		activeMobs.forEach(m => m.move());
 	}
 
-	if (bulletsChanged || mobsList.length > 0) {
+	if (changed || activeMobs.length > 0) {
 		broadcast();
 		broadcastMob();
 	}
@@ -153,30 +199,3 @@ setInterval(() => {
 setInterval(() => {
 	spawnMobs();
 }, 2000);
-
-function spawnMobs(){
-	const randomMobs = Math.floor(Math.random()*mobsTypes.length);
-
-	switch(mobsTypes[randomMobs]){
-		case 'spider':
-			mobsList.push(new Spider()); 
-			break;
-		case 'pie':
-			mobsList.push(new Pie());
-			break;
-		case 'galinette':
-			mobsList.push(new Galinette());
-			break;
-		default:
-			mobsList.push(new Spider());
-			break
-	} 
-}
-
-function broadcastMob(){
-	const mobsInfo: object[] = [];
-	mobsList.forEach(m => mobsInfo.push(m.getAsJson()));
-	io.emit('mobsInfo', {
-		mobs: mobsInfo
-	});
-}
