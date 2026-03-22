@@ -16,7 +16,6 @@ export default class RucheHour extends Entite {
 		this.x -= this.speed;
 	}
 
-	// Overrides base takeDamage to clamp at 0
 	takeDamage(amount: number): void {
 		this.health -= amount;
 		if (this.health < 0) this.health = 0;

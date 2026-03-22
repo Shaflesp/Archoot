@@ -225,7 +225,7 @@ export class GameView extends CanvasView implements View {
 		}
 
 		this.bulletInfo.forEach((b: BulletData) => {
-			const angle = Math.atan2(b.dy, b.dx);
+			const angle = Math.atan2(b.dy, b.dx) + Math.PI/4;
 			const centerX = b.x + b.width / 2;
 			const centerY = b.y + b.height / 2;
 
