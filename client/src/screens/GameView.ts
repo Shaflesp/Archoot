@@ -47,6 +47,9 @@ export class GameView extends CanvasView implements View {
 	private mobsImages: HTMLImageElement[] = [];
 	private coeurImage: HTMLImageElement;
 
+	private flashDuration: number = 0;
+	private lastLives: number | null = null;
+
 	private readonly mobsSrcs: string[] = [
 		'/images/sprites/pie.gif',
 		'/images/sprites/galinette.png',
@@ -167,6 +170,15 @@ export class GameView extends CanvasView implements View {
 	}) => {
 		this.playerInfo = new Map(Object.entries(info.players));
 		this.bulletInfo = info.bullets;
+
+		//si collision = flash rouge
+		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
+		if (me) {
+			if (this.lastLives !== null && me.lives < this.lastLives) {
+				this.flashDuration = 10;
+			}
+			this.lastLives = me.lives;
+		}
 	};
 
 	private onMobsInfo = (info: { mobs: Array<MobsData> }) => {
@@ -241,5 +253,11 @@ export class GameView extends CanvasView implements View {
 			);
 			this.ctx.restore();
 		});
+
+		if (this.flashDuration > 0) {
+			this.ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+			this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+			this.flashDuration--;
+		}
 	}
 }
