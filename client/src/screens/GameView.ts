@@ -225,7 +225,21 @@ export class GameView extends CanvasView implements View {
 		}
 
 		this.bulletInfo.forEach((b: BulletData) => {
-			this.ctx.drawImage(this.bulletImage, b.x, b.y, b.width, b.height);
+			const angle = Math.atan2(b.dy, b.dx);
+			const centerX = b.x + b.width / 2;
+			const centerY = b.y + b.height / 2;
+
+			this.ctx.save();
+			this.ctx.translate(centerX, centerY);
+			this.ctx.rotate(angle);
+			this.ctx.drawImage(
+				this.bulletImage,
+				-b.width / 2,
+				-b.height / 2,
+				b.width,
+				b.height
+			);
+			this.ctx.restore();
 		});
 	}
 }
