@@ -58,10 +58,7 @@ io.on('connection', socket => {
 	socket.on('keypress', direction => {
 		const player = players.get(socket.id);
 
-		if (!player) {
-			socket.emit('game_error', 'You must register before playing.');
-			return;
-		}
+		if (!player || player.isDead()) { return;}
 
 		const prevX = player.x;
     	const prevY = player.y;
@@ -85,7 +82,7 @@ io.on('connection', socket => {
 
 	socket.on('shoot', (data: { dx: number; dy: number }) => {
 		const player = players.get(socket.id);
-		if (!player) return;
+		if (!player || player.isDead()) return;
 
 		const bullet = bulletPool.acquire();
 		if (!bullet) return;
@@ -186,7 +183,23 @@ setInterval(() => {
 
 	// --- Mobs ---
 	if (activeMobs.length > 0) {
-		activeMobs.forEach(m => m.move());
+		activeMobs.forEach(mob => {
+			mob.move();
+
+			players.forEach(player => {
+				if (player.collidesWith(mob)) {
+					player.takeDamage(mob.damage);
+					changed = true;
+					if (player.isDead()) {
+						console.log(`${player.username} was eliminated.`);
+					}
+				}
+			});
+
+			if (mob.x < -mob.width) {
+				mob.active = false;
+			}
+		});
 	}
 
 	if (changed || activeMobs.length > 0) {

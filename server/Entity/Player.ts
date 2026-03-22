@@ -1,6 +1,8 @@
 import type { Collidable } from './Collidable.ts';
 
 export class Player {
+	active: boolean = true;
+
 	private bounds: { width: number; height: number };
 
 	movementSpeed: number;
@@ -69,8 +71,11 @@ export class Player {
 	takeDamage(amount: number): void {
 		if (Date.now() < this.invincibleUntil) return;
 		this.lives -= amount;
-		if (this.lives < 0) this.lives = 0;
 		this.invincibleUntil = Date.now() + 1500;
+		if (this.lives <= 0) {
+			this.lives = 0;
+			this.active = false;
+		}
 	}
 
 	isDead(): boolean {
@@ -86,6 +91,7 @@ export class Player {
 			width: this.width,
 			height: this.height,
 			lives: this.lives,
+			active: this.active,
 		};
 	}
 }

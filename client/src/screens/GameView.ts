@@ -10,6 +10,7 @@ interface PlayerData {
     width: number;
     height: number;
 	  lives : number;
+		active : number;
 }
 
 interface BulletData {
@@ -196,10 +197,18 @@ export class GameView extends CanvasView implements View {
 		});
 
 		this.playerInfo.forEach((p: PlayerData) => {
+			if (!p.active) {
+				this.ctx.globalAlpha = 0.4;
+				this.ctx.filter = 'grayscale(100%)';
+			}
+
 			this.ctx.drawImage(this.playerImage, p.x, p.y, p.width, p.height);
-			this.ctx.font = '12px Arial';
-			this.ctx.fillStyle = 'white';
+			this.ctx.font = '24px Arial';
+			this.ctx.fillStyle = p.active ? 'white' : 'red';
 			this.ctx.fillText(p.username, p.x, p.y - 10);
+
+			this.ctx.globalAlpha = 1;
+			this.ctx.filter = 'none';
 		});
 
 		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
