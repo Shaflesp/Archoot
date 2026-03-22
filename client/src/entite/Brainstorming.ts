@@ -1,31 +1,18 @@
-import type { Entite } from "./Entite";
+import { Entite } from './Entite';
 
-export default class Brainstorming implements Entite {
-    width: number = 50;
-    height: number = 50;
-    name: string = "Brainstorming";
-    x: number = 0;
-    y: number = 0;
-    movementSpeed: number = 2;
-    health: number = 15;
-    damage: number = 2;
-    shootSpeed: number = 1;
-    speed:number = 2;
+export default class Brainstorming extends Entite {
+	name = 'Brainstorming';
+	x = 0;
+	y = 0;
+	width = 50;
+	height = 50;
+	speed = 2;
+	movementSpeed = 2;
+	health = 15;
+	damage = 2;
+	shootSpeed = 1;
 
-    move(): void {
-        this.x -= this.speed;
-    }
-    takeDamage(amount: number): void { this.health -= amount; }
-        
-    getAsJson() {         
-         return {
-			name: this.name,
-			x: this.x,
-			y: this.y,
-			width: this.width,
-			height: this.height,
-		};
-    }
-
-    toString(): string { return `${this.name} (HP: ${this.health})`; }
+	move(): void {
+		this.x -= this.speed;
+	}
 }

@@ -1,35 +1,24 @@
-import type { Entite } from "./Entite";
+import { Entite } from './Entite';
 
-export default class RucheHour implements Entite {
-    speed: number = 0;
-    width: number=100;
-    height: number=100;
-    name: string = "Ruche Hour";
-    x: number = 900;
-    y: number = 400;
-    movementSpeed: number = 3;
-    health: number = 30;
-    damage: number = 1;
-    shootSpeed: number = 4;
+export default class RucheHour extends Entite {
+	name = 'Ruche Hour';
+	x = 900;
+	y = 400;
+	width = 100;
+	height = 100;
+	speed = 0;
+	movementSpeed = 3;
+	health = 30;
+	damage = 1;
+	shootSpeed = 4;
 
-    move(): void {
-        this.x-=this.speed;
-    }
-    takeDamage(amount: number): void {
-        this.health -= amount;
-        if (this.health < 0) this.health = 0; // à modif pour display le mob + compter points 
-    }
+	move(): void {
+		this.x -= this.speed;
+	}
 
-    getAsJson() {
-       return {
-			name: this.name,
-			x: this.x,
-			y: this.y,
-			width: this.width,
-			height: this.height,
-		};
-    }
-    toString(): string {
-        return `${this.name} [HP: ${this.health}] is at ${this.x},${this.y}`;
-    }
+	// Overrides base takeDamage to clamp at 0
+	takeDamage(amount: number): void {
+		this.health -= amount;
+		if (this.health < 0) this.health = 0;
+	}
 }

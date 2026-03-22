@@ -1,31 +1,18 @@
-import type { Entite } from "./Entite";
+import { Entite } from './Entite';
 
-export default class Pie implements Entite {
-    width: number = 50;
-    height: number = 50;
-    speed: number = 1;
-    name: string = "pie";
-    x: number = Math.random()*1600;
-    y: number = Math.random()*700;
-    movementSpeed: number = 2;
-    health: number = 5;
-    damage: number = 1;
-    shootSpeed: number = 0; // à modifier 
+export default class Pie extends Entite {
+	name = 'pie';
+	x = Math.random() * 1600;
+	y = Math.random() * 700;
+	width = 50;
+	height = 50;
+	speed = 1;
+	movementSpeed = 2;
+	health = 5;
+	damage = 1;
+	shootSpeed = 0;
 
-    move(): void {
-        this.x-=this.speed;
-    }
-    takeDamage(amount: number): void { this.health -= amount; }
-    
-    getAsJson() {         
-        return {
-			name: this.name,
-			x: this.x,
-			y: this.y,
-			width: this.width,
-			height: this.height,
-		};
-    }
-
-    toString(): string { return `${this.name} (HP: ${this.health})`; }
+	move(): void {
+		this.x -= this.speed;
+	}
 }

@@ -1,20 +1,32 @@
-export interface Entite {
-    name: string;
-    x: number;
-    y: number;
-    width:number;
-    height:number;
-    movementSpeed: number;
-    health: number;
-    damage: number;
-    shootSpeed: number;
-    speed:number;
+export abstract class Entite {
+	abstract name: string;
+	abstract x: number;
+	abstract y: number;
+	abstract width: number;
+	abstract height: number;
+	abstract movementSpeed: number;
+	abstract health: number;
+	abstract damage: number;
+	abstract shootSpeed: number;
+	abstract speed: number;
 
-    move(): void;
-    getAsJson():any;
-    takeDamage(amount: number): void;
-    // healing(heart: number): void;
-    // changeShootSpeed(newSpeed: number): void;
-    // changeMovementSpeed(speedBonus: number): void;
-    // changeDamage(damageBonus: number): void;
+	abstract move(): void;
+
+	takeDamage(amount: number): void {
+		this.health -= amount;
+	}
+
+	getAsJson() {
+		return {
+			name: this.name,
+			x: this.x,
+			y: this.y,
+			width: this.width,
+			height: this.height,
+		};
+	}
+
+	toString(): string {
+		return `${this.name} (HP: ${this.health})`;
+	}
 }
