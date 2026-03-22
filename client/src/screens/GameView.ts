@@ -17,6 +17,8 @@ interface BulletData {
 	y: number;
 	width: number;
 	height: number;
+	dx: number;
+	dy: number;
 	ownerId: string;
 	active: boolean;
 }
@@ -31,13 +33,13 @@ interface MobsData {
 	// image: HTMLImageElement;
 }
 
-export class GameView extends CanvasView implements View{
+export class GameView extends CanvasView implements View {
 	socket: Socket;
 	sm: ViewManager;
 
 	playerInfo: Map<string, PlayerData> = new Map();
 	bulletInfo: Array<BulletData> = [];
-	mobsInfo:Array<MobsData> = [];
+	mobsInfo: Array<MobsData> = [];
 
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
@@ -50,7 +52,7 @@ export class GameView extends CanvasView implements View{
 		'/images/sprites/spider1.png',
 		'/images/sprites/spider2.png',
 		'/images/sprites/spider3.png',
-		'/images/sprites/spider4.png'
+		'/images/sprites/spider4.png',
 	];
 
 	private running: boolean = false;
@@ -65,7 +67,7 @@ export class GameView extends CanvasView implements View{
 		this.playerImage.src = '/images/cobaye.png';
 
 		this.coeurImage = new Image();
-        this.coeurImage.src = '/images/coeur.png';
+		this.coeurImage.src = '/images/coeur.png';
 
 		this.bulletImage = new Image();
 		this.bulletImage.src = '/images/Arrow.png';
@@ -85,10 +87,16 @@ export class GameView extends CanvasView implements View{
 				socket.emit('player-leave');
 				sm.show('home-screen');
 			});
-			// setInterval(() => {
-			// 	if (this.running) this.spawnMobs();
-			// }, 1500);
+		// setInterval(() => {
+		// 	if (this.running) this.spawnMobs();
+		// }, 1500);
 	}
+
+	private gameLoop = () => {
+		if (!this.running) return;
+		this.draw();
+		requestAnimationFrame(this.gameLoop);
+	};
 
 	show(): void {
 		this.element.style.display = 'flex';
@@ -112,19 +120,19 @@ export class GameView extends CanvasView implements View{
 	private onKeyDown = (e: KeyboardEvent) => {
 		switch (e.key) {
 			case 'ArrowUp':
-				case 'z':
+			case 'z':
 				this.socket.emit('keypress', 'up');
 				break;
 			case 'ArrowDown':
-				case 's':
+			case 's':
 				this.socket.emit('keypress', 'down');
 				break;
 			case 'ArrowLeft':
-				case 'q': 
+			case 'q':
 				this.socket.emit('keypress', 'left');
 				break;
 			case 'ArrowRight':
-				case 'd': 
+			case 'd':
 				this.socket.emit('keypress', 'right');
 				break;
 		}
@@ -153,36 +161,30 @@ export class GameView extends CanvasView implements View{
 	};
 
 	private onPlayerInfo = (info: {
-			players: any;
-			bullets: Array<BulletData>;
-		}) => {
-			this.playerInfo = new Map(Object.entries(info.players));
-			this.bulletInfo = info.bullets;
+		players: any;
+		bullets: Array<BulletData>;
+	}) => {
+		this.playerInfo = new Map(Object.entries(info.players));
+		this.bulletInfo = info.bullets;
 	};
 
 	private onMobsInfo = (info: { mobs: Array<MobsData> }) => {
 		this.mobsInfo = info.mobs;
 	};
 
-	private getMobImage(name:string):HTMLImageElement {
+	private getMobImage(name: string): HTMLImageElement {
 		switch (name) {
 			case 'pie':
 				return this.mobsImages[0];
 			case 'galinette cendrée':
 				return this.mobsImages[1];
 			case 'araignée':
-				const index = Math.floor(Math.random() * (5-2)+3);
+				const index = Math.floor(Math.random() * (5 - 2) + 3);
 				return this.mobsImages[index];
 			default:
 				return this.mobsImages[3];
 		}
 	}
-
-	private gameLoop = () => {
-		if (!this.running) return;
-		this.draw();
-		requestAnimationFrame(this.gameLoop);
-	};
 
 	private draw() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -190,17 +192,28 @@ export class GameView extends CanvasView implements View{
 		if (!this.playerImage.complete) return;
 
 		this.mobsInfo.forEach((m: MobsData) => {
-			this.ctx.drawImage(this.getMobImage(m.name), m.x, m.y,m.width ,m.height);
+			this.ctx.drawImage(this.getMobImage(m.name), m.x, m.y, m.width, m.height);
 		});
 
 		this.playerInfo.forEach((p: PlayerData) => {
 			this.ctx.drawImage(this.playerImage, p.x, p.y, p.width, p.height);
 			this.ctx.font = '12px Arial';
+			this.ctx.fillStyle = 'white';
 			this.ctx.fillText(p.username, p.x, p.y - 10);
-			for(let i = 0; i < 3 /*à changer plus tard*/ ; i++ ){
-                this.ctx.drawImage(this.coeurImage, this.canvas.width-40-(i*40), 0, 40, 40);
-			}
 		});
+
+		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
+		if (me) {
+			for (let i = 0; i < me.lives; i++) {
+				this.ctx.drawImage(
+					this.coeurImage,
+					this.canvas.width - 40 - i * 40,
+					0,
+					40,
+					40
+				);
+			}
+		}
 
 		this.bulletInfo.forEach((b: BulletData) => {
 			this.ctx.drawImage(this.bulletImage, b.x, b.y, b.width, b.height);

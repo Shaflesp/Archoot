@@ -5,8 +5,8 @@ export class Bullet implements Collidable {
 
 	x: number;
 	y: number;
-	width: number = 10;
-	height: number = 10;
+	width: number = 30;
+	height: number = 30;
 	dx: number;
 	dy: number;
 	ownerId: string;
@@ -55,6 +55,8 @@ export class Bullet implements Collidable {
 			y: this.y,
 			width: this.width,
 			height: this.height,
+			dx: this.dx,
+			dy: this.dy,
 			ownerId: this.ownerId,
 			active: this.active,
 		};

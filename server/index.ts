@@ -121,26 +121,38 @@ function broadcast() {
 }
 
 setInterval(() => {
-	const activeBefore = bulletPool.getActive().length;
 
+	// --- Bullets ---
+	const activeBefore = bulletPool.getActive().length;
 	bulletPool.updateAll();
 
-	let changed = activeBefore !== bulletPool.getActive().length;
+	let bulletsChanged = activeBefore !== bulletPool.getActive().length;
 
 	bulletPool.getActive().forEach(bullet => {
 		players.forEach(player => {
 			if (player.identifier === bullet.ownerId) return;
 			if (player.collidesWith(bullet)) {
 				bullet.active = false;
-				changed = true;
+				bulletsChanged = true;
 			}
 		});
 	});
 
-	if (changed) {
-		broadcast();
+	// --- Mobs ---
+	if (mobsList.length > 0) {
+		mobsList.forEach(m => m.move());
 	}
+
+	if (bulletsChanged || mobsList.length > 0) {
+		broadcast();
+		broadcastMob();
+	}
+
 }, 1000 / 60);
+
+setInterval(() => {
+	spawnMobs();
+}, 2000);
 
 function spawnMobs(){
 	const randomMobs = Math.floor(Math.random()*mobsTypes.length);
@@ -168,14 +180,3 @@ function broadcastMob(){
 		mobs: mobsInfo
 	});
 }
-
-setInterval(() => {
-    spawnMobs();
-}, 2000); 
-
-setInterval(() => {
-    if (mobsList.length > 0) {
-        mobsList.forEach(m => m.move());
-        broadcastMob();
-    }
-}, 1000 / 60);

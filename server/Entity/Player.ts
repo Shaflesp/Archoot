@@ -17,8 +17,8 @@ export class Player {
 		this.movementSpeed = 5;
 		this.x = 0;
 		this.y = 0;
-		this.width = 30; //a ajuster selon la taille que l'on veut pour la hitbox
-		this.height = 30; //Pour le moment j'ai mis pareil que le sprite (voir GameView)
+		this.width = 100; //a ajuster selon la taille que l'on veut pour la hitbox
+		this.height = 100; //Pour le moment j'ai mis pareil que le sprite (voir GameView)
 		this.username = username ? username : 'placeholder';
 		this.identifier = id;
 	}
