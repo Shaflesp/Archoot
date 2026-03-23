@@ -17,21 +17,50 @@ const httpServer = http.createServer((_req, res) => {
 const boundWidth: number = 1680;
 const boundHeight: number = 800;
 
-const players = new Map<string, Player>();
-const bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
+class RoomState {
+	players: Map<string, Player> = new Map();
+	bulletPool: Pool<Bullet> = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
+
+	galinettePool: Pool<Galinette> = new Pool(() => new Galinette(), 20);
+	spiderPool: Pool<Spider> = new Pool(() => new Spider(), 20);
+	piePool: Pool<Pie> = new Pool(() => new Pie(), 20);
+
+	getAllActiveMobs(): Array<Entite> {
+		//il faut trouver une manière moins hardcodée
+		return ([] as Array<Entite>)
+			.concat(this.spiderPool.getActive())
+			.concat(this.piePool.getActive())
+			.concat(this.galinettePool.getActive());
+	}
+
+	spawnMob() {
+		const roll = Math.floor(Math.random() * 3); //là pareil
+		if (roll === 0) this.galinettePool.acquire();
+		else if (roll === 1) this.spiderPool.acquire();
+		else this.piePool.acquire();
+	}
+}
 
 const rooms = new Map<number, RoomServer>();
+const roomStates = new Map<number, RoomState>();
 let roomIdCpt = 0;
+
+function createRoom(name: string, capacityMax: number): RoomServer {
+	const r: RoomServer = {
+		id: ++roomIdCpt,
+		name,
+		capacityMax,
+		players: new Set(),
+	};
+	rooms.set(r.id, r);
+	roomStates.set(r.id, new RoomState());
+	return r;
+}
 
 createRoom('Bleu', 1);
 createRoom('Blanc', 2);
 createRoom('Orouge', 3);
 createRoom('Coconut [DO NOT DELETE]', 4);
-
-const mobsTypes = ['spider', 'pie', 'galinette'];
-const galinettePool = new Pool(() => new Galinette(), 20);
-const spiderPool = new Pool(() => new Spider(), 20);
-const piePool = new Pool(() => new Pie(), 20);
 
 const port = 8080;
 httpServer.listen(port, () => {
@@ -40,216 +69,38 @@ httpServer.listen(port, () => {
 
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
-io.on('connection', socket => {
-	broadcastRooms();
-	socket.on('register', (data: { username: string }) => {
-		const username = data.username?.trim();
+function broadcastRooms(target: { emit: Function } = io) {
+	const roomList = Array.from(rooms.values()).map(r => ({
+		roomId: r.id,
+		roomName: r.name,
+		capacityMax: r.capacityMax,
+		currentPlayers: r.players.size,
+	}));
 
-		if (!username || username.length < 2) {
-			socket.emit('register_error', 'Invalid username.');
-			return;
-		}
-
-		const isTaken = Array.from(players.values()).some(
-			p => p.username === username
-		);
-
-		if (isTaken) {
-			socket.emit('register_error', 'Username already taken.');
-			return;
-		}
-
-		players.set(
-			socket.id,
-			new Player(socket.id, username, boundWidth, boundHeight)
-		);
-		console.log(`Player registered: ${username} (${socket.id})`);
-		socket.emit('register_success');
-		broadcast();
-	});
-
-	socket.on('keypress', direction => {
-		const player = players.get(socket.id);
-
-		if (!player || player.isDead()) {
-			return;
-		}
-
-		const prevX = player.x;
-		const prevY = player.y;
-
-		player.move(direction);
-		console.log(
-			`${player.username} moved ${direction} → (${player.x}, ${player.y})`
-		);
-
-		const collides = Array.from(players.values()).some(
-			other =>
-				other.identifier !== player.identifier && player.collidesWith(other)
-		);
-
-		if (collides) {
-			player.x = prevX;
-			player.y = prevY;
-		}
-
-		if (player.x !== prevX || player.y !== prevY) {
-			broadcast();
-		}
-	});
-
-	socket.on('shoot', (data: { dx: number; dy: number }) => {
-		const player = players.get(socket.id);
-		if (!player || player.isDead()) return;
-
-		const bullet = bulletPool.acquire();
-		if (!bullet) return;
-
-		bullet.fire(
-			player.x + player.width / 2,
-			player.y + player.height / 2,
-			data.dx,
-			data.dy,
-			player.identifier
-		);
-
-		broadcast();
-	});
-
-	function removePlayer(socketId: string) {
-		const player = players.get(socketId);
-		if (player) {
-			console.log(`${player.username} left.`);
-			players.delete(socketId);
-			broadcast();
-		}
-	}
-
-	socket.on('player-leave', () => removePlayer(socket.id));
-	socket.on('disconnect', () => removePlayer(socket.id));
-});
-
-function getAllActiveMobs(): Array<Entite> {
-	return ([] as Array<Entite>)
-		.concat(spiderPool.getActive())
-		.concat(piePool.getActive())
-		.concat(galinettePool.getActive());
+	target.emit('update-rooms', { rooms: roomList });
 }
 
-function spawnMobs() {
-	const roll = Math.floor(Math.random() * mobsTypes.length);
-	switch (roll) {
-		case 0:
-			galinettePool.acquire();
-			break;
-		case 1:
-			spiderPool.acquire();
-			break;
-		case 2:
-			piePool.acquire();
-			break;
-		default:
-			break;
-	}
+function getRoomKey(roomId: number): string {
+	return `room-${roomId}`;
 }
 
-function broadcast() {
+function broadcastGame(roomId: number, state: RoomState) {
 	const playerInfo: Map<string, object> = new Map();
-	players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
-	io.emit('playerInfo', {
+	state.players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
+	io.to(getRoomKey(roomId)).emit('playerInfo', {
 		players: Object.fromEntries(playerInfo),
-		bullets: bulletPool.getActive().map(b => b.getAsJson()),
+		bullets: state.bulletPool.getActive().map(b => b.getAsJson()),
 	});
 }
 
-function broadcastMob() {
+function broadcastMobs(roomId: number, state: RoomState) {
 	const mobsInfo: object[] = [];
-	getAllActiveMobs().forEach(m => mobsInfo.push(m.getAsJson()));
-	io.emit('mobsInfo', { mobs: mobsInfo });
+	state.getAllActiveMobs().forEach(m => mobsInfo.push(m.getAsJson()));
+	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });
 }
 
-setInterval(() => {
-	const activeMobs = getAllActiveMobs();
-
-	// --- Bullets ---
-	const activeBefore = bulletPool.getActive().length;
-	bulletPool.updateAll();
-	let changed = activeBefore !== bulletPool.getActive().length;
-
-	bulletPool.getActive().forEach(bullet => {
-		players.forEach(player => {
-			if (player.identifier === bullet.ownerId) return;
-			if (player.collidesWith(bullet)) {
-				player.takeDamage(1);
-				bullet.active = false;
-				changed = true;
-
-				if (player.isDead()) {
-					console.log(`${player.username} was eliminated.`);
-				}
-			}
-		});
-
-		activeMobs.forEach(mob => {
-			if (mob.collidesWith(bullet)) {
-				mob.takeDamage(1);
-				bullet.active = false;
-				changed = true;
-				console.log(`${mob.name} hit, HP: ${mob.health}`);
-
-				if (mob.isDead()) {
-					console.log(`${mob.name} eliminated.`);
-					mob.active = false;
-				}
-			}
-		});
-	});
-
-	// --- Mobs ---
-	if (activeMobs.length > 0) {
-		activeMobs.forEach(mob => {
-			if (mob instanceof Pie) {
-				const targetPlayer = getClosestPlayer(mob, players);
-
-				mob.target = targetPlayer
-					? { x: targetPlayer.x, y: targetPlayer.y }
-					: null;
-			}
-
-			mob.move();
-
-			players.forEach(player => {
-				if (player.collidesWith(mob)) {
-					player.takeDamage(mob.damage);
-					changed = true;
-					if (player.isDead()) {
-						console.log(`${player.username} was eliminated.`);
-					}
-				}
-			});
-
-			if (mob.x < -mob.width) {
-				mob.active = false;
-			}
-		});
-	}
-
-	if (changed || activeMobs.length > 0) {
-		broadcast();
-		broadcastMob();
-	}
-}, 1000 / 60);
-
-setInterval(() => {
-	spawnMobs();
-}, 2000);
-
-function getClosestPlayer(
-	mob: Entite,
-	players: Map<string, Player>
-): Player | null {
+function getClosestPlayer(mob: Entite, players: Map<string, Player>): Player | null {
 	const activePlayers = Array.from(players.values()).filter(p => p.active);
-
 	if (activePlayers.length === 0) return null;
 
 	let closest = activePlayers[0];
@@ -267,26 +118,216 @@ function getClosestPlayer(
 	return closest;
 }
 
-function createRoom(name: string, capacityMax: number): RoomServer {
-	const r: RoomServer = {
-		id: ++roomIdCpt,
-		name: name,
-		capacityMax: capacityMax,
-		players: new Set(),
-	};
+io.on('connection', socket => {
+	broadcastRooms();
 
-	rooms.set(r.id, r);
+	let currentRoomId: number | null = null;
 
-	return r;
-}
+	socket.on('get-rooms', () => {
+		broadcastRooms(socket);
+	});
 
-function broadcastRooms() {
-	const roomList = Array.from(rooms.values()).map(r => ({
-		roomId: r.id,
-		roomName: r.name,
-		capacityMax: r.capacityMax,
-		currentPlayers: r.players.size,
-	}));
 
-	io.emit('update-rooms', { rooms: roomList });
-}
+	socket.on('register', (data: { username: string }) => {
+		const username = data.username?.trim();
+
+		if (!username || username.length < 2) {
+			socket.emit('register_error', 'Invalid username.');
+			return;
+		}
+
+		const isTaken = Array.from(roomStates.values()).some(state =>
+			Array.from(state.players.values()).some(p => p.username === username)
+		);
+
+		if (isTaken) {
+			socket.emit('register_error', 'Username already taken.');
+			return;
+		}
+
+		socket.data.username = username;
+		socket.emit('register_success');
+	});
+
+	socket.on('join-room', (roomId: number) => {
+		const room = rooms.get(roomId);
+		const state = roomStates.get(roomId);
+
+		if (!room || !state) {
+			socket.emit('room_error', 'Room not found.');
+			return;
+		}
+
+		if (room.players.size >= room.capacityMax) {
+			socket.emit('room_error', 'Room is full.');
+			return;
+		}
+
+		if (currentRoomId !== null) {
+			removeFromRoom(currentRoomId);
+		}
+
+		const username = socket.data.username as string | undefined;
+		if (!username) {
+			socket.emit('room_error', 'You must register before joining a room.');
+			return;
+		}
+
+		currentRoomId = roomId;
+		room.players.add(socket.id);
+		socket.join(getRoomKey(roomId));
+
+		state.players.set(
+			socket.id,
+			new Player(socket.id, username, boundWidth, boundHeight)
+		);
+		console.log(`${socket.id} joined room ${room.name}`);
+
+		broadcastRooms();
+		socket.emit('join-room-success', roomId);
+		broadcastGame(roomId, state);
+	});
+
+	socket.on('keypress', direction => {
+		if (currentRoomId === null) return;
+		const state = roomStates.get(currentRoomId);
+		if (!state) return;
+
+		const player = state.players.get(socket.id);
+		if (!player || player.isDead()) return;
+
+		const prevX = player.x;
+		const prevY = player.y;
+
+		player.move(direction);
+		console.log(
+			`${player.username} moved ${direction} → (${player.x}, ${player.y})`
+		);
+
+		const collides = Array.from(state.players.values()).some(
+			other =>
+				other.identifier !== player.identifier && player.collidesWith(other)
+		);
+
+		if (collides) {
+			player.x = prevX;
+			player.y = prevY;
+		}
+
+		if (player.x !== prevX || player.y !== prevY) {
+			broadcastGame(currentRoomId, state);
+		}
+	});
+
+	socket.on('shoot', (data: { dx: number; dy: number }) => {
+		if (currentRoomId === null) return;
+		const state = roomStates.get(currentRoomId);
+		if (!state) return;
+
+		const player = state.players.get(socket.id);
+		if (!player || player.isDead()) return;
+
+		const bullet = state.bulletPool.acquire();
+		if (!bullet) return;
+
+		bullet.fire(
+			player.x + player.width / 2,
+			player.y + player.height / 2,
+			data.dx,
+			data.dy,
+			player.identifier
+		);
+
+		broadcastGame(currentRoomId, state);
+	});
+
+	function removeFromRoom(roomId: number) {
+		const room = rooms.get(roomId);
+		const state = roomStates.get(roomId);
+		if (!room || !state) return;
+
+		const player = state.players.get(socket.id);
+		if (player) {
+			console.log(`${player.username} left room ${room.name}.`);
+			state.players.delete(socket.id);
+		}
+
+		room.players.delete(socket.id);
+		socket.leave(getRoomKey(roomId));
+		currentRoomId = null;
+		broadcastRooms();
+		broadcastGame(roomId, state);
+	}
+
+	socket.on('player-leave', () => {
+		console.log(`player-leave received, currentRoomId: ${currentRoomId}`);
+		if (currentRoomId !== null) removeFromRoom(currentRoomId);
+	});
+
+	socket.on('disconnect', () => {
+		if (currentRoomId !== null) removeFromRoom(currentRoomId);
+	});
+});
+
+setInterval(() => {
+	roomStates.forEach((state, roomId) => {
+		if (state.players.size === 0) return;
+
+		const activeMobs = state.getAllActiveMobs();
+		const activeBefore = state.bulletPool.getActive().length;
+		state.bulletPool.updateAll();
+		let changed = activeBefore !== state.bulletPool.getActive().length;
+
+		state.bulletPool.getActive().forEach(bullet => {
+			state.players.forEach(player => {
+				if (player.identifier === bullet.ownerId) return;
+				if (player.collidesWith(bullet)) {
+					player.takeDamage(1);
+					bullet.active = false;
+					changed = true;
+					if (player.isDead()) console.log(`${player.username} eliminated.`);
+				}
+			});
+
+			activeMobs.forEach(mob => {
+				if (mob.collidesWith(bullet)) {
+					mob.takeDamage(1);
+					bullet.active = false;
+					changed = true;
+					if (mob.isDead()) mob.active = false;
+				}
+			});
+		});
+
+		activeMobs.forEach(mob => {
+			if (mob instanceof Pie) { //Pareil c'est hardcodé, Pas très SOLID
+				const target = getClosestPlayer(mob, state.players);
+				mob.target = target ? { x: target.x, y: target.y } : null;
+			}
+
+			mob.move();
+
+			state.players.forEach(player => {
+				if (player.collidesWith(mob)) {
+					player.takeDamage(mob.damage);
+					changed = true;
+					if (player.isDead()) console.log(`${player.username} eliminated.`);
+				}
+			});
+
+			if (mob.x < -mob.width) mob.active = false;
+		});
+
+		if (changed || activeMobs.length > 0) {
+			broadcastGame(roomId, state);
+			broadcastMobs(roomId, state);
+		}
+	});
+}, 1000 / 60);
+
+setInterval(() => {
+	roomStates.forEach((state) => {
+		if (state.players.size === 0) return;
+		state.spawnMob();
+	});
+}, 2000);

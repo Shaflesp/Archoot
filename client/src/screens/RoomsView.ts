@@ -29,13 +29,6 @@ export class RoomsView implements View {
 				sm.show('home-screen');
 			});
 
-		this.filterRooms();
-
-		socket.on('update-rooms', data => {
-			this.roomList = data.rooms;
-			this.filterRooms();
-		});
-
 		this.searchInput.addEventListener('input', () => {
 			this.filterRooms();
 		});
@@ -43,11 +36,29 @@ export class RoomsView implements View {
 
 	show(): void {
 		this.element.style.display = 'flex';
+		this.socket.on('join-room-success', this.onJoinRoomSuccess);
+		this.socket.on('room_error', this.onRoomError);
+		this.socket.on('update-rooms', this.onUpdateRooms);
+		this.socket.emit('get-rooms');
+		this.filterRooms()
 	}
 
 	clearRooms(): void {
 		this.roomListHtml.innerHTML = '';
 	}
+
+	private onJoinRoomSuccess = () => {
+		this.sm.show('game-screen');
+	};
+
+	private onRoomError = (message: string) => {
+		console.error('Room error:', message);
+	};
+
+	private onUpdateRooms = (data: { rooms: Room[] }) => {
+		this.roomList = data.rooms;
+		this.filterRooms();
+	};
 
 	roomToHtml(room: Room): string {
 		// plus utile
@@ -90,7 +101,6 @@ export class RoomsView implements View {
 
 			button.addEventListener('click', () => {
 				this.socket.emit('join-room', room.roomId);
-				this.sm.show('game-screen');
 			});
 
 			tdButton.appendChild(button);
@@ -115,5 +125,8 @@ export class RoomsView implements View {
 
 	hide(): void {
 		this.element.style.display = 'none';
+		this.socket.off('join-room-success', this.onJoinRoomSuccess);
+		this.socket.off('room_error', this.onRoomError);
+		this.socket.off('update-rooms', this.onUpdateRooms);
 	}
 }

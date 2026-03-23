@@ -11,6 +11,9 @@ export class HomeView implements View {
 	pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
 	usernamePopup = new Popup('.username');
 
+	private pendingDestination: string | null = null;
+	private pendingRoomId: number | null = null;
+
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
 		this.sm = sm;
@@ -23,12 +26,13 @@ export class HomeView implements View {
 			event.preventDefault();
 
 			const username = this.pseudoInput.value.trim();
-
 			if (username.length < 2) {
 				this.usernamePopup.show();
 				return;
 			}
 
+			this.pendingDestination = 'game-screen';
+			this.pendingRoomId = 1; //la 1 a une capacité max de 1, à ajuster pour avoir des rooms individuelles
 			socket.emit('register', { username });
 		});
 
@@ -38,7 +42,13 @@ export class HomeView implements View {
 		buttonMultiplayer.addEventListener('click', event => {
 			event.preventDefault();
 
-			sm.show('search-room');
+			const username = this.pseudoInput.value.trim();
+			if (username.length < 2) {
+				this.usernamePopup.show();
+				return;
+			}
+			this.pendingDestination = 'search-room';
+			socket.emit('register', { username });
 		});
 
 		/* Gestion du bouton crédits */
@@ -65,19 +75,35 @@ export class HomeView implements View {
 		this.element.style.display = 'flex';
 		this.socket.on('register_success', this.onRegisterSuccess);
 		this.socket.on('register_error', this.onRegisterError);
+		this.socket.on('join-room-success', this.onJoinRoomSuccess);
 	}
 
 	hide(): void {
 		this.element.style.display = 'none';
 		this.socket.off('register_success', this.onRegisterSuccess);
 		this.socket.off('register_error', this.onRegisterError);
+		this.socket.off('join-room-success', this.onJoinRoomSuccess);
 	}
 
 	private onRegisterSuccess = () => {
-		this.sm.show('game-screen');
+		if (
+			this.pendingDestination === 'game-screen' && this.pendingRoomId !== null) {
+				this.socket.emit('join-room', this.pendingRoomId);
+				this.pendingRoomId = null;
+		} else if (this.pendingDestination === 'search-room') {
+			this.sm.show('search-room');
+			this.pendingDestination = null;
+		}
 	};
 
 	private onRegisterError = (message: string) => {
 		console.error('Registration failed:', message);
+	};
+
+	private onJoinRoomSuccess = () => {
+		if (this.pendingDestination) {
+			this.sm.show(this.pendingDestination);
+			this.pendingDestination = null;
+		}
 	};
 }
