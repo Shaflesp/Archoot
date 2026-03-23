@@ -11,6 +11,7 @@ export default class Galinette extends Entite {
 	health = 5;
 	damage = 1;
 	shootSpeed = 0;
+	target=null;
 
 	move(): void {
 		this.x -= this.speed;

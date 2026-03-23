@@ -184,6 +184,12 @@ setInterval(() => {
 	// --- Mobs ---
 	if (activeMobs.length > 0) {
 		activeMobs.forEach(mob => {
+			if(mob instanceof Pie){
+				const targetPlayer = getClosestPlayer(mob, players);
+
+				mob.target = targetPlayer?{x: targetPlayer.x, y: targetPlayer.y}:null; 
+			}
+			
 			mob.move();
 
 			players.forEach(player => {
@@ -212,3 +218,23 @@ setInterval(() => {
 setInterval(() => {
 	spawnMobs();
 }, 2000);
+
+function getClosestPlayer(mob: Entite, players: Map<string, Player>):Player | null{
+	const activePlayers = Array.from(players.values()).filter(p => p.active); 
+
+	if(activePlayers.length===0) return null;
+
+	let closest = activePlayers[0];
+	let minDistance = Math.hypot(closest.x - mob.x, closest.y - mob.y);
+
+	for(let i = 1; i<activePlayers.length; i++){
+		const p = activePlayers[i];
+		const d= Math.hypot(p.x - mob.x, p.y - mob.y);
+
+		if(d<minDistance) {
+			minDistance = d;
+			closest = p;
+		}
+	}
+	return closest; 
+}

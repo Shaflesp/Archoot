@@ -11,9 +11,26 @@ export default class Pie extends Entite {
 	health = 5;
 	damage = 1;
 	shootSpeed = 0;
+	target: { x: number; y: number; } | null;
+
+	constructor(){
+		super();
+		this.target=null;
+	}
 
 	move(): void {
-		this.x -= this.speed;
+		if(this.target!=null){
+			const dx = this.target.x - this.x;
+			const dy = this.target.y - this.y;
+			const dist = Math.hypot(dx, dy);
+
+			if(dist>5) {
+				this.x += (dx/dist)* this.movementSpeed;
+				this.y += (dy/dist)* this.movementSpeed;
+			}
+		}else{
+			this.x -= this.speed;
+		}
 	}
 
 	reset(): void {

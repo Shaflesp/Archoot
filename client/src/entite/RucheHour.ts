@@ -11,6 +11,7 @@ export default class RucheHour extends Entite {
 	health = 30;
 	damage = 1;
 	shootSpeed = 4;
+	target=null;
 
 	move(): void {
 		this.x -= this.speed;

@@ -13,6 +13,7 @@ export abstract class Entite implements Collidable {
 	abstract damage: number;
 	abstract shootSpeed: number;
 	abstract speed: number;
+	abstract target: {x:number, y:number} | null
 
 	abstract move(): void;
 

@@ -11,6 +11,7 @@ export default class LeTyrus extends Entite {
 	health = 25;
 	damage = 1;
 	shootSpeed = 3;
+	target=null;
 
 	move(): void {
 		this.x -= this.speed;

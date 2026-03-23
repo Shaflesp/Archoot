@@ -1,6 +1,7 @@
 import { Entite } from './Entite.ts';
 
 export default class Brainstorming extends Entite {
+	target=null
 	name = 'Brainstorming';
 	x = 0;
 	y = 0;

@@ -12,6 +12,7 @@ export default class Spider extends Entite {
 	damage = 1;
 	shootSpeed = 0;
 	private climbing = false;
+	target=null;
 
 	move(): void {
 		if (!this.climbing) {
