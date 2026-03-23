@@ -1,0 +1,110 @@
+.search-container {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+    margin: 20px;
+
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.search-container label {
+    color: white;
+
+    font-weight: bold;
+    font-size: 26px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+    text-shadow: 2px 0 #000, -2px 0 #000000, 0 2px #000, 0 -2px #000,
+               1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000000;
+}
+
+.search-room {
+    padding: 8px 12px;
+    
+    border-radius: 8px;
+    border: 2px solid #ccc;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.search-room:focus {
+    border-color: #4CAF50;
+}
+
+.room-list {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+
+    background: rgba(69, 17, 16, 0.6);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.room-list th {
+    text-shadow: 2px 0 #000, -2px 0 #000000, 0 2px #000, 0 -2px #000,
+    1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000000;
+    background-color: #451110;
+    color: white;
+
+    padding: 12px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.room-list td {
+    padding: 10px;
+    text-align: center;
+    color: #eee;
+
+    text-shadow: 2px 0 #000, -2px 0 #000000, 0 2px #000, 0 -2px #000,
+    1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000000;
+}
+
+.room-list tr:hover {
+    background-color: rgba(69, 17, 16, 0.15);
+}
+
+.room-list button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+
+    background-color: #3da35d;
+
+    color: white;
+    cursor: pointer;
+}
+
+.room-list button:disabled {
+    background-color: #586f7c;
+    color:#ccc;
+
+    cursor: not-allowed;
+}
+
+#room-select-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+
+    justify-content: flex-start;
+}
+
+.room-list thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.room-list-scroll {
+    width: 50%;
+    max-height: 90vh; 
+    overflow-y: auto;
+
+    margin: 0 auto;
+    border-radius: 10px;
+}

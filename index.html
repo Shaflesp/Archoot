@@ -11,6 +11,8 @@
         <link rel="stylesheet" href="/css/credits.css">
         <link rel="stylesheet" href="/css/leaderboard.css">
         <link rel="stylesheet" href="/css/popup.css">
+        <link rel="stylesheet" href="/css/rooms.css">
+
 
         
         <script type="module" src="client/src/main.ts"></script>
@@ -45,18 +47,28 @@
         </div>
 
         <div id="room-select-screen" class="screen">
-            <label for="search-room">Recherche: </label>
-            <input name="search-room" id="search-room" class="search-room">
+            <a class="back-button home-button"><img src="./images/ui/retour.png"></a>  
 
-            <table class="room-list">
-                <tr>
-                    <th>Nom de salle</th>
-                    <th>Capacité</th>
-                    <th>Rejoindre</th>
-                </tr>
+            <div class="search-container">
+                <label for="search-room">Recherche: </label>
+                <input name="search-room" id="search-room" class="search-room">
+            </div>
 
-            </table>
-            
+            <div class="room-list-scroll">
+                <table class="room-list">
+                    <thead>
+                        <tr>
+                            <th>Nom de salle</th>
+                            <th>Capacité</th>
+                            <th>Rejoindre</th>
+                        </tr>
+                    </thead>
+    
+                    <tbody>
+    
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="game-screen" class="screen">

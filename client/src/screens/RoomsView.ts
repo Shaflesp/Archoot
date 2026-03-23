@@ -11,7 +11,7 @@ export class RoomsView implements View {
 	element = document.getElementById('room-select-screen')!;
 	pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
 	usernamePopup = new Popup('.username');
-	roomListHtml = document.querySelector<HTMLElement>('.room-list')!;
+	roomListHtml = document.querySelector<HTMLElement>('.room-list tbody')!;
 
 	searchInput = document.querySelector('.search-room')!;
 
@@ -21,6 +21,14 @@ export class RoomsView implements View {
 		this.socket = socket;
 		this.sm = sm;
 
+		this.element
+			.querySelector<HTMLAnchorElement>('.back-button')
+			?.addEventListener('click', () => {
+				console.log('Bouton retour cliqué (via Game)');
+
+				sm.show('home-screen');
+			});
+
 		const lambdaRoom: Room = {
 			capacityMax: 1,
 			currentPlayers: 1,
@@ -29,6 +37,16 @@ export class RoomsView implements View {
 		};
 
 		this.roomList.push(lambdaRoom);
+
+		for (let i = 0; i <= 49; i++) {
+			const r: Room = {
+				capacityMax: 1,
+				currentPlayers: 0,
+				roomName: `test${i}`,
+				roomId: i,
+			};
+			this.roomList.push(r);
+		}
 
 		this.fillRooms();
 
@@ -43,12 +61,7 @@ export class RoomsView implements View {
 	}
 
 	clearRooms(): void {
-		this.roomListHtml.innerHTML =
-			'<tr>' +
-			'<th>Nom de salle</th>' +
-			'<th>Capacité</th>' +
-			'<th>Rejoindre</th>' +
-			'</tr>';
+		this.roomListHtml.innerHTML = '';
 	}
 
 	roomToHtml(room: Room): string {
@@ -65,12 +78,13 @@ export class RoomsView implements View {
 			`<tr>` +
 			`<td>${room.roomName}</td>` +
 			`<td>${room.currentPlayers}/${room.capacityMax}</td>` +
-			`<th>${button}</th>` +
+			`<td>${button}</td>` +
 			`</tr>`
 		);
 	}
 
 	fillRooms() {
+		this.clearRooms();
 		this.roomList.forEach(room => {
 			this.roomListHtml.innerHTML += this.roomToHtml(room);
 		});
