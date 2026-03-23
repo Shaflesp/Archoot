@@ -1,6 +1,6 @@
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
-import { Player } from './Entity/Player.ts'
+import { Player } from './Entity/Player.ts';
 import { Bullet } from './Entity/Bullet.ts';
 import { Pool } from './Entity/Pool.ts';
 
@@ -8,6 +8,7 @@ import type { Entite } from '../client/src/entite/Entite.ts';
 import Spider from '../client/src/entite/spider.ts';
 import Pie from '../client/src/entite/pie.ts';
 import Galinette from '../client/src/entite/galinette.ts';
+import type { RoomServer } from './RoomServer.ts';
 
 const httpServer = http.createServer((_req, res) => {
 	res.statusCode = 200;
@@ -19,8 +20,16 @@ const boundHeight: number = 800;
 const players = new Map<string, Player>();
 const bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
 
+const rooms = new Map<number, RoomServer>();
+let roomIdCpt = 0;
+
+createRoom('Bleu', 1);
+createRoom('Blanc', 2);
+createRoom('Orouge', 3);
+createRoom('Coconut [DO NOT DELETE]', 4);
+
 const mobsTypes = ['spider', 'pie', 'galinette'];
-const galinettePool = new Pool(() => new Galinette(),20)
+const galinettePool = new Pool(() => new Galinette(), 20);
 const spiderPool = new Pool(() => new Spider(), 20);
 const piePool = new Pool(() => new Pie(), 20);
 
@@ -32,6 +41,7 @@ httpServer.listen(port, () => {
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
 io.on('connection', socket => {
+	broadcastRooms();
 	socket.on('register', (data: { username: string }) => {
 		const username = data.username?.trim();
 
@@ -49,7 +59,10 @@ io.on('connection', socket => {
 			return;
 		}
 
-		players.set(socket.id, new Player(socket.id, username, boundWidth, boundHeight));
+		players.set(
+			socket.id,
+			new Player(socket.id, username, boundWidth, boundHeight)
+		);
 		console.log(`Player registered: ${username} (${socket.id})`);
 		socket.emit('register_success');
 		broadcast();
@@ -58,18 +71,23 @@ io.on('connection', socket => {
 	socket.on('keypress', direction => {
 		const player = players.get(socket.id);
 
-		if (!player || player.isDead()) { return;}
+		if (!player || player.isDead()) {
+			return;
+		}
 
 		const prevX = player.x;
-    	const prevY = player.y;
+		const prevY = player.y;
 
 		player.move(direction);
-		console.log(`${player.username} moved ${direction} → (${player.x}, ${player.y})`);
+		console.log(
+			`${player.username} moved ${direction} → (${player.x}, ${player.y})`
+		);
 
 		const collides = Array.from(players.values()).some(
-			other => other.identifier !== player.identifier && player.collidesWith(other)
+			other =>
+				other.identifier !== player.identifier && player.collidesWith(other)
 		);
-	
+
 		if (collides) {
 			player.x = prevX;
 			player.y = prevY;
@@ -98,7 +116,6 @@ io.on('connection', socket => {
 		broadcast();
 	});
 
-
 	function removePlayer(socketId: string) {
 		const player = players.get(socketId);
 		if (player) {
@@ -122,20 +139,27 @@ function getAllActiveMobs(): Array<Entite> {
 function spawnMobs() {
 	const roll = Math.floor(Math.random() * mobsTypes.length);
 	switch (roll) {
-		case 0: galinettePool.acquire(); break;
-		case 1: spiderPool.acquire(); break;
-		case 2: piePool.acquire(); break;
-		default: break;
+		case 0:
+			galinettePool.acquire();
+			break;
+		case 1:
+			spiderPool.acquire();
+			break;
+		case 2:
+			piePool.acquire();
+			break;
+		default:
+			break;
 	}
 }
 
 function broadcast() {
-    const playerInfo: Map<string, object> = new Map();
-    players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
-    io.emit('playerInfo', {
-			players: Object.fromEntries(playerInfo),
-			bullets: bulletPool.getActive().map(b => b.getAsJson()),
-		});
+	const playerInfo: Map<string, object> = new Map();
+	players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
+	io.emit('playerInfo', {
+		players: Object.fromEntries(playerInfo),
+		bullets: bulletPool.getActive().map(b => b.getAsJson()),
+	});
 }
 
 function broadcastMob() {
@@ -166,7 +190,7 @@ setInterval(() => {
 			}
 		});
 
-		activeMobs.forEach( mob => {
+		activeMobs.forEach(mob => {
 			if (mob.collidesWith(bullet)) {
 				mob.takeDamage(1);
 				bullet.active = false;
@@ -184,12 +208,14 @@ setInterval(() => {
 	// --- Mobs ---
 	if (activeMobs.length > 0) {
 		activeMobs.forEach(mob => {
-			if(mob instanceof Pie){
+			if (mob instanceof Pie) {
 				const targetPlayer = getClosestPlayer(mob, players);
 
-				mob.target = targetPlayer?{x: targetPlayer.x, y: targetPlayer.y}:null; 
+				mob.target = targetPlayer
+					? { x: targetPlayer.x, y: targetPlayer.y }
+					: null;
 			}
-			
+
 			mob.move();
 
 			players.forEach(player => {
@@ -212,29 +238,55 @@ setInterval(() => {
 		broadcast();
 		broadcastMob();
 	}
-
 }, 1000 / 60);
 
 setInterval(() => {
 	spawnMobs();
 }, 2000);
 
-function getClosestPlayer(mob: Entite, players: Map<string, Player>):Player | null{
-	const activePlayers = Array.from(players.values()).filter(p => p.active); 
+function getClosestPlayer(
+	mob: Entite,
+	players: Map<string, Player>
+): Player | null {
+	const activePlayers = Array.from(players.values()).filter(p => p.active);
 
-	if(activePlayers.length===0) return null;
+	if (activePlayers.length === 0) return null;
 
 	let closest = activePlayers[0];
 	let minDistance = Math.hypot(closest.x - mob.x, closest.y - mob.y);
 
-	for(let i = 1; i<activePlayers.length; i++){
+	for (let i = 1; i < activePlayers.length; i++) {
 		const p = activePlayers[i];
-		const d= Math.hypot(p.x - mob.x, p.y - mob.y);
+		const d = Math.hypot(p.x - mob.x, p.y - mob.y);
 
-		if(d<minDistance) {
+		if (d < minDistance) {
 			minDistance = d;
 			closest = p;
 		}
 	}
-	return closest; 
+	return closest;
+}
+
+function createRoom(name: string, capacityMax: number): RoomServer {
+	const r: RoomServer = {
+		id: ++roomIdCpt,
+		name: name,
+		capacityMax: capacityMax,
+		players: new Set(),
+	};
+
+	rooms.set(r.id, r);
+
+	return r;
+}
+
+function broadcastRooms() {
+	const roomList = Array.from(rooms.values()).map(r => ({
+		roomId: r.id,
+		roomName: r.name,
+		capacityMax: r.capacityMax,
+		currentPlayers: r.players.size,
+	}));
+
+	io.emit('update-rooms', { rooms: roomList });
 }

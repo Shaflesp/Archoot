@@ -24,29 +24,10 @@ export class RoomsView implements View {
 		this.element
 			.querySelector<HTMLAnchorElement>('.back-button')
 			?.addEventListener('click', () => {
-				console.log('Bouton retour cliqué (via Game)');
+				console.log('Bouton retour cliqué (via Rooms)');
 
 				sm.show('home-screen');
 			});
-
-		const lambdaRoom: Room = {
-			capacityMax: 1,
-			currentPlayers: 1,
-			roomName: 'Banane',
-			roomId: 1,
-		};
-
-		this.roomList.push(lambdaRoom);
-
-		for (let i = 0; i <= 49; i++) {
-			const r: Room = {
-				capacityMax: 1,
-				currentPlayers: 0,
-				roomName: `test${i}`,
-				roomId: i,
-			};
-			this.roomList.push(r);
-		}
 
 		this.filterRooms();
 
@@ -69,6 +50,7 @@ export class RoomsView implements View {
 	}
 
 	roomToHtml(room: Room): string {
+		// plus utile
 		let button = '';
 
 		button = `<button type="button">Rejoindre</button>`;
@@ -90,7 +72,34 @@ export class RoomsView implements View {
 	fillRooms(rooms: Room[]) {
 		this.clearRooms();
 		rooms.forEach(room => {
-			this.roomListHtml.innerHTML += this.roomToHtml(room);
+			const tr = document.createElement('tr');
+
+			const tdName = document.createElement('td');
+			tdName.textContent = room.roomName;
+
+			const tdCount = document.createElement('td');
+			tdCount.textContent = `${room.currentPlayers}/${room.capacityMax}`;
+
+			const tdButton = document.createElement('td');
+			const button = document.createElement('button');
+			button.textContent = 'Rejoindre';
+
+			if (room.currentPlayers >= room.capacityMax) {
+				button.disabled = true;
+			}
+
+			button.addEventListener('click', () => {
+				this.socket.emit('join-room', room.roomId);
+				this.sm.show('game-screen');
+			});
+
+			tdButton.appendChild(button);
+
+			tr.appendChild(tdName);
+			tr.appendChild(tdCount);
+			tr.appendChild(tdButton);
+
+			this.roomListHtml.appendChild(tr);
 		});
 	}
 
