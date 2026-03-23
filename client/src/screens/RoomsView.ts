@@ -13,7 +13,7 @@ export class RoomsView implements View {
 	usernamePopup = new Popup('.username');
 	roomListHtml = document.querySelector<HTMLElement>('.room-list tbody')!;
 
-	searchInput = document.querySelector('.search-room')!;
+	searchInput = document.querySelector<HTMLInputElement>('.search-room')!;
 
 	roomList: Room[] = [];
 
@@ -32,7 +32,7 @@ export class RoomsView implements View {
 		const lambdaRoom: Room = {
 			capacityMax: 1,
 			currentPlayers: 1,
-			roomName: 'test',
+			roomName: 'Banane',
 			roomId: 1,
 		};
 
@@ -48,11 +48,15 @@ export class RoomsView implements View {
 			this.roomList.push(r);
 		}
 
-		this.fillRooms();
+		this.filterRooms();
 
 		socket.on('update-rooms', data => {
 			this.roomList = data.rooms;
-			this.fillRooms();
+			this.filterRooms();
+		});
+
+		this.searchInput.addEventListener('input', () => {
+			this.filterRooms();
 		});
 	}
 
@@ -83,11 +87,21 @@ export class RoomsView implements View {
 		);
 	}
 
-	fillRooms() {
+	fillRooms(rooms: Room[]) {
 		this.clearRooms();
-		this.roomList.forEach(room => {
+		rooms.forEach(room => {
 			this.roomListHtml.innerHTML += this.roomToHtml(room);
 		});
+	}
+
+	filterRooms() {
+		const val = this.searchInput.value.toLowerCase();
+
+		const newRooms = this.roomList.filter(r =>
+			r.roomName.toLowerCase().includes(val)
+		);
+
+		this.fillRooms(newRooms);
 	}
 
 	hide(): void {
