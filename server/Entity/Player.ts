@@ -20,8 +20,8 @@ export class Player {
 		this.bounds = { width, height };
 
 		this.movementSpeed = 5;
-		this.x = 0;
-		this.y = 0;
+		this.x = width/2;
+		this.y = height/2;
 		this.width = 100; //a ajuster selon la taille que l'on veut pour la hitbox /Sprite
 		this.height = 100;
 		this.username = username ? username : 'placeholder';
