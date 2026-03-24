@@ -32,7 +32,6 @@ export class HomeView implements View {
 			}
 
 			this.pendingDestination = 'game-screen';
-			this.pendingRoomId = 1; //la 1 a une capacité max de 1, à ajuster pour avoir des rooms individuelles
 			socket.emit('register', { username });
 		});
 
@@ -86,10 +85,9 @@ export class HomeView implements View {
 	}
 
 	private onRegisterSuccess = () => {
-		if (
-			this.pendingDestination === 'game-screen' && this.pendingRoomId !== null) {
-				this.socket.emit('join-room', this.pendingRoomId);
-				this.pendingRoomId = null;
+		if (this.pendingDestination === 'game-screen') {
+			this.socket.emit('create-solo-room'); 
+			this.pendingRoomId = null;
 		} else if (this.pendingDestination === 'search-room') {
 			this.sm.show('search-room');
 			this.pendingDestination = null;

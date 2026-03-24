@@ -45,21 +45,25 @@ const rooms = new Map<number, RoomServer>();
 const roomStates = new Map<number, RoomState>();
 let roomIdCpt = 0;
 
-function createRoom(name: string, capacityMax: number): RoomServer {
+function createRoom(name: string, capacityMax: number, solo: boolean = false): RoomServer {
 	const r: RoomServer = {
 		id: ++roomIdCpt,
 		name,
 		capacityMax,
 		players: new Set(),
+		solo
 	};
 	rooms.set(r.id, r);
 	roomStates.set(r.id, new RoomState());
 	return r;
 }
 
-createRoom('Bleu', 1);
-createRoom('Blanc', 2);
-createRoom('Orouge', 3);
+createRoom('Bleu', 4);
+createRoom('Blanc', 4);
+createRoom('Vert', 4);
+createRoom('Orange', 4);
+createRoom('Rouge', 4);
+createRoom('Jaune', 4);
 createRoom('Coconut [DO NOT DELETE]', 4);
 
 const port = 8080;
@@ -70,7 +74,9 @@ httpServer.listen(port, () => {
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
 function broadcastRooms(target: { emit: Function } = io) {
-	const roomList = Array.from(rooms.values()).map(r => ({
+	const roomList = Array.from(rooms.values())
+	.filter(r => !r.solo)
+	.map(r => ({
 		roomId: r.id,
 		roomName: r.name,
 		capacityMax: r.capacityMax,
@@ -188,6 +194,29 @@ io.on('connection', socket => {
 		broadcastGame(roomId, state);
 	});
 
+	socket.on('create-solo-room', () => {
+		const username = socket.data.username as string | undefined;
+		if (!username) {
+			socket.emit('room_error', 'You must register first.');
+			return;
+		}
+	
+		if (currentRoomId !== null) removeFromRoom(currentRoomId);
+	
+		const room = createRoom(`${username}'s game`, 1, true);
+		const state = roomStates.get(room.id)!;
+	
+		currentRoomId = room.id;
+		room.players.add(socket.id);
+		socket.join(getRoomKey(room.id));
+		state.players.set(socket.id, new Player(socket.id, username, boundWidth, boundHeight));
+	
+		console.log(`${username} created solo room ${room.id}`);
+		socket.emit('join-room-success', room.id);
+
+		broadcastGame(room.id, state);
+	});
+
 	socket.on('keypress', direction => {
 		if (currentRoomId === null) return;
 		const state = roomStates.get(currentRoomId);
@@ -255,8 +284,15 @@ io.on('connection', socket => {
 		room.players.delete(socket.id);
 		socket.leave(getRoomKey(roomId));
 		currentRoomId = null;
+
+		if (room.solo) {
+			rooms.delete(roomId);
+			roomStates.delete(roomId);
+		}
+
+		
 		broadcastRooms();
-		broadcastGame(roomId, state);
+		if (!room.solo) broadcastGame(roomId, state);
 	}
 
 	socket.on('player-leave', () => {
