@@ -39,11 +39,4 @@ export default class RoomState {
             .concat(this.brainPool.getActive())
             .concat(this.tyrusPool.getActive());
     }
-
-    // spawnMob() {
-        // const roll = Math.floor(Math.random() * 3); //là pareil
-        // if (roll === 0) this.galinettePool.acquire();
-        // else if (roll === 1) this.spiderPool.acquire();
-        // else this.piePool.acquire();
-    // }
 }

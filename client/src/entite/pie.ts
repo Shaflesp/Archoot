@@ -1,11 +1,9 @@
 import { Entite } from './Entite.ts';
-const boundWidth: number = 1680;
-const boundHeight: number = 800;
 
 export default class Pie extends Entite {
 	name = 'pie';
-	x = Math.random() * boundWidth;
-	y = Math.random() * boundHeight;
+	x = Math.random() * this.canvaWidth -50;
+	y = Math.random() * this.canvaHeight -50;
 	width = 50;
 	height = 50;
 	speed = 1;

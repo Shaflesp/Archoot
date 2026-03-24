@@ -1,7 +1,10 @@
 .gameCanvas {
     border: 3px solid gray;
     box-sizing: border-box;
-    width: 80%;
-    height: 80%;
+    width: 80vw; 
+    height: auto; 
+    max-height: 90vh; 
+    display: block;
+    margin: auto;
     box-shadow: 6px 6px 25px rgba(0, 0, 0, 0.5);
 }

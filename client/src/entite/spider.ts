@@ -1,10 +1,8 @@
 import { Entite } from './Entite.ts'
-const boundWidth: number = 1680;
-const boundHeight: number = 800;
 
 export default class Spider extends Entite {
 	name = 'araignée';
-	x = Math.random() * boundWidth;
+	x = Math.random() * this.canvaWidth-50;
 	y = 0;
 	width = 50;
 	height = 50;
@@ -17,10 +15,12 @@ export default class Spider extends Entite {
 	target=null;
 
 	move(): void {
+		const limitBas = this.canvaHeight - this.height;
+		
 		if (!this.climbing) {
 			this.y += this.speed;
-			if (this.y >= 800) {
-				this.y = 800;
+			if (this.y >= limitBas) {
+				this.y = limitBas;
 				this.climbing = true;
 			}
 		} else {

@@ -1,13 +1,11 @@
 import { Entite } from './Entite.ts';
-const boundWidth: number = 1680;
-const boundHeight: number = 800;
 
 export default class RucheHour extends Entite {
 	name = 'Ruche Hour';
-	x = 900;
-	y = 400;
-	width = 100;
-	height = 100;
+	width = 600;
+	height = 600;
+	x = (this.canvaWidth / 2) - (this.width / 2);
+    y = (this.canvaHeight / 2) - (this.height / 2);
 	speed = 0;
 	movementSpeed = 3;
 	health = 30;
@@ -25,8 +23,10 @@ export default class RucheHour extends Entite {
 	}
 
 	reset(): void {
-		this.x = 900;
-		this.y = 400;
+		this.width = 600;
+		this.height = 600;
+		this.x = (this.canvaWidth / 2) - (this.width / 2);
+    	this.y = (this.canvaHeight / 2) - (this.height / 2);
 		this.health = 30;
 		this.active = true;
 	}

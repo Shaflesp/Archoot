@@ -1,11 +1,9 @@
 import { Entite } from './Entite.ts';
-const boundWidth: number = 1680;
-const boundHeight: number = 800;
 
 export default class Galinette extends Entite {
 	name = 'galinette cendrée';
-	x = 1680;
-	y = Math.random() * boundHeight;
+	x = this.canvaWidth;
+	y = Math.random() * this.canvaHeight;
 	width = 50;
 	height = 50;
 	speed = 2;

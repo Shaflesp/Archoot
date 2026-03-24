@@ -1,14 +1,12 @@
 import { Entite } from './Entite.ts';
-const boundWidth: number = 1680;
-const boundHeight: number = 800;
 
 export default class Mygalomane extends Entite {
 	target= null;
 	name = 'Mygalomane';
-	x = boundWidth/2;
-	y = boundHeight/2;
-	width = 250;
-	height = 250;
+	width = 600;
+	height = 600;
+	x = (this.canvaWidth / 2) - (this.width / 2);
+    y = (this.canvaHeight / 2) - (this.height / 2);
 	speed = 2;
 	movementSpeed = 0;
 	health = 25;
@@ -20,8 +18,10 @@ export default class Mygalomane extends Entite {
 	}
 
 	reset(): void {
-		this.x = 900;
-		this.y = 400;
+		this.width = 600;
+        this.height = 600;
+        this.x = (this.canvaWidth / 2) - (this.width / 2);
+        this.y = (this.canvaHeight / 2) - (this.height / 2);
 		this.health = 25;
 		this.active = true;
 	}

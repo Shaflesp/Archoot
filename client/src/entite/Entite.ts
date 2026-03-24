@@ -14,7 +14,14 @@ export abstract class Entite implements Collidable {
 	abstract shootSpeed: number;
 	abstract speed: number;
 	abstract target: {x:number, y:number} | null
+	canvaWidth:number;
+	canvaHeight:number;
 	
+	constructor(){
+		this.canvaWidth= 1680;
+		this.canvaHeight= 800;
+	}
+
 	abstract move(): void;
 
 	takeDamage(amount: number): void {

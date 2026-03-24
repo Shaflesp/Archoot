@@ -305,6 +305,7 @@ setInterval(() => {
 			});
 
 			activeMobs.forEach(mob => {
+				if(!mob.active) return;
 				if (mob.collidesWith(bullet)) {
 					mob.takeDamage(1);
 					bullet.active = false;
@@ -312,7 +313,8 @@ setInterval(() => {
 					if (mob.isDead()){
 						mob.active = false;
 						const killer = state.players.get(bullet.ownerId);
-						if(killer) killer.score += 100;						
+						if(killer) killer.score += 100;			
+						console.log(`${mob.name} tué`); 
 						if(bossNames.includes(mob.name)) manager?.bossDead();
 					} 
 				}
@@ -331,8 +333,13 @@ setInterval(() => {
 				if (player.collidesWith(mob)) {
 					player.takeDamage(mob.damage);
 					changed = true;
-					mob.active = false;
-					if(bossNames.includes(mob.name)) manager?.bossDead();
+					if(!bossNames.includes(mob.name)) { 
+						mob.active = false;
+					}else{
+						player.x -= 150;
+						if(player.x < 0) player.x=0;
+						console.log(`Effet recul pour ${player.username} suite collision avec ${mob.name}`);
+					}
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}
 			});

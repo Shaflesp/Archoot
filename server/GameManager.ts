@@ -17,6 +17,7 @@ export default class GameManager {
 
     spawnMob(){
         if(this.state.players.size === 0) return; // si aucun joueur, on ff 
+        if(this.bossSpawn) return; 
 
         const score = this.getTotalScore();
 
@@ -69,7 +70,7 @@ export default class GameManager {
         if(name==='Le Tyrus') boss = this.state.tyrusPool.acquire();
 
         if(boss){
-
+            boss.reset();
             this.bossSpawn=true;
             console.log(`Boss en cours : ${boss.name}`);
         }
