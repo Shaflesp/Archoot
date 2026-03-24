@@ -50,6 +50,8 @@ export class GameView extends CanvasView implements View {
 	private flashDuration: number = 0;
 	private lastLives: number | null = null;
 
+	private keysHeld: Set<string> = new Set();
+
 	private readonly mobsSrcs: string[] = [
 		'/images/sprites/pie.gif',
 		'/images/sprites/galinette.png',
@@ -104,8 +106,12 @@ export class GameView extends CanvasView implements View {
 		this.element.style.display = 'flex';
 		this.socket.on('playerInfo', this.onPlayerInfo);
 		this.socket.on('mobsInfo', this.onMobsInfo);
+
 		window.addEventListener('keydown', this.onKeyDown);
+		window.addEventListener('keyup', this.onKeyUp)
 		this.canvas.addEventListener('click', this.onMouseClick);
+		this.canvas.addEventListener('contextmenu', this.onMouseRightClick);
+
 		this.running = true;
 		this.gameLoop();
 	}
@@ -114,30 +120,61 @@ export class GameView extends CanvasView implements View {
 		this.element.style.display = 'none';
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
+
 		window.removeEventListener('keydown', this.onKeyDown);
+		window.removeEventListener('keyup', this.onKeyUp)
 		this.canvas.removeEventListener('click', this.onMouseClick);
+		this.canvas.removeEventListener('contextmenu', this.onMouseRightClick);
+		
 		this.running = false;
+		this.keysHeld.clear();
 	}
 
 	private onKeyDown = (e: KeyboardEvent) => {
-		switch (e.key) {
-			case 'ArrowUp':
-			case 'z':
-				this.socket.emit('keypress', 'up');
-				break;
-			case 'ArrowDown':
-			case 's':
-				this.socket.emit('keypress', 'down');
-				break;
-			case 'ArrowLeft':
-			case 'q':
-				this.socket.emit('keypress', 'left');
-				break;
-			case 'ArrowRight':
-			case 'd':
-				this.socket.emit('keypress', 'right');
-				break;
-		}
+		this.keysHeld.add(e.key);
+		this.emitMovement();
+	};
+	
+	private onKeyUp = (e: KeyboardEvent) => {
+		this.keysHeld.delete(e.key);
+	};
+	
+	private emitMovement() {
+		const up    = this.keysHeld.has('ArrowUp')    || this.keysHeld.has('z');
+		const down  = this.keysHeld.has('ArrowDown')  || this.keysHeld.has('s');
+		const left  = this.keysHeld.has('ArrowLeft')  || this.keysHeld.has('q');
+		const right = this.keysHeld.has('ArrowRight') || this.keysHeld.has('d');
+	
+		let dx = 0;
+		let dy = 0;
+	
+		if (up)    dy -= 1;
+		if (down)  dy += 1;
+		if (left)  dx -= 1;
+		if (right) dx += 1;
+	
+		if (dx === 0 && dy === 0) return;
+	
+		// Normalize so diagonal isn't faster
+		const dist = Math.hypot(dx, dy);
+		this.socket.emit('move', { dx: dx / dist, dy: dy / dist });
+	}
+
+	private onMouseRightClick = (e: MouseEvent) => {
+		e.preventDefault();
+		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
+		if (!me) return;
+	
+		const targetX = e.offsetX;
+		const targetY = e.offsetY;
+	
+		const dist = Math.hypot(targetX - me.x, targetY - me.y);
+		if (dist === 0) return;
+	
+		this.socket.emit('move', {
+			dx: (targetX - me.x) / dist,
+			dy: (targetY - me.y) / dist
+		});
 	};
 
 	private onMouseClick = (e: MouseEvent) => {

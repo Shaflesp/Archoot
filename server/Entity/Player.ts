@@ -31,33 +31,18 @@ export class Player {
 		this.invincibleUntil = 0;
 	}
 
-	move(direction: string) {
-		let newx = this.x;
-		let newy = this.y;
-
-		switch (direction) {
-			case 'up':
-				newy = this.y - this.movementSpeed;
-				break;
-			case 'down':
-				newy = this.y + this.movementSpeed;
-				break;
-			case 'left':
-				newx = this.x - this.movementSpeed;
-				break;
-			case 'right':
-				newx = this.x + this.movementSpeed;
-				break;
-		}
-
-		if (newx >= 0 && newx <= this.bounds.width) {
+	move(dx: number, dy: number) {
+		const newx = this.x + dx * this.movementSpeed;
+		const newy = this.y + dy * this.movementSpeed;
+	
+		if (newx >= 0 && newx <= this.bounds.width - this.width) {
 			this.x = newx;
 		}
-
-		if (newy >= 0 && newy <= this.bounds.height) {
+		if (newy >= 0 && newy <= this.bounds.height - this.height) {
 			this.y = newy;
 		}
 	}
+	
 
 	collidesWith(other: Collidable): boolean {
 		return (

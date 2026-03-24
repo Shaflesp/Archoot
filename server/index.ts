@@ -217,7 +217,7 @@ io.on('connection', socket => {
 		broadcastGame(room.id, state);
 	});
 
-	socket.on('keypress', direction => {
+	socket.on('move', (data: { dx: number, dy: number }) => {
 		if (currentRoomId === null) return;
 		const state = roomStates.get(currentRoomId);
 		if (!state) return;
@@ -228,21 +228,17 @@ io.on('connection', socket => {
 		const prevX = player.x;
 		const prevY = player.y;
 
-		player.move(direction);
-		console.log(
-			`${player.username} moved ${direction} → (${player.x}, ${player.y})`
-		);
+		player.move(data.dx, data.dy);
 
 		const collides = Array.from(state.players.values()).some(
-			other =>
-				other.identifier !== player.identifier && player.collidesWith(other)
+			other => other.identifier !== player.identifier && player.collidesWith(other)
 		);
-
+	
 		if (collides) {
 			player.x = prevX;
 			player.y = prevY;
 		}
-
+	
 		if (player.x !== prevX || player.y !== prevY) {
 			broadcastGame(currentRoomId, state);
 		}
