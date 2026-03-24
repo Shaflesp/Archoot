@@ -4,14 +4,18 @@ export default class RucheHour extends Entite {
 	name = 'Ruche Hour';
 	width = 600;
 	height = 600;
-	x = (this.canvaWidth / 2) - (this.width / 2);
-    y = (this.canvaHeight / 2) - (this.height / 2);
+	x = this.boundWidth / 2 - this.width / 2;
+	y = this.boundHeight / 2 - this.height / 2;
 	speed = 0;
 	movementSpeed = 3;
 	health = 30;
 	damage = 1;
 	shootSpeed = 4;
-	target=null;
+	target = null;
+
+	constructor(boundWith: number, boundHeight: number) {
+		super(boundWith, boundHeight);
+	}
 
 	move(): void {
 		this.x -= this.speed;
@@ -25,8 +29,8 @@ export default class RucheHour extends Entite {
 	reset(): void {
 		this.width = 600;
 		this.height = 600;
-		this.x = (this.canvaWidth / 2) - (this.width / 2);
-    	this.y = (this.canvaHeight / 2) - (this.height / 2);
+		this.x = this.boundWidth / 2 - this.width / 2;
+		this.y = this.boundHeight / 2 - this.height / 2;
 		this.health = 30;
 		this.active = true;
 	}

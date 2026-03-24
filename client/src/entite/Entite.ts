@@ -1,6 +1,9 @@
 import type {Collidable} from "../../../server/Entity/Collidable.ts";
 
 export abstract class Entite implements Collidable {
+	boundWidth: number;
+	boundHeight: number;
+
 	active: boolean = false;
 
 	abstract name: string;
@@ -13,13 +16,11 @@ export abstract class Entite implements Collidable {
 	abstract damage: number;
 	abstract shootSpeed: number;
 	abstract speed: number;
-	abstract target: {x:number, y:number} | null
-	canvaWidth:number;
-	canvaHeight:number;
-	
-	constructor(){
-		this.canvaWidth= 1680;
-		this.canvaHeight= 800;
+	target: { x: number; y: number } | null = null;
+
+	constructor(boundWidth: number, boundHeight: number) {
+		this.boundWidth = boundWidth;
+		this.boundHeight = boundHeight;
 	}
 
 	abstract move(): void;
@@ -57,4 +58,8 @@ export abstract class Entite implements Collidable {
 	}
 
 	abstract reset(): void;
+
+	needsTarget(): boolean {
+		return false;
+	}
 }

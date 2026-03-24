@@ -10,33 +10,52 @@ import { Bullet } from "./Entity/Bullet.ts";
 import type { Player } from "./Entity/Player.ts";
 import { Pool } from "./Entity/Pool.ts";
 
-const boundWidth = 1680;
-const boundHeight = 800;
-
 export default class RoomState {
-    players: Map<string, Player> = new Map();
-    bulletPool: Pool<Bullet> = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
+	boundWidth: number;
+	boundHeight: number;
 
-    galinettePool: Pool<Galinette> = new Pool(() => new Galinette(), 20);
-    spiderPool: Pool<Spider> = new Pool(() => new Spider(), 20);
-    piePool: Pool<Pie> = new Pool(() => new Pie(), 20);
-    mygaloPool: Pool<Mygalomane> = new Pool(() => new Mygalomane(), 1); 
-    ruchePool = new Pool(() => new RucheHour(), 1);
-    brainPool = new Pool(() => new Brainstorming(), 1);
-    tyrusPool = new Pool(()=> new LeTyrus(), 1);
+	players: Map<string, Player> = new Map();
+	bulletPool: Pool<Bullet>;
 
-    /* gestion niveau difficulté : */
-    level: number = 1;
+	private allPools: Array<Pool<Entite>>;
 
-    getAllActiveMobs(): Array<Entite> {
-        //il faut trouver une manière moins hardcodée
-        return ([] as Array<Entite>)
-            .concat(this.spiderPool.getActive())
-            .concat(this.piePool.getActive())
-            .concat(this.galinettePool.getActive())
-            .concat(this.mygaloPool.getActive())
-            .concat(this.ruchePool.getActive())
-            .concat(this.brainPool.getActive())
-            .concat(this.tyrusPool.getActive());
-    }
+	galinettePool: Pool<Galinette>;
+	spiderPool: Pool<Spider>;
+	piePool: Pool<Pie>;
+	mygaloPool: Pool<Mygalomane>;
+	ruchePool: Pool<RucheHour>;
+	brainPool: Pool<Brainstorming>;
+	tyrusPool: Pool<LeTyrus>;
+
+	constructor(boundWidth: number, boundHeight: number) {
+		this.boundWidth = boundWidth;
+		this.boundHeight = boundHeight;
+		this.bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
+
+		this.bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
+		this.galinettePool = new Pool(() => new Galinette(boundWidth, boundHeight), 20);
+		this.spiderPool = new Pool(() => new Spider(boundWidth, boundHeight), 20);
+		this.piePool = new Pool(() => new Pie(boundWidth, boundHeight), 20);
+
+		this.mygaloPool = new Pool(() => new Mygalomane(boundWidth, boundHeight), 1);
+		this.ruchePool = new Pool(() => new RucheHour(boundWidth, boundHeight), 1);
+		this.brainPool = new Pool(() => new Brainstorming(boundWidth, boundHeight), 1);
+		this.tyrusPool = new Pool(() => new LeTyrus(boundWidth, boundHeight), 1);
+
+		this.allPools = [
+			this.galinettePool,
+			this.spiderPool,
+			this.piePool,
+			this.mygaloPool,
+			this.ruchePool,
+			this.brainPool,
+			this.tyrusPool,
+		];
+	}
+
+	getAllActiveMobs(): Array<Entite> {
+		const mobs: Array<Entite> = [];
+		this.allPools.forEach(pool => pool.getActive().forEach(m => mobs.push(m)));
+		return mobs;
+	}
 }

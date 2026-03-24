@@ -2,8 +2,8 @@ import { Entite } from './Entite.ts';
 
 export default class Galinette extends Entite {
 	name = 'galinette cendrée';
-	x = this.canvaWidth;
-	y = Math.random() * this.canvaHeight;
+	x = this.boundWidth;
+	y = Math.random() * this.boundHeight;
 	width = 50;
 	height = 50;
 	speed = 2;
@@ -11,7 +11,11 @@ export default class Galinette extends Entite {
 	health = 5;
 	damage = 1;
 	shootSpeed = 0;
-	target=null;
+	target = null;
+
+	constructor(boundWith: number, boundHeight: number) {
+		super(boundWith, boundHeight);
+	}
 
 	move(): void {
 		this.x -= this.speed;

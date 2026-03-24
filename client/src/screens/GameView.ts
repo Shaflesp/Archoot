@@ -243,7 +243,6 @@ export class GameView extends CanvasView implements View {
 			this.ctx.drawImage(this.playerImage, p.x, p.y, p.width, p.height);
 			this.ctx.font = '24px Arial';
 			this.ctx.fillStyle = p.active ? 'white' : 'red';
-			this.ctx.fillText(p.username, p.x, p.y - 10);
 			this.ctx.fillText(`${p.username} [${p.score || 0}]`, p.x, p.y - 10);
 
 			this.ctx.globalAlpha = 1;

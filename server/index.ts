@@ -2,8 +2,6 @@ import http from 'http';
 import { Server as IOServer } from 'socket.io';
 import { Player } from './Entity/Player.ts';
 
-import type { Entite } from '../client/src/entite/Entite.ts';
-import Pie from '../client/src/entite/pie.ts';
 import type { RoomServer } from './RoomServer.ts';
 import RoomState from './RoomState.ts';
 import GameManager from './GameManager.ts';
@@ -20,10 +18,9 @@ const roomStates = new Map<number, RoomState>();
 let roomIdCpt = 0;
 
 const gameManagers = new Map<number, GameManager>();
-const bossNames = ['Mygalomane', 'Brainstorming', 'Ruche Hour', 'Le Tyrus'];
 
 function createRoom(name: string, capacityMax: number, solo: boolean = false): RoomServer {
-	const state = new RoomState();
+	const state = new RoomState(boundWidth,boundHeight);
 	const manager = new GameManager(state);
 
 	const r: RoomServer = {
@@ -34,7 +31,6 @@ function createRoom(name: string, capacityMax: number, solo: boolean = false): R
 		solo
 	};
 	rooms.set(r.id, r);
-	// roomStates.set(r.id, new RoomState());
 	roomStates.set(r.id, state)
 	gameManagers.set(r.id, manager);
 	return r;
@@ -55,15 +51,15 @@ httpServer.listen(port, () => {
 
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
-function broadcastRooms(target: { emit: Function } = io) {
+function broadcastRooms( target: { emit: (event: string, data: object) => void } = io) {
 	const roomList = Array.from(rooms.values())
-	.filter(r => !r.solo)
-	.map(r => ({
-		roomId: r.id,
-		roomName: r.name,
-		capacityMax: r.capacityMax,
-		currentPlayers: r.players.size,
-	}));
+		.filter(r => !r.solo)
+		.map(r => ({
+			roomId: r.id,
+			roomName: r.name,
+			capacityMax: r.capacityMax,
+			currentPlayers: r.players.size,
+		}));
 
 	target.emit('update-rooms', { rooms: roomList });
 }
@@ -85,25 +81,6 @@ function broadcastMobs(roomId: number, state: RoomState) {
 	const mobsInfo: object[] = [];
 	state.getAllActiveMobs().forEach(m => mobsInfo.push(m.getAsJson()));
 	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });
-}
-
-function getClosestPlayer(mob: Entite, players: Map<string, Player>): Player | null {
-	const activePlayers = Array.from(players.values()).filter(p => p.active);
-	if (activePlayers.length === 0) return null;
-
-	let closest = activePlayers[0];
-	let minDistance = Math.hypot(closest.x - mob.x, closest.y - mob.y);
-
-	for (let i = 1; i < activePlayers.length; i++) {
-		const p = activePlayers[i];
-		const d = Math.hypot(p.x - mob.x, p.y - mob.y);
-
-		if (d < minDistance) {
-			minDistance = d;
-			closest = p;
-		}
-	}
-	return closest;
 }
 
 io.on('connection', socket => {
@@ -266,15 +243,14 @@ io.on('connection', socket => {
 		if (room.solo) {
 			rooms.delete(roomId);
 			roomStates.delete(roomId);
+			gameManagers.delete(roomId);
 		}
 
-		
 		broadcastRooms();
 		if (!room.solo) broadcastGame(roomId, state);
 	}
 
 	socket.on('player-leave', () => {
-		console.log(`player-leave received, currentRoomId: ${currentRoomId}`);
 		if (currentRoomId !== null) removeFromRoom(currentRoomId);
 	});
 
@@ -312,18 +288,18 @@ setInterval(() => {
 					changed = true;
 					if (mob.isDead()){
 						mob.active = false;
+
 						const killer = state.players.get(bullet.ownerId);
-						if(killer) killer.score += 100;			
-						console.log(`${mob.name} tué`); 
-						if(bossNames.includes(mob.name)) manager?.bossDead();
+						if(killer) killer.score += 100;
+						if (manager?.isBoss(mob.name)) manager.bossDead();
 					} 
 				}
 			});
 		});
 
 		activeMobs.forEach(mob => {
-			if (mob instanceof Pie) { //Pareil c'est hardcodé, Pas très SOLID
-				const target = getClosestPlayer(mob, state.players);
+			if (mob.needsTarget()) {
+				const target = manager?.getClosestPlayer(mob);
 				mob.target = target ? { x: target.x, y: target.y } : null;
 			}
 
@@ -333,12 +309,20 @@ setInterval(() => {
 				if (player.collidesWith(mob)) {
 					player.takeDamage(mob.damage);
 					changed = true;
-					if(!bossNames.includes(mob.name)) { 
+
+					if (!manager?.isBoss(mob.name)) {
 						mob.active = false;
 					}else{
-						player.x -= 150;
-						if(player.x < 0) player.x=0;
-						console.log(`Effet recul pour ${player.username} suite collision avec ${mob.name}`);
+						const knockbackDist = 150;
+						const angle = Math.atan2(player.y - mob.y, player.x - mob.x);
+						player.x = Math.max(
+							0,
+							Math.min(boundWidth, player.x + Math.cos(angle) * knockbackDist)
+						);
+						player.y = Math.max(
+							0,
+							Math.min(boundHeight, player.y + Math.sin(angle) * knockbackDist)
+						);
 					}
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}

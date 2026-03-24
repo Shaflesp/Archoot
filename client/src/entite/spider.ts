@@ -2,7 +2,7 @@ import { Entite } from './Entite.ts'
 
 export default class Spider extends Entite {
 	name = 'araignée';
-	x = Math.random() * this.canvaWidth-50;
+	x = Math.random() * this.boundWidth - 50;
 	y = 0;
 	width = 50;
 	height = 50;
@@ -12,11 +12,15 @@ export default class Spider extends Entite {
 	damage = 1;
 	shootSpeed = 0;
 	private climbing = false;
-	target=null;
+	target = null;
+
+	constructor(boundWith: number, boundHeight: number) {
+		super(boundWith, boundHeight);
+	}
 
 	move(): void {
-		const limitBas = this.canvaHeight - this.height;
-		
+		const limitBas = this.boundHeight - this.height;
+
 		if (!this.climbing) {
 			this.y += this.speed;
 			if (this.y >= limitBas) {
