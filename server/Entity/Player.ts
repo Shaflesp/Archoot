@@ -15,11 +15,12 @@ export class Player {
 
 	lives: number;
 	invincibleUntil: number;
+	score: number;
 
 	constructor(id: string, username: string, width: number, height: number) {
 		this.bounds = { width, height };
 
-		this.movementSpeed = 5;
+		this.movementSpeed = 10;
 		this.x = width/2;
 		this.y = height/2;
 		this.width = 100; //a ajuster selon la taille que l'on veut pour la hitbox /Sprite
@@ -27,8 +28,9 @@ export class Player {
 		this.username = username ? username : 'placeholder';
 		this.identifier = id;
 
-		this.lives = 3;
+		this.lives = 5;
 		this.invincibleUntil = 0;
+		this.score = 0;
 	}
 
 	move(dx: number, dy: number) {
@@ -77,6 +79,7 @@ export class Player {
 			height: this.height,
 			lives: this.lives,
 			active: this.active,
+			score: this.score,
 		};
 	}
 }

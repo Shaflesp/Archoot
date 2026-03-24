@@ -11,6 +11,7 @@ interface PlayerData {
     height: number;
 	  lives : number;
 		active : number;
+	score : number;
 }
 
 interface BulletData {
@@ -231,6 +232,7 @@ export class GameView extends CanvasView implements View {
 			this.ctx.font = '24px Arial';
 			this.ctx.fillStyle = p.active ? 'white' : 'red';
 			this.ctx.fillText(p.username, p.x, p.y - 10);
+			this.ctx.fillText(`${p.username} [${p.score || 0}]`, p.x, p.y - 10);
 
 			this.ctx.globalAlpha = 1;
 			this.ctx.filter = 'none';
@@ -247,6 +249,15 @@ export class GameView extends CanvasView implements View {
 					40
 				);
 			}
+			this.ctx.save();
+			this.ctx.fillStyle = 'yellow';
+			this.ctx.font = 'bold 28px Arial';
+			this.ctx.textAlign = 'right';
+			this.ctx.shadowColor = 'black';
+			this.ctx.shadowBlur = 4;
+			
+			this.ctx.fillText(`Score: ${me.score || 0}`, this.canvas.width - 10, 70);
+			this.ctx.restore();
 		}
 
 		this.bulletInfo.forEach((b: BulletData) => {

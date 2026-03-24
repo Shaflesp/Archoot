@@ -326,7 +326,13 @@ setInterval(() => {
 					mob.takeDamage(1);
 					bullet.active = false;
 					changed = true;
-					if (mob.isDead()) mob.active = false;
+					if (mob.isDead()){
+						mob.active = false;
+						const killer = state.players.get(bullet.ownerId);
+						if(killer){
+							killer.score += 100;
+						}
+					} 
 				}
 			});
 		});
@@ -343,6 +349,7 @@ setInterval(() => {
 				if (player.collidesWith(mob)) {
 					player.takeDamage(mob.damage);
 					changed = true;
+					mob.active = false;
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}
 			});
