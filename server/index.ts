@@ -6,6 +6,7 @@ import type { Entite } from '../client/src/entite/Entite.ts';
 import Pie from '../client/src/entite/pie.ts';
 import type { RoomServer } from './RoomServer.ts';
 import RoomState from './RoomState.ts';
+import GameManager from './GameManager.ts';
 
 const httpServer = http.createServer((_req, res) => {
 	res.statusCode = 200;
@@ -18,7 +19,12 @@ const rooms = new Map<number, RoomServer>();
 const roomStates = new Map<number, RoomState>();
 let roomIdCpt = 0;
 
+const gameManagers = new Map<number, GameManager>();
+
 function createRoom(name: string, capacityMax: number, solo: boolean = false): RoomServer {
+	const state = new RoomState();
+	const manager = new GameManager(state);
+
 	const r: RoomServer = {
 		id: ++roomIdCpt,
 		name,
@@ -27,7 +33,9 @@ function createRoom(name: string, capacityMax: number, solo: boolean = false): R
 		solo
 	};
 	rooms.set(r.id, r);
-	roomStates.set(r.id, new RoomState());
+	// roomStates.set(r.id, new RoomState());
+	roomStates.set(r.id, state)
+	gameManagers.set(r.id, manager);
 	return r;
 }
 
@@ -278,6 +286,7 @@ setInterval(() => {
 	roomStates.forEach((state, roomId) => {
 		if (state.players.size === 0) return;
 
+		const manager = gameManagers.get(roomId);
 		const activeMobs = state.getAllActiveMobs();
 		const activeBefore = state.bulletPool.getActive().length;
 		state.bulletPool.updateAll();
@@ -302,9 +311,9 @@ setInterval(() => {
 					if (mob.isDead()){
 						mob.active = false;
 						const killer = state.players.get(bullet.ownerId);
-						if(killer){
-							killer.score += 100;
-						}
+						if(killer) killer.score += 100;
+						const boss = mob.name;
+						if(boss === 'Mygalomane' || boss ==='Brainstorming' || boss==='Ruche Hour' || boss==='Le Tyrus') manager?.bossDead();
 					} 
 				}
 			});
@@ -323,6 +332,8 @@ setInterval(() => {
 					player.takeDamage(mob.damage);
 					changed = true;
 					mob.active = false;
+					const boss = mob.name;
+					if(boss === 'Mygalomane' || boss ==='Brainstorming' || boss==='Ruche Hour' || boss==='Le Tyrus') manager?.bossDead();
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}
 			});
@@ -338,8 +349,7 @@ setInterval(() => {
 }, 1000 / 60);
 
 setInterval(() => {
-	roomStates.forEach((state) => {
-		if (state.players.size === 0) return;
-		state.spawnMob();
+	gameManagers.forEach((manager) => {
+		manager.spawnMob();
 	});
 }, 2000);

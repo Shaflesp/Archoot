@@ -2,7 +2,7 @@ import { Entite } from './Entite.ts';
 
 export default class Mygalomane extends Entite {
 	target= null;
-	name = 'Darognée';
+	name = 'Mygalomane';
 	x = 900;
 	y = 400;
 	width = 50;
