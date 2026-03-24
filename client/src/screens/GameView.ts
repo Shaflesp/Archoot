@@ -109,8 +109,8 @@ export class GameView extends CanvasView implements View {
 
 		window.addEventListener('keydown', this.onKeyDown);
 		window.addEventListener('keyup', this.onKeyUp)
-		this.canvas.addEventListener('click', this.onMouseClick);
-		this.canvas.addEventListener('contextmenu', this.onMouseRightClick);
+		this.canvas.addEventListener('mousedown', this.onMouseDown);
+		this.canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 		this.running = true;
 		this.gameLoop();
@@ -123,8 +123,8 @@ export class GameView extends CanvasView implements View {
 
 		window.removeEventListener('keydown', this.onKeyDown);
 		window.removeEventListener('keyup', this.onKeyUp)
-		this.canvas.removeEventListener('click', this.onMouseClick);
-		this.canvas.removeEventListener('contextmenu', this.onMouseRightClick);
+		this.canvas.removeEventListener('mousedown', this.onMouseDown);
+		this.canvas.removeEventListener('contextmenu', e => e.preventDefault());
 		
 		this.running = false;
 		this.keysHeld.clear();
@@ -160,43 +160,21 @@ export class GameView extends CanvasView implements View {
 		this.socket.emit('move', { dx: dx / dist, dy: dy / dist });
 	}
 
-	private onMouseRightClick = (e: MouseEvent) => {
-		e.preventDefault();
+	private onMouseDown = (e: MouseEvent) => {
 		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
 		if (!me) return;
 	
-		const targetX = e.offsetX;
-		const targetY = e.offsetY;
-	
-		const dist = Math.hypot(targetX - me.x, targetY - me.y);
-		if (dist === 0) return;
-	
-		this.socket.emit('move', {
-			dx: (targetX - me.x) / dist,
-			dy: (targetY - me.y) / dist
-		});
-	};
-
-	private onMouseClick = (e: MouseEvent) => {
-		const mouseX = e.offsetX;
-		const mouseY = e.offsetY;
-
-		let me;
-		if (this.socket.id != null) {
-			me = this.playerInfo.get(this.socket.id);
-		}
-		if (!me) return;
-
 		const centerX = me.x + me.width / 2;
 		const centerY = me.y + me.height / 2;
-		const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
-
+		const dist = Math.hypot(e.offsetX - centerX, e.offsetY - centerY);
+	
 		if (dist === 0) return;
-
-		const dx = (mouseX - centerX) / dist;
-		const dy = (mouseY - centerY) / dist;
-
-		this.socket.emit('shoot', { dx, dy });
+	
+		const dx = (e.offsetX - centerX) / dist;
+		const dy = (e.offsetY - centerY) / dist;
+	
+		if (e.button === 0) this.socket.emit('shoot', { dx, dy });
+		if (e.button === 2) this.socket.emit('move', { dx, dy });
 	};
 
 	private onPlayerInfo = (info: {
