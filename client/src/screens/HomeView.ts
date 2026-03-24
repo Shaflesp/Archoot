@@ -12,7 +12,6 @@ export class HomeView implements View {
 	usernamePopup = new Popup('.username');
 
 	private pendingDestination: string | null = null;
-	private pendingRoomId: number | null = null;
 
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
@@ -86,8 +85,7 @@ export class HomeView implements View {
 
 	private onRegisterSuccess = () => {
 		if (this.pendingDestination === 'game-screen') {
-			this.socket.emit('create-solo-room'); 
-			this.pendingRoomId = null;
+			this.socket.emit('create-solo-room');
 		} else if (this.pendingDestination === 'search-room') {
 			this.sm.show('search-room');
 			this.pendingDestination = null;
