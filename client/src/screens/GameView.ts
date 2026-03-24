@@ -60,6 +60,10 @@ export class GameView extends CanvasView implements View {
 		'/images/sprites/spider2.png',
 		'/images/sprites/spider3.png',
 		'/images/sprites/spider4.png',
+		'/images/sprites/Mygalomane.png', // 6
+		'/images/sprites/RucheHour.png',
+		'/images/sprites/Brainstorming.png',
+		'/images/sprites/Mygalomane.png', // à changer pour tyrus
 	];
 
 	private running: boolean = false;
@@ -199,15 +203,23 @@ export class GameView extends CanvasView implements View {
 		this.mobsInfo = info.mobs;
 	};
 
-	private getMobImage(name: string): HTMLImageElement {
-		switch (name) {
+	private getMobImage(mob: MobsData): HTMLImageElement {
+		switch (mob.name) {
 			case 'pie':
 				return this.mobsImages[0];
 			case 'galinette cendrée':
 				return this.mobsImages[1];
 			case 'araignée':
-				const index = Math.floor(Math.random() * (5 - 2) + 3);
+				const index = (Math.floor(mob.x)%4)+2; // pour régler pb d'affichage sur le canva
 				return this.mobsImages[index];
+			case 'Mygalomane':
+				return this.mobsImages[6];
+			case 'Ruche Hour':
+				return this.mobsImages[7];
+			case 'Brainstorming':
+				return this.mobsImages[8];
+			case 'Le Tyrus':
+				return this.mobsImages[9];
 			default:
 				return this.mobsImages[3];
 		}
@@ -219,7 +231,7 @@ export class GameView extends CanvasView implements View {
 		if (!this.playerImage.complete) return;
 
 		this.mobsInfo.forEach((m: MobsData) => {
-			this.ctx.drawImage(this.getMobImage(m.name), m.x, m.y, m.width, m.height);
+			this.ctx.drawImage(this.getMobImage(m), m.x, m.y, m.width, m.height);
 		});
 
 		this.playerInfo.forEach((p: PlayerData) => {

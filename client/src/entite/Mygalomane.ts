@@ -1,12 +1,14 @@
 import { Entite } from './Entite.ts';
+const boundWidth: number = 1680;
+const boundHeight: number = 800;
 
 export default class Mygalomane extends Entite {
 	target= null;
 	name = 'Mygalomane';
-	x = 900;
-	y = 400;
-	width = 50;
-	height = 50;
+	x = boundWidth/2;
+	y = boundHeight/2;
+	width = 250;
+	height = 250;
 	speed = 2;
 	movementSpeed = 0;
 	health = 25;
@@ -14,7 +16,7 @@ export default class Mygalomane extends Entite {
 	shootSpeed = 3;
 
 	move(): void {
-		this.x -= this.speed;
+		
 	}
 
 	reset(): void {

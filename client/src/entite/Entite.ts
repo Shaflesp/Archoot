@@ -14,7 +14,7 @@ export abstract class Entite implements Collidable {
 	abstract shootSpeed: number;
 	abstract speed: number;
 	abstract target: {x:number, y:number} | null
-
+	
 	abstract move(): void;
 
 	takeDamage(amount: number): void {

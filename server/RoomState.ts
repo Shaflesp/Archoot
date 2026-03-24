@@ -1,7 +1,10 @@
+import Brainstorming from "../client/src/entite/Brainstorming.ts";
 import type { Entite } from "../client/src/entite/Entite.ts";
 import Galinette from "../client/src/entite/galinette.ts";
+import LeTyrus from "../client/src/entite/LeTyrus.ts";
 import Mygalomane from "../client/src/entite/Mygalomane.ts";
 import Pie from "../client/src/entite/pie.ts";
+import RucheHour from "../client/src/entite/RucheHour.ts";
 import Spider from "../client/src/entite/spider.ts";
 import { Bullet } from "./Entity/Bullet.ts";
 import type { Player } from "./Entity/Player.ts";
@@ -17,7 +20,10 @@ export default class RoomState {
     galinettePool: Pool<Galinette> = new Pool(() => new Galinette(), 20);
     spiderPool: Pool<Spider> = new Pool(() => new Spider(), 20);
     piePool: Pool<Pie> = new Pool(() => new Pie(), 20);
-    bossPool: Pool<Mygalomane> = new Pool(() => new Mygalomane(), 1); 
+    mygaloPool: Pool<Mygalomane> = new Pool(() => new Mygalomane(), 1); 
+    ruchePool = new Pool(() => new RucheHour(), 1);
+    brainPool = new Pool(() => new Brainstorming(), 1);
+    tyrusPool = new Pool(()=> new LeTyrus(), 1);
 
     /* gestion niveau difficulté : */
     level: number = 1;
@@ -28,7 +34,10 @@ export default class RoomState {
             .concat(this.spiderPool.getActive())
             .concat(this.piePool.getActive())
             .concat(this.galinettePool.getActive())
-            .concat(this.bossPool.getActive());
+            .concat(this.mygaloPool.getActive())
+            .concat(this.ruchePool.getActive())
+            .concat(this.brainPool.getActive())
+            .concat(this.tyrusPool.getActive());
     }
 
     // spawnMob() {

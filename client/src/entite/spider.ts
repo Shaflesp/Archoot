@@ -1,8 +1,10 @@
 import { Entite } from './Entite.ts'
+const boundWidth: number = 1680;
+const boundHeight: number = 800;
 
 export default class Spider extends Entite {
 	name = 'araignée';
-	x = Math.random() * 1600;
+	x = Math.random() * boundWidth;
 	y = 0;
 	width = 50;
 	height = 50;

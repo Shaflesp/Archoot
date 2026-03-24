@@ -20,6 +20,7 @@ const roomStates = new Map<number, RoomState>();
 let roomIdCpt = 0;
 
 const gameManagers = new Map<number, GameManager>();
+const bossNames = ['Mygalomane', 'Brainstorming', 'Ruche Hour', 'Le Tyrus'];
 
 function createRoom(name: string, capacityMax: number, solo: boolean = false): RoomServer {
 	const state = new RoomState();
@@ -311,9 +312,8 @@ setInterval(() => {
 					if (mob.isDead()){
 						mob.active = false;
 						const killer = state.players.get(bullet.ownerId);
-						if(killer) killer.score += 100;
-						const boss = mob.name;
-						if(boss === 'Mygalomane' || boss ==='Brainstorming' || boss==='Ruche Hour' || boss==='Le Tyrus') manager?.bossDead();
+						if(killer) killer.score += 100;						
+						if(bossNames.includes(mob.name)) manager?.bossDead();
 					} 
 				}
 			});
@@ -332,8 +332,7 @@ setInterval(() => {
 					player.takeDamage(mob.damage);
 					changed = true;
 					mob.active = false;
-					const boss = mob.name;
-					if(boss === 'Mygalomane' || boss ==='Brainstorming' || boss==='Ruche Hour' || boss==='Le Tyrus') manager?.bossDead();
+					if(bossNames.includes(mob.name)) manager?.bossDead();
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}
 			});

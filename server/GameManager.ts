@@ -34,7 +34,7 @@ export default class GameManager {
             if(score<1500) {
                 this.state.galinettePool.acquire();
             }else{
-                this.spawnBoss('RucheHour');
+                this.spawnBoss('Ruche Hour');
             }
         }
 
@@ -52,17 +52,26 @@ export default class GameManager {
             if(score<3500){
                 this.state.piePool.acquire();
             }else{
-                this.spawnBoss('LeTyrus');
+                this.spawnBoss('Le Tyrus');
             }
         }
     }
 
     /* spawn du boss + notif console et boolean */
     spawnBoss(name:string){
-        const boss = this.state.bossPool.acquire();
+        if(this.bossSpawn) return; // si déjà boss on annule 
+        this.clearMobs();
+
+        let boss;
+        if(name==='Mygalomane') boss = this.state.mygaloPool.acquire();
+        if(name==='Ruche Hour') boss = this.state.ruchePool.acquire();
+        if(name==='Brainstorming') boss = this.state.brainPool.acquire();
+        if(name==='Le Tyrus') boss = this.state.tyrusPool.acquire();
+
         if(boss){
+
             this.bossSpawn=true;
-            console.log(`Boss en cours : ${name}`);
+            console.log(`Boss en cours : ${boss.name}`);
         }
     }
 
@@ -71,5 +80,12 @@ export default class GameManager {
         this.bossSpawn=false;
         this.state.level++;
         console.log("Boss tué ! Gain de niveau");
+    }
+
+    /* pour faire dispawn les mobs pdt un boss */
+    clearMobs(){
+        this.state.spiderPool.getActive().forEach(m => m.active = false);
+        this.state.galinettePool.getActive().forEach(m => m.active = false);
+        this.state.piePool.getActive().forEach(m => m.active = false);
     }
 }

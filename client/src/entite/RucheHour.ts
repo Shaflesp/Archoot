@@ -1,4 +1,6 @@
 import { Entite } from './Entite.ts';
+const boundWidth: number = 1680;
+const boundHeight: number = 800;
 
 export default class RucheHour extends Entite {
 	name = 'Ruche Hour';

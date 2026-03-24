@@ -1,9 +1,11 @@
 import { Entite } from './Entite.ts';
+const boundWidth: number = 1680;
+const boundHeight: number = 800;
 
 export default class Galinette extends Entite {
 	name = 'galinette cendrée';
 	x = 1680;
-	y = Math.random() * 800;
+	y = Math.random() * boundHeight;
 	width = 50;
 	height = 50;
 	speed = 2;
