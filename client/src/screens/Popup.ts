@@ -14,7 +14,7 @@ export class Popup {
 	}
 
 	show() {
-		this.popup.style.display = 'block';
+		this.popup.style.display = 'flex';
 		this.popup.classList.add('visible');
 	}
 

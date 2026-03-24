@@ -52,6 +52,7 @@ export class GameView extends CanvasView implements View {
 	private lastLives: number | null = null;
 
 	private keysHeld: Set<string> = new Set();
+	private rightClickTarget: { x: number; y: number } | null = null;
 
 	private readonly mobsSrcs: string[] = [
 		'/images/sprites/pie.gif',
@@ -96,13 +97,17 @@ export class GameView extends CanvasView implements View {
 				socket.emit('player-leave');
 				sm.show('home-screen');
 			});
-		// setInterval(() => {
-		// 	if (this.running) this.spawnMobs();
-		// }, 1500);
 	}
 
 	private gameLoop = () => {
 		if (!this.running) return;
+		if (this.rightClickTarget !== null) {
+			const dir = this.getDirection(
+				this.rightClickTarget.x,
+				this.rightClickTarget.y
+			);
+			if (dir) this.socket.emit('move', dir);
+		}
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
 	};
@@ -113,8 +118,10 @@ export class GameView extends CanvasView implements View {
 		this.socket.on('mobsInfo', this.onMobsInfo);
 
 		window.addEventListener('keydown', this.onKeyDown);
-		window.addEventListener('keyup', this.onKeyUp)
+		window.addEventListener('keyup', this.onKeyUp);
 		this.canvas.addEventListener('mousedown', this.onMouseDown);
+		this.canvas.addEventListener('mousemove', this.onMouseMove);
+		this.canvas.addEventListener('mouseup', this.onMouseUp);
 		this.canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 		this.running = true;
@@ -127,60 +134,81 @@ export class GameView extends CanvasView implements View {
 		this.socket.off('mobsInfo', this.onMobsInfo);
 
 		window.removeEventListener('keydown', this.onKeyDown);
-		window.removeEventListener('keyup', this.onKeyUp)
+		window.removeEventListener('keyup', this.onKeyUp);
 		this.canvas.removeEventListener('mousedown', this.onMouseDown);
+		this.canvas.removeEventListener('mousemove', this.onMouseMove);
+		this.canvas.removeEventListener('mouseup', this.onMouseUp);
 		this.canvas.removeEventListener('contextmenu', e => e.preventDefault());
-		
+
 		this.running = false;
 		this.keysHeld.clear();
+		this.rightClickTarget = null;
 	}
 
 	private onKeyDown = (e: KeyboardEvent) => {
 		this.keysHeld.add(e.key);
 		this.emitMovement();
 	};
-	
+
 	private onKeyUp = (e: KeyboardEvent) => {
 		this.keysHeld.delete(e.key);
 	};
-	
+
 	private emitMovement() {
-		const up    = this.keysHeld.has('ArrowUp')    || this.keysHeld.has('z');
-		const down  = this.keysHeld.has('ArrowDown')  || this.keysHeld.has('s');
-		const left  = this.keysHeld.has('ArrowLeft')  || this.keysHeld.has('q');
+		const up = this.keysHeld.has('ArrowUp') || this.keysHeld.has('z');
+		const down = this.keysHeld.has('ArrowDown') || this.keysHeld.has('s');
+		const left = this.keysHeld.has('ArrowLeft') || this.keysHeld.has('q');
 		const right = this.keysHeld.has('ArrowRight') || this.keysHeld.has('d');
-	
+
 		let dx = 0;
 		let dy = 0;
-	
-		if (up)    dy -= 1;
-		if (down)  dy += 1;
-		if (left)  dx -= 1;
+
+		if (up) dy -= 1;
+		if (down) dy += 1;
+		if (left) dx -= 1;
 		if (right) dx += 1;
-	
+
 		if (dx === 0 && dy === 0) return;
-	
+
 		// Normalize so diagonal isn't faster
 		const dist = Math.hypot(dx, dy);
 		this.socket.emit('move', { dx: dx / dist, dy: dy / dist });
 	}
 
 	private onMouseDown = (e: MouseEvent) => {
+		e.preventDefault();
+		if (e.button === 0) {
+			const dir = this.getDirection(e.offsetX, e.offsetY);
+			if (dir) this.socket.emit('shoot', dir);
+		}
+		if (e.button === 2) this.rightClickTarget = { x: e.offsetX, y: e.offsetY };
+	};
+
+	private onMouseMove = (e: MouseEvent) => {
+		if (this.rightClickTarget === null) return;
+		this.rightClickTarget = { x: e.offsetX, y: e.offsetY };
+	};
+
+	private onMouseUp = (e: MouseEvent) => {
+		if (e.button === 2) this.rightClickTarget = null;
+	};
+
+	private getDirection(offsetX: number, offsetY: number): { dx: number; dy: number } | null {
+
 		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
-		if (!me) return;
-	
+		if (!me) return null;
+
 		const centerX = me.x + me.width / 2;
 		const centerY = me.y + me.height / 2;
-		const dist = Math.hypot(e.offsetX - centerX, e.offsetY - centerY);
-	
-		if (dist === 0) return;
-	
-		const dx = (e.offsetX - centerX) / dist;
-		const dy = (e.offsetY - centerY) / dist;
-	
-		if (e.button === 0) this.socket.emit('shoot', { dx, dy });
-		if (e.button === 2) this.socket.emit('move', { dx, dy });
-	};
+		const dist = Math.hypot(offsetX - centerX, offsetY - centerY);
+
+		if (dist < me.width / 2) return null;
+
+		return {
+			dx: (offsetX - centerX) / dist,
+			dy: (offsetY - centerY) / dist,
+		};
+	}
 
 	private onPlayerInfo = (info: {
 		players: any;
@@ -210,7 +238,7 @@ export class GameView extends CanvasView implements View {
 			case 'galinette cendrée':
 				return this.mobsImages[1];
 			case 'araignée':
-				const index = (Math.floor(mob.x)%4)+2; // pour régler pb d'affichage sur le canva
+				const index = (Math.floor(mob.x) % 4) + 2; // pour régler pb d'affichage sur le canva
 				return this.mobsImages[index];
 			case 'Mygalomane':
 				return this.mobsImages[6];
@@ -266,13 +294,13 @@ export class GameView extends CanvasView implements View {
 			this.ctx.textAlign = 'right';
 			this.ctx.shadowColor = 'black';
 			this.ctx.shadowBlur = 4;
-			
+
 			this.ctx.fillText(`Score: ${me.score || 0}`, this.canvas.width - 10, 70);
 			this.ctx.restore();
 		}
 
 		this.bulletInfo.forEach((b: BulletData) => {
-			const angle = Math.atan2(b.dy, b.dx) + Math.PI/4;
+			const angle = Math.atan2(b.dy, b.dx) + Math.PI / 4;
 			const centerX = b.x + b.width / 2;
 			const centerY = b.y + b.height / 2;
 
