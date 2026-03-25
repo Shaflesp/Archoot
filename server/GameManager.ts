@@ -6,10 +6,19 @@ import type { Pool } from './Entity/Pool.ts';
 export default class GameManager {
 	state: RoomState;
 	bossSpawn: boolean = false;
+	private readonly bossPoolMap: Map<string, Pool<Entite>>;
 	level: number = 1;
+
+	private spawnCooldown: number = 0;
 
 	constructor(state: RoomState) {
 		this.state = state;
+		this.bossPoolMap = new Map([
+			['Mygalomane', this.state.mygaloPool],
+			['Ruche Hour', this.state.ruchePool],
+			['Brainstorming', this.state.brainPool],
+			['Le Tyrus', this.state.tyrusPool],
+		]);
 	}
 
 	/* Avoir score total de tous les joueurs d'une room */
@@ -23,6 +32,11 @@ export default class GameManager {
 		if (this.state.players.size === 0) return; // si aucun joueur, on ff
 		if (this.bossSpawn) return;
 
+		if (this.spawnCooldown > 0) {
+			this.spawnCooldown--;
+			return;
+		}
+
 		const score = this.getTotalScore();
 
 		if (this.level === 1) {
@@ -30,7 +44,6 @@ export default class GameManager {
 			score < 500
 				? this.state.spiderPool.acquire()
 				: this.spawnBoss('Mygalomane');
-
 		} else if (this.level === 2) {
 			/* NIVEAU 2 : Galinette + Ruche Hour */
 			score < 1500
@@ -49,17 +62,9 @@ export default class GameManager {
 
 	/* spawn du boss + notif console et boolean */
 	spawnBoss(name: string) {
-		if (this.bossSpawn) return; // si déjà boss on annule
+		if (this.bossSpawn) return;
 		this.clearMobs();
-
-		const bossPool: Map<string, Pool<Entite>> = new Map([
-			['Mygalomane',   this.state.mygaloPool],
-			['Ruche Hour',   this.state.ruchePool],
-			['Brainstorming', this.state.brainPool],
-			['Le Tyrus',     this.state.tyrusPool],
-		]);
-
-		const boss = bossPool.get(name)?.acquire();
+		const boss = this.bossPoolMap.get(name)?.acquire();
 		if (boss) {
 			this.bossSpawn = true;
 			console.log(`Boss en cours : ${boss.name}`);
@@ -67,19 +72,22 @@ export default class GameManager {
 	}
 
 	isBoss(name: string): boolean {
-		return ['Mygalomane', 'Brainstorming', 'Ruche Hour', 'Le Tyrus'].includes(name);
+		return ['Mygalomane', 'Brainstorming', 'Ruche Hour', 'Le Tyrus'].includes(
+			name
+		);
 	}
 
 	/* màj des variables quand boss tué */
 	bossDead() {
 		this.bossSpawn = false;
 		this.level++;
+		this.spawnCooldown = 5;
 		console.log('Boss tué ! Gain de niveau');
 	}
 
 	/* pour faire dispawn les mobs pdt un boss */
 	clearMobs() {
-		this.state.getAllActiveMobs().forEach(m => m.active = false);
+		this.state.getAllActiveMobs().forEach(m => (m.active = false));
 	}
 
 	getClosestPlayer(mob: Entite): Player | null {

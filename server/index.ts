@@ -5,6 +5,7 @@ import { Player } from './Entity/Player.ts';
 import type { RoomServer } from './RoomServer.ts';
 import RoomState from './RoomState.ts';
 import GameManager from './GameManager.ts';
+import type { Entite } from '../client/src/entite/Entite.ts';
 
 const httpServer = http.createServer((_req, res) => {
 	res.statusCode = 200;
@@ -16,6 +17,8 @@ const boundHeight: number = 800;
 const rooms = new Map<number, RoomServer>();
 const roomStates = new Map<number, RoomState>();
 let roomIdCpt = 0;
+
+const dirtyRooms: Set<number> = new Set();
 
 const gameManagers = new Map<number, GameManager>();
 const registeredUsernames: Set<string> = new Set();
@@ -81,9 +84,9 @@ function broadcastGame(roomId: number, state: RoomState) {
 	});
 }
 
-function broadcastMobs(roomId: number, state: RoomState) {
+function broadcastMobs(roomId: number, mobs: Array<Entite>) {
 	const mobsInfo: object[] = [];
-	state.getAllActiveMobs().forEach(m => mobsInfo.push(m.getAsJson()));
+	mobs.forEach(m => mobsInfo.push(m.getAsJson()));
 	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });
 }
 
@@ -198,14 +201,8 @@ io.on('connection', socket => {
 		const player = state.players.get(socket.id);
 		if (!player || player.isDead()) return;
 
-		const prevX = player.x;
-		const prevY = player.y;
-
 		player.move(data.dx, data.dy);
-	
-		if (player.x !== prevX || player.y !== prevY) {
-			broadcastGame(currentRoomId, state);
-		}
+		dirtyRooms.add(currentRoomId);
 	});
 
 	socket.on('shoot', (data: { dx: number; dy: number }) => {
@@ -275,11 +272,16 @@ setInterval(() => {
 
 		const manager = gameManagers.get(roomId);
 		const activeMobs = state.getAllActiveMobs();
+
 		const activeBefore = state.bulletPool.getActive().length;
 		state.bulletPool.updateAll();
-		let changed = activeBefore !== state.bulletPool.getActive().length;
+		const activeBullets = state.bulletPool.getActive();
+		let changed =
+			activeBefore !== activeBullets.length || dirtyRooms.has(roomId);
 
-		state.bulletPool.getActive().forEach(bullet => {
+		dirtyRooms.delete(roomId);
+
+		activeBullets.forEach(bullet => {
 			state.players.forEach(player => {
 				if (!player.active) return;
 				if (player.identifier === bullet.ownerId) return;
@@ -291,8 +293,11 @@ setInterval(() => {
 				}
 			});
 
+			if (!bullet.active) return;
+
 			activeMobs.forEach(mob => {
 				if(!mob.active) return;
+				if (!bullet.active) return;
 				if (mob.collidesWith(bullet)) {
 					mob.takeDamage(1);
 					bullet.active = false;
@@ -302,6 +307,9 @@ setInterval(() => {
 
 						const killer = state.players.get(bullet.ownerId);
 						if(killer) killer.score += 100;
+						console.log(
+							`mob dead: ${mob.name}, manager exists: ${!!manager}, isBoss: ${manager?.isBoss(mob.name)}`
+						);
 						if (manager?.isBoss(mob.name)) manager.bossDead();
 					} 
 				}
@@ -346,7 +354,7 @@ setInterval(() => {
 
 		if (changed || activeMobs.length > 0) {
 			broadcastGame(roomId, state);
-			broadcastMobs(roomId, state);
+			broadcastMobs(roomId, activeMobs);
 		}
 	});
 }, 1000 / 60);

@@ -57,6 +57,9 @@ export class GameView extends CanvasView implements View {
 	private keysHeld: Set<string> = new Set();
 	private rightClickTarget: { x: number; y: number } | null = null;
 
+	private lastMoveEmit: number = 0;
+	private readonly MOVE_RATE = 1000 / 60
+
 	private readonly mobsSrcs: string[] = [
 		'/images/sprites/pie.gif',
 		'/images/sprites/galinette.png',
@@ -132,11 +135,14 @@ export class GameView extends CanvasView implements View {
 	private gameLoop = () => {
 		if (!this.running) return;
 		if (this.rightClickTarget !== null) {
-			const dir = this.getDirection(
-				this.rightClickTarget.x,
-				this.rightClickTarget.y
-			);
-			if (dir) this.socket.emit('move', dir);
+			const now = Date.now();
+			if (now - this.lastMoveEmit >= this.MOVE_RATE) {
+				const dir = this.getDirection(this.rightClickTarget.x, this.rightClickTarget.y);
+				if (dir) {
+					this.socket.emit('move', dir);
+					this.lastMoveEmit = now;
+				}
+			}
 		}
 		this.draw();
 		requestAnimationFrame(this.gameLoop);
