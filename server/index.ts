@@ -327,13 +327,14 @@ setInterval(() => {
 					}else{
 						const knockbackDist = 150;
 						const angle = Math.atan2(player.y - mob.y, player.x - mob.x);
+
 						player.x = Math.max(
 							0,
-							Math.min(boundWidth, player.x + Math.cos(angle) * knockbackDist)
+							Math.min(boundWidth - player.width, player.x + Math.cos(angle) * knockbackDist)
 						);
 						player.y = Math.max(
 							0,
-							Math.min(boundHeight, player.y + Math.sin(angle) * knockbackDist)
+							Math.min(boundHeight - player.height, player.y + Math.sin(angle) * knockbackDist)
 						);
 					}
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
