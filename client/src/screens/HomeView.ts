@@ -10,6 +10,7 @@ export class HomeView implements View {
 	element = document.getElementById('home-screen')!;
 	pseudoInput = document.getElementById('pseudo') as HTMLInputElement;
 	usernamePopup = new Popup('.username');
+	takenPopup = new Popup('.taken');
 
 	private pendingDestination: string | null = null;
 
@@ -93,7 +94,11 @@ export class HomeView implements View {
 	};
 
 	private onRegisterError = (message: string) => {
-		console.error('Registration failed:', message);
+		if (message === 'Username already taken.') {
+			this.takenPopup.show();
+		} else {
+			this.usernamePopup.show();
+		}
 	};
 
 	private onJoinRoomSuccess = () => {

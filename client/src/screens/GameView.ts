@@ -48,6 +48,9 @@ export class GameView extends CanvasView implements View {
 	private mobsImages: HTMLImageElement[] = [];
 	private coeurImage: HTMLImageElement;
 
+	private deathPopup: HTMLElement;
+	private escPopup: HTMLElement;
+
 	private flashDuration: number = 0;
 	private lastLives: number | null = null;
 
@@ -97,6 +100,33 @@ export class GameView extends CanvasView implements View {
 				socket.emit('player-leave');
 				sm.show('home-screen');
 			});
+
+		this.deathPopup = this.element.querySelector<HTMLElement>('.death-popup')!;
+		this.escPopup = this.element.querySelector<HTMLElement>('.esc-popup')!;
+
+		this.element
+			.querySelector<HTMLElement>('.spectate-button')
+			?.addEventListener('click', () => this.closePopup(this.deathPopup));
+
+		this.element
+			.querySelector<HTMLElement>('.leave-button')
+			?.addEventListener('click', () => {
+				this.closePopup(this.deathPopup);
+				socket.emit('player-leave');
+				sm.show('home-screen');
+			});
+
+		this.element
+			.querySelector<HTMLElement>('.resume-button')
+			?.addEventListener('click', () => this.closePopup(this.escPopup));
+
+		this.element
+			.querySelector<HTMLElement>('.quit-button')
+			?.addEventListener('click', () => {
+				this.closePopup(this.escPopup);
+				socket.emit('player-leave');
+				sm.show('home-screen');
+			});
 	}
 
 	private gameLoop = () => {
@@ -130,6 +160,10 @@ export class GameView extends CanvasView implements View {
 
 	hide(): void {
 		this.element.style.display = 'none';
+
+		this.closePopup(this.deathPopup);
+		this.closePopup(this.escPopup);
+
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
 
@@ -142,10 +176,28 @@ export class GameView extends CanvasView implements View {
 
 		this.running = false;
 		this.keysHeld.clear();
+		this.lastLives = null;
 		this.rightClickTarget = null;
 	}
 
+	private openPopup(popup: HTMLElement) {
+		popup.style.display = 'flex';
+		popup.classList.add('visible');
+	}
+
+	private closePopup(popup: HTMLElement) {
+		popup.style.display = 'none';
+		popup.classList.remove('visible');
+	}
+
 	private onKeyDown = (e: KeyboardEvent) => {
+		if (e.key === 'Escape') {
+			const escVisible = this.escPopup.classList.contains('visible');
+			escVisible
+				? this.closePopup(this.escPopup)
+				: this.openPopup(this.escPopup);
+			return;
+		}
 		this.keysHeld.add(e.key);
 		this.emitMovement();
 	};
@@ -170,43 +222,59 @@ export class GameView extends CanvasView implements View {
 
 		if (dx === 0 && dy === 0) return;
 
-		// Normalize so diagonal isn't faster
 		const dist = Math.hypot(dx, dy);
 		this.socket.emit('move', { dx: dx / dist, dy: dy / dist });
 	}
 
 	private onMouseDown = (e: MouseEvent) => {
 		e.preventDefault();
+		const { x, y } = this.getCanvasCoords(e);
+
 		if (e.button === 0) {
-			const dir = this.getDirection(e.offsetX, e.offsetY);
+			const dir = this.getDirection(x, y);
 			if (dir) this.socket.emit('shoot', dir);
 		}
-		if (e.button === 2) this.rightClickTarget = { x: e.offsetX, y: e.offsetY };
+		if (e.button === 2) {
+			this.rightClickTarget = { x, y };
+		}
 	};
 
 	private onMouseMove = (e: MouseEvent) => {
 		if (this.rightClickTarget === null) return;
-		this.rightClickTarget = { x: e.offsetX, y: e.offsetY };
+		const { x, y } = this.getCanvasCoords(e);
+		this.rightClickTarget = { x, y };
 	};
 
 	private onMouseUp = (e: MouseEvent) => {
 		if (e.button === 2) this.rightClickTarget = null;
 	};
 
-	private getDirection(offsetX: number, offsetY: number): { dx: number; dy: number } | null {
-
+	private getDirection(
+		x: number,
+		y: number
+	): { dx: number; dy: number } | null {
 		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
 		if (!me) return null;
 
 		const centerX = me.x + me.width / 2;
 		const centerY = me.y + me.height / 2;
-		const dist = Math.hypot(offsetX - centerX, offsetY - centerY);
+		const dist = Math.hypot(x - centerX, y - centerY);
 
 		if (dist < me.width / 2) return null;
 
 		return {
-			dx: (offsetX - centerX) / dist,
-			dy: (offsetY - centerY) / dist,
+			dx: (x - centerX) / dist,
+			dy: (y - centerY) / dist,
+		};
+	}
+
+	private getCanvasCoords(e: MouseEvent): { x: number; y: number } {
+		const rect = this.canvas.getBoundingClientRect(); //Independant du zoom de l'ecran
+		const scaleX = this.canvas.width / rect.width;
+		const scaleY = this.canvas.height / rect.height;
+		return {
+			x: (e.clientX - rect.left) * scaleX,
+			y: (e.clientY - rect.top) * scaleY,
 		};
 	}
 
@@ -223,6 +291,11 @@ export class GameView extends CanvasView implements View {
 			if (this.lastLives !== null && me.lives < this.lastLives) {
 				this.flashDuration = 10;
 			}
+			if (this.lastLives !== 0 && me.lives === 0) {
+				this.deathPopup.style.display = 'flex';
+				this.deathPopup.classList.add('visible');
+			}
+
 			this.lastLives = me.lives;
 		}
 	};

@@ -18,6 +18,7 @@ const roomStates = new Map<number, RoomState>();
 let roomIdCpt = 0;
 
 const gameManagers = new Map<number, GameManager>();
+const registeredUsernames: Set<string> = new Set();
 
 function createRoom(name: string, capacityMax: number, solo: boolean = false): RoomServer {
 	const state = new RoomState(boundWidth,boundHeight);
@@ -51,9 +52,12 @@ httpServer.listen(port, () => {
 
 const io = new IOServer(httpServer, { cors: { origin: true } });
 
-function broadcastRooms( target: { emit: (event: string, data: object) => void } = io) {
+function broadcastRooms(
+	target: { emit: (event: string, data: object) => void } = io,
+	bannedRooms: Set<number> = new Set()
+) {
 	const roomList = Array.from(rooms.values())
-		.filter(r => !r.solo)
+		.filter(r => !r.solo && !bannedRooms.has(r.id))
 		.map(r => ({
 			roomId: r.id,
 			roomName: r.name,
@@ -87,6 +91,7 @@ io.on('connection', socket => {
 	broadcastRooms();
 
 	let currentRoomId: number | null = null;
+	const bannedRooms: Set<number> = new Set();
 
 	socket.on('get-rooms', () => {
 		broadcastRooms(socket);
@@ -101,22 +106,31 @@ io.on('connection', socket => {
 			return;
 		}
 
-		const isTaken = Array.from(roomStates.values()).some(state =>
-			Array.from(state.players.values()).some(p => p.username === username)
-		);
+		const isMine = socket.data.username === username;
 
-		if (isTaken) {
+		if (!isMine && registeredUsernames.has(username)) {
 			socket.emit('register_error', 'Username already taken.');
 			return;
 		}
 
+		if (socket.data.username && socket.data.username !== username) {
+			registeredUsernames.delete(socket.data.username);
+		}
+
+		registeredUsernames.add(username);
 		socket.data.username = username;
 		socket.emit('register_success');
 	});
 
+
 	socket.on('join-room', (roomId: number) => {
 		const room = rooms.get(roomId);
 		const state = roomStates.get(roomId);
+
+		if (bannedRooms.has(roomId)) {
+			socket.emit('room_error', 'You cannot rejoin a room you have left.');
+			return;
+		}
 
 		if (!room || !state) {
 			socket.emit('room_error', 'Room not found.');
@@ -235,6 +249,8 @@ io.on('connection', socket => {
 			rooms.delete(roomId);
 			roomStates.delete(roomId);
 			gameManagers.delete(roomId);
+		} else {
+			bannedRooms.add(roomId);
 		}
 
 		broadcastRooms();
@@ -246,6 +262,9 @@ io.on('connection', socket => {
 	});
 
 	socket.on('disconnect', () => {
+		if (socket.data.username) {
+			registeredUsernames.delete(socket.data.username);
+		}
 		if (currentRoomId !== null) removeFromRoom(currentRoomId);
 	});
 });

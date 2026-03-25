@@ -30,9 +30,8 @@ export default class RoomState {
 	constructor(boundWidth: number, boundHeight: number) {
 		this.boundWidth = boundWidth;
 		this.boundHeight = boundHeight;
-		this.bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
+		this.bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 300);
 
-		this.bulletPool = new Pool(() => new Bullet(boundWidth, boundHeight), 100);
 		this.galinettePool = new Pool(() => new Galinette(boundWidth, boundHeight), 20);
 		this.spiderPool = new Pool(() => new Spider(boundWidth, boundHeight), 20);
 		this.piePool = new Pool(() => new Pie(boundWidth, boundHeight), 20);

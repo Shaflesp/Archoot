@@ -44,6 +44,13 @@
                     <p>Votre pseudonyme est trop court!</p>
                 </article>
             </aside>
+            <aside class="popup taken">
+                <article class="popupContent taken">
+                    <button class="closeButton taken">X</button>
+                    <h1>Attention!</h1>
+                    <p>Ce pseudonyme est déjà pris!</p>
+                </article>
+            </aside>
         </div>
 
         <div id="room-select-screen" class="screen">
@@ -72,8 +79,26 @@
         </div>
 
         <div id="game-screen" class="screen">
-            <a class="back-button home-button"><img src="./images/ui/retour.png"></a>  
             <canvas class="gameCanvas" width="1680" height="800"></canvas>
+
+            <div class="esc-popup popup">
+                <div class="popupContent">
+                    <h1>Menu</h1>
+                    <button class="resume-button">Reprendre</button>
+                    <button class="quit-button">Quitter la partie</button>
+                </div>
+            </div>
+
+            <div class="death-popup popup">
+                <div class="popupContent">
+                    <h1>Vous êtes mort !</h1>
+                    <p>Que souhaitez-vous faire ?</p>
+                    <div class="death-buttons">
+                        <button class="spectate-button">Spectate</button>
+                        <button class="leave-button">Quit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="leaderboard-screen" class="screen">
