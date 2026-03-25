@@ -270,6 +270,8 @@ setInterval(() => {
 	roomStates.forEach((state, roomId) => {
 		if (state.players.size === 0) return;
 
+		const t0 = performance.now();
+
 		const manager = gameManagers.get(roomId);
 		const activeMobs = state.getAllActiveMobs();
 
@@ -280,6 +282,8 @@ setInterval(() => {
 			activeBefore !== activeBullets.length || dirtyRooms.has(roomId);
 
 		dirtyRooms.delete(roomId);
+
+		const t1 = performance.now();
 
 		activeBullets.forEach(bullet => {
 			state.players.forEach(player => {
@@ -307,14 +311,13 @@ setInterval(() => {
 
 						const killer = state.players.get(bullet.ownerId);
 						if(killer) killer.score += 100;
-						console.log(
-							`mob dead: ${mob.name}, manager exists: ${!!manager}, isBoss: ${manager?.isBoss(mob.name)}`
-						);
 						if (manager?.isBoss(mob.name)) manager.bossDead();
 					} 
 				}
 			});
 		});
+
+		const t2 = performance.now();
 
 		activeMobs.forEach(mob => {
 			if (mob.needsTarget()) {
@@ -352,9 +355,22 @@ setInterval(() => {
 			if (mob.x < -mob.width) mob.active = false;
 		});
 
+		const t3 = performance.now();
+
 		if (changed || activeMobs.length > 0) {
 			broadcastGame(roomId, state);
 			broadcastMobs(roomId, activeMobs);
+		}
+
+		const t4 = performance.now();
+
+		const total = t4 - t0;
+		if (total > 5) {
+			console.log(`[Room ${roomId}] SLOW TICK ${total.toFixed(2)}ms`);
+			console.log(`  setup:      ${(t1 - t0).toFixed(2)}ms`);
+			console.log(`  bullets:    ${(t2 - t1).toFixed(2)}ms`);
+			console.log(`  mobs:       ${(t3 - t2).toFixed(2)}ms`);
+			console.log(`  broadcast:  ${(t4 - t3).toFixed(2)}ms`);
 		}
 	});
 }, 1000 / 60);
