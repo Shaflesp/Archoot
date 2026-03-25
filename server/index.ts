@@ -188,15 +188,6 @@ io.on('connection', socket => {
 		const prevY = player.y;
 
 		player.move(data.dx, data.dy);
-
-		const collides = Array.from(state.players.values()).some(
-			other => other.identifier !== player.identifier && player.collidesWith(other)
-		);
-	
-		if (collides) {
-			player.x = prevX;
-			player.y = prevY;
-		}
 	
 		if (player.x !== prevX || player.y !== prevY) {
 			broadcastGame(currentRoomId, state);
@@ -271,6 +262,7 @@ setInterval(() => {
 
 		state.bulletPool.getActive().forEach(bullet => {
 			state.players.forEach(player => {
+				if (!player.active) return;
 				if (player.identifier === bullet.ownerId) return;
 				if (player.collidesWith(bullet)) {
 					player.takeDamage(1);
@@ -306,6 +298,7 @@ setInterval(() => {
 			mob.move();
 
 			state.players.forEach(player => {
+				if (!player.active) return;
 				if (player.collidesWith(mob)) {
 					player.takeDamage(mob.damage);
 					changed = true;
