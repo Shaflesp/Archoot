@@ -9,6 +9,15 @@ interface ScoreEntry {
 export class Leaderboard {
     private scores: ScoreEntry[] = [];
     private readonly MAX:number = 10;
+    private readonly FILE_PATH: string = "/statistique/leaderboard.json";
+
+    public async load(): Promise<ScoreEntry[]> {
+            const response = await fetch(this.FILE_PATH);
+            if (response.ok) {
+                this.scores = await response.json();
+            }
+        return this.scores;
+    }
 
     public addPlayer(player : Player, score:number): void {
         const date = new Date().toLocaleDateString('fr-FR');
