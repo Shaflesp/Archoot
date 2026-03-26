@@ -86,7 +86,7 @@ export class HomeView implements View {
 
 	private onRegisterSuccess = () => {
 		if (this.pendingDestination === 'game-screen') {
-			this.socket.emit('create-solo-room');
+			this.socket.emit('create-room', 1);
 		} else if (this.pendingDestination === 'search-room') {
 			this.sm.show('search-room');
 			this.pendingDestination = null;

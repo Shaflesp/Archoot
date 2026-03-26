@@ -1,7 +1,6 @@
 import type { ViewManager } from '../ViewManager.ts';
 import type { View } from './View.ts';
 import type { Socket } from 'socket.io-client';
-import type { Room } from './Room.ts';
 
 export class CreateRoomView implements View {
 	socket: Socket;
@@ -57,12 +56,13 @@ export class CreateRoomView implements View {
 
 	show(): void {
 		this.element.style.display = 'flex';
-
+		this.socket.on('join-room-success', this.onJoinRoomSuccess);
 		this.handleForm();
 	}
 
 	hide(): void {
 		this.element.style.display = 'none';
+		this.socket.off('join-room-success', this.onJoinRoomSuccess);
 	}
 
 	handleNameField(): boolean {
@@ -121,7 +121,10 @@ export class CreateRoomView implements View {
 			roomName: this.name,
 		};
 
-		this.socket.emit('new-room', r);
+		this.socket.emit('create-room', r);
 		console.log(r);
+	}
+	private onJoinRoomSuccess = () => {
+			this.sm.show('game-screen');
 	}
 }

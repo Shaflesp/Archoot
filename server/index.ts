@@ -40,12 +40,6 @@ function createRoom(name: string, capacityMax: number, solo: boolean = false): R
 	return r;
 }
 
-createRoom('Bleu', 4);
-createRoom('Blanc', 4);
-createRoom('Vert', 4);
-createRoom('Orange', 4);
-createRoom('Rouge', 4);
-createRoom('Jaune', 4);
 createRoom('Coconut [DO NOT DELETE]', 4);
 
 const port = 8080;
@@ -196,7 +190,7 @@ io.on('connection', socket => {
 		broadcastGame(roomId, state);
 	});
 
-	socket.on('create-solo-room', () => {
+	socket.on('create-room', (capacity:number, name: string = '') => {
 		const username = socket.data.username as string | undefined;
 		if (!username) {
 			socket.emit('room_error', 'You must register first.');
@@ -204,8 +198,11 @@ io.on('connection', socket => {
 		}
 	
 		if (currentRoomId !== null) removeFromRoom(currentRoomId);
-	
-		const room = createRoom(`${username}'s game`, 1, true);
+
+		const roomName = capacity == 1 ? `${username}'s game` : name;
+		const solo = capacity == 1;
+
+		const room = createRoom(roomName, capacity, solo);
 		const state = roomStates.get(room.id)!;
 	
 		currentRoomId = room.id;
@@ -274,6 +271,12 @@ io.on('connection', socket => {
 			gameManagers.delete(roomId);
 		} else {
 			bannedRooms.add(roomId);
+		}
+
+		if (room.players.size ==0){
+			rooms.delete(roomId);
+			roomStates.delete(roomId);
+			gameManagers.delete(roomId);
 		}
 
 		broadcastRooms();
