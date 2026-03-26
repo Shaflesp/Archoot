@@ -7,6 +7,7 @@ export abstract class Entite implements Collidable {
 	active: boolean = false;
 
 	abstract name: string;
+	abstract img:string;
 	abstract x: number;
 	abstract y: number;
 	abstract width: number;
@@ -41,6 +42,7 @@ export abstract class Entite implements Collidable {
 			y: this.y,
 			width: this.width,
 			height: this.height,
+			img: this.img,
 		};
 	}
 
@@ -61,5 +63,11 @@ export abstract class Entite implements Collidable {
 
 	needsTarget(): boolean {
 		return false;
+	}
+
+	getMobImage():HTMLImageElement {
+		const image = new Image();
+		image.src=this.img;
+		return image;
 	}
 }

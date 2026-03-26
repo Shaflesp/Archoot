@@ -1,3 +1,4 @@
+import type Bonus from '../../client/src/bonus/Bonus.ts';
 import type { Collidable } from './Collidable.ts';
 
 export class Player {
@@ -16,6 +17,7 @@ export class Player {
 	lives: number;
 	invincibleUntil: number;
 	score: number;
+	bonusList:Bonus[]=[];
 
 	constructor(id: string, username: string, width: number, height: number) {
 		this.bounds = { width, height };

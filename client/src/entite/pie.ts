@@ -2,6 +2,7 @@ import { Entite } from './Entite.ts';
 
 export default class Pie extends Entite {
 	name = 'pie';
+	img='/images/sprites/pie.gif';
 	x = Math.random() * this.boundWidth - 50;
 	y = Math.random() * this.boundHeight - 50;
 	width = 50;

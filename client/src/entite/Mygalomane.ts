@@ -3,6 +3,7 @@ import { Entite } from './Entite.ts';
 export default class Mygalomane extends Entite {
 	target= null;
 	name = 'Mygalomane';
+	img = '/images/sprites/Mygalomane.png';
 	width = 600;
 	height = 600;
 	x = (this.boundWidth / 2) - (this.width / 2);
