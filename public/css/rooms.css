@@ -79,6 +79,10 @@
     cursor: pointer;
 }
 
+.room-list button:enabled:hover {
+    background-color: #5eca80;
+}
+
 .room-list button:disabled {
     background-color: #586f7c;
     color:#ccc;
@@ -107,4 +111,13 @@
 
     margin: 0 auto;
     border-radius: 10px;
+}
+
+.room-create-button {
+    transition: filter 0.3s, transform 50ms ease-in-out;
+}
+
+.room-create-button:hover {
+    filter: brightness(1.3) contrast(1.1);
+    transform:scale(1.1);
 }
