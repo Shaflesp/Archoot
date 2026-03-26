@@ -27,6 +27,11 @@ export default class RoomState {
 	brainPool: Pool<Brainstorming>;
 	tyrusPool: Pool<LeTyrus>;
 
+	cachedPayload: {
+        players: { [id: string]: object };
+        bullets: object[];
+    } = { players: {}, bullets: [] };
+
 	constructor(boundWidth: number, boundHeight: number) {
 		this.boundWidth = boundWidth;
 		this.boundHeight = boundHeight;
@@ -57,4 +62,16 @@ export default class RoomState {
 		this.allPools.forEach(pool => pool.getActive().forEach(m => mobs.push(m)));
 		return mobs;
 	}
+
+	updatePlayerCache(player: Player) {
+        this.cachedPayload.players[player.identifier] = player.getAsJson();
+    }
+
+    removePlayerCache(identifier: string) {
+        delete this.cachedPayload.players[identifier];
+    }
+
+    updateBulletCache() {
+        this.cachedPayload.bullets = this.bulletPool.getActive().map(b => b.getAsJson());
+    }
 }
