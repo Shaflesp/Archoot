@@ -32,8 +32,6 @@ export default class RoomState {
         bullets: object[];
     } = { players: {}, bullets: [] };
 
-	cachedMobsPayload: { mobs: object[] } = { mobs: [] };
-
 	constructor(boundWidth: number, boundHeight: number) {
 		this.boundWidth = boundWidth;
 		this.boundHeight = boundHeight;
@@ -76,8 +74,4 @@ export default class RoomState {
     updateBulletCache() {
         this.cachedPayload.bullets = this.bulletPool.getActive().map(b => b.getAsJson());
     }
-
-	updateMobsCache(mobs: Array<Entite>) {
-		this.cachedMobsPayload.mobs = mobs.map(m => m.getAsJson());
-	}
 }
