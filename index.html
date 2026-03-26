@@ -12,8 +12,7 @@
         <link rel="stylesheet" href="/css/leaderboard.css">
         <link rel="stylesheet" href="/css/popup.css">
         <link rel="stylesheet" href="/css/rooms.css">
-
-
+        <link rel="stylesheet" href="/css/create-room.css">
         
         <script type="module" src="client/src/main.ts"></script>
     </head>
@@ -54,7 +53,8 @@
         </div>
 
         <div id="room-select-screen" class="screen">
-            <a class="back-button home-button"><img src="./images/ui/retour.png"></a>  
+            <a class="back-button home-button"><img src="./images/ui/retour.png"></a>
+            <a class="room-create-button"><img src="./images/ui/boutonSolo.png"></a>    
 
             <div class="search-container">
                 <label for="search-room">Recherche: </label>
@@ -76,6 +76,21 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <div id="create-room-screen" class="screen">
+            <form class="create-room-form">
+                <label for="name">Nom de la salle</label>
+                <input type="text" name="name" id="name" class="create-input" maxlength="16">
+                <p class="name-warning warning"></p>
+
+                <label for="player-count">Nombre de joueurs</label>
+                <input type="number" id="player-count" name="player-count" class="create-input" min="2" max="8" value="2">
+                <p class="player-count-warning warning"></p>
+
+                <input type="submit" name="submit-room" value="Créer">
+                <p class="submit-warning warning"></p>
+            </form>
         </div>
 
         <div id="game-screen" class="screen">

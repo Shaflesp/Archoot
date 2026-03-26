@@ -115,6 +115,7 @@
 
 .room-create-button {
     transition: filter 0.3s, transform 50ms ease-in-out;
+    cursor: pointer;
 }
 
 .room-create-button:hover {

@@ -29,6 +29,12 @@ export class RoomsView implements View {
 				sm.show('home-screen');
 			});
 
+		this.element
+			.querySelector<HTMLAnchorElement>('.room-create-button')
+			?.addEventListener('click', () => {
+				sm.show('create-room-screen');
+			});
+
 		this.searchInput.addEventListener('input', () => {
 			this.filterRooms();
 		});
@@ -40,7 +46,7 @@ export class RoomsView implements View {
 		this.socket.on('room_error', this.onRoomError);
 		this.socket.on('update-rooms', this.onUpdateRooms);
 		this.socket.emit('get-rooms');
-		this.filterRooms()
+		this.filterRooms();
 	}
 
 	clearRooms(): void {
