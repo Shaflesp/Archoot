@@ -116,9 +116,7 @@ export class CreateRoomView implements View {
 	}
 
 	submit(): void {
-
 		this.socket.emit('create-room', this.capacityMax, this.name);
-		console.log(r);
 	}
 	private onJoinRoomSuccess = () => {
 			this.sm.show('game-screen');
