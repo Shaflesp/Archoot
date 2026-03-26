@@ -69,7 +69,7 @@ export class CreateRoomView implements View {
 		const currentName = this.roomName?.value!;
 
 		if (currentName === '') {
-			this.nameWarning.innerHTML = 'Le nom ne doit pas 9être vide.';
+			this.nameWarning.innerHTML = 'Le nom ne doit pas être vide.';
 			return false;
 		}
 
