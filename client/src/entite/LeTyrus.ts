@@ -2,6 +2,7 @@ import { Entite } from './Entite.ts';
 
 export default class LeTyrus extends Entite {
 	name = 'Le Tyrus';
+	img = '/images/sprites/LeTyrus.png';
 	width = 600;
 	height = 600;
 	x = this.boundWidth / 2 - this.width / 2;

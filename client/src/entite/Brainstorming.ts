@@ -2,6 +2,7 @@ import { Entite } from './Entite.ts';
 
 export default class Brainstorming extends Entite {
 	target = null;
+	img='/images/sprites/Brainstorming.png';
 	name = 'Brainstorming';
 	width = 600;
 	height = 600;

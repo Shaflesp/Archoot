@@ -2,6 +2,7 @@ import { Entite } from './Entite.ts';
 
 export default class Galinette extends Entite {
 	name = 'galinette cendrée';
+	img = '/images/sprites/galinette.png';
 	x = this.boundWidth;
 	y = Math.random() * this.boundHeight;
 	width = 50;

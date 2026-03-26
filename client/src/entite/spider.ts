@@ -2,6 +2,7 @@ import { Entite } from './Entite.ts'
 
 export default class Spider extends Entite {
 	name = 'araignée';
+	img: string;
 	x = Math.random() * this.boundWidth - 50;
 	y = 0;
 	width = 50;
@@ -16,6 +17,8 @@ export default class Spider extends Entite {
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		const idx = Math.random()*3+1;
+		this.img=`/images/sprites/spider${idx}.png`;
 	}
 
 	move(): void {
@@ -43,4 +46,5 @@ export default class Spider extends Entite {
 		this.active = true;
 		this.climbing = false;
 	}
+
 }
