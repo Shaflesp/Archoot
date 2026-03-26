@@ -1,7 +1,6 @@
 import type { Socket } from 'socket.io-client';
 import type { ViewManager } from '../ViewManager.ts';
 import { CanvasView, type View } from './View.ts';
-import { Leaderboard } from '../../../server/Leaderboard.ts';
 
 interface PlayerData {
 	identifier: string;
@@ -43,8 +42,6 @@ export class GameView extends CanvasView implements View {
 	playerInfo: Map<string, PlayerData> = new Map();
 	bulletInfo: Array<BulletData> = [];
 	mobsInfo: Array<MobsData> = [];
-
-	private leaderboard = new Leaderboard();
 
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
@@ -316,7 +313,10 @@ export class GameView extends CanvasView implements View {
 		this.deathPopup.style.display = 'flex';
 		this.deathPopup.classList.add('visible');
 
-		this.leaderboard.addPlayer(player.username, player.score);
+		this.socket.emit('add-score', {
+			username: player.username,
+			score: player.score,
+		});
 
 		console.log(`Score de ${player.score} enregistré pour ${player.username}`);
 	}
