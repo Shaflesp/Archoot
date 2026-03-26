@@ -309,15 +309,6 @@ export class GameView extends CanvasView implements View {
 		}
 	};
 
-	private async handlePlayerDeath(player: PlayerData) {
-		this.deathPopup.style.display = 'flex';
-		this.deathPopup.classList.add('visible');
-
-		this.leaderboard.addPlayer(player.username, player.score);
-		
-		console.log(`Score de ${player.score} enregistré pour ${player.username}`);
-	}
-
 	private onMobsInfo = (info: { mobs: Array<MobsData> }) => {
 		this.mobsInfo = info.mobs;
 	};
