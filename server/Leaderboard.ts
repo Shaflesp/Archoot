@@ -1,4 +1,4 @@
-import { Player } from "./Entity/Player.ts";
+import fs from 'fs';
 
 interface ScoreEntry {
     username: string; 
@@ -19,11 +19,11 @@ export class Leaderboard {
         return this.scores;
     }
 
-    public addPlayer(player : Player, score:number): void {
+    public addPlayer(player : string, score:number): void {
         const date = new Date().toLocaleDateString('fr-FR');
         
         this.scores.push({
-            username: player.username,
+            username: player,
             score: score,
             date: date
         });
@@ -34,14 +34,19 @@ export class Leaderboard {
         if(this.scores.length > this.MAX) {
             this.scores = this.scores.slice(0, this.MAX);
         }
+        this.save();
     }
 
-    public save(leaderboard: ScoreEntry[]): void {
-        let lead = '';
-        for(let i=1; i < leaderboard.length; i++){
-            lead += JSON.stringify(leaderboard[i]);
-        }
-        console.log(lead);
+    public save(): void {
+        const leaderdata = JSON.stringify(this.scores,null,2);
+        fs.writeFile(this.FILE_PATH,leaderdata,(err) => {
+            if(err) {
+                console.log('Error writing file:', err);
+            } else {
+                console.log('Successfully wrote file');
+            }
+        })
+        console.log(leaderdata);
     }
 
     public getLeaderboard(): ScoreEntry[]{

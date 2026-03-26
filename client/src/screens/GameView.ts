@@ -1,6 +1,7 @@
 import type { Socket } from 'socket.io-client';
 import type { ViewManager } from '../ViewManager.ts';
 import  { CanvasView, type View } from './View.ts';
+import { Leaderboard } from '../../../server/Leaderboard.ts';
 
 interface PlayerData {
     identifier: string;
@@ -42,6 +43,8 @@ export class GameView extends CanvasView implements View {
 	playerInfo: Map<string, PlayerData> = new Map();
 	bulletInfo: Array<BulletData> = [];
 	mobsInfo: Array<MobsData> = [];
+
+	private leaderboard = new Leaderboard();
 
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
@@ -298,13 +301,22 @@ export class GameView extends CanvasView implements View {
 				this.flashDuration = 10;
 			}
 			if (this.lastLives !== 0 && me.lives === 0) {
-				this.deathPopup.style.display = 'flex';
-				this.deathPopup.classList.add('visible');
+				console.log("chevre");
+				this.handlePlayerDeath(me);
 			}
 
 			this.lastLives = me.lives;
 		}
 	};
+
+	private async handlePlayerDeath(player: PlayerData) {
+		this.deathPopup.style.display = 'flex';
+		this.deathPopup.classList.add('visible');
+
+		this.leaderboard.addPlayer(player.username, player.score);
+		
+		console.log(`Score de ${player.score} enregistré pour ${player.username}`);
+	}
 
 	private onMobsInfo = (info: { mobs: Array<MobsData> }) => {
 		this.mobsInfo = info.mobs;
