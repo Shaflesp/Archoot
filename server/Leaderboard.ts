@@ -36,6 +36,14 @@ export class Leaderboard {
         }
     }
 
+    public save(leaderboard: ScoreEntry[]): void {
+        let lead = '';
+        for(let i=1; i < leaderboard.length; i++){
+            lead += JSON.stringify(leaderboard[i]);
+        }
+        console.log(lead);
+    }
+
     public getLeaderboard(): ScoreEntry[]{
         return this.scores;
     }
