@@ -116,12 +116,8 @@ export class CreateRoomView implements View {
 	}
 
 	submit(): void {
-		const r = {
-			capacityMax: this.capacityMax,
-			roomName: this.name,
-		};
 
-		this.socket.emit('create-room', r);
+		this.socket.emit('create-room', this.capacityMax, this.name);
 		console.log(r);
 	}
 	private onJoinRoomSuccess = () => {
