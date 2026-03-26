@@ -5,6 +5,7 @@
         <meta charset="UTF-8">
         <title>Équipe 5 - Archoot</title>
 
+        <link rel="stylesheet" href="/css/general.css">
         <link rel="stylesheet" href="/css/main.css">
         <link rel="stylesheet" href="/css/home.css">
         <link rel="stylesheet" href="/css/canvas.css">
@@ -22,18 +23,18 @@
             <h1>Archoot</h1>
 
             <div class="username-field">
-                <img src="./images/ui/avatarUndef.png" draggable="false">
+                <img class="noselect" src="./images/ui/avatarUndef.png" draggable="false">
                 <input type="text" id="pseudo" name="pseudo" maxlength="150" minlength="2" placeholder="Votre pseudo">
             </div>
 
-            <a class="credits-button home-button"><img src="./images/ui/credits.png" draggable="false"></a>
-            <img class="logo-home" src="./images/logo.png">
-            <img class="character" src="./images/cobaye.png">
+            <a class="credits-button home-button noselect"><img src="./images/ui/credits.png" draggable="false"></a>
+            <img class="logo-home noselect" src="./images/logo.png" draggable="false">
+            <img class="character noselect" src="./images/cobaye.png" draggable="false">
             
             <div class="bottom-menu">
-                <a class="play-button-solo home-button"><img src="./images/ui/boutonSolo.png" draggable="false"></a>
-                <a class="play-button-multi home-button"><img src="./images/ui/boutonMulti.png" draggable="false"></a>
-                <a class="leaderboard-button home-button"><img src="./images/leaderboard/leaderboard.png" draggable="false"></a> 
+                <a class="play-button-solo home-button noselect"><img src="./images/ui/boutonSolo.png" draggable="false"></a>
+                <a class="play-button-multi home-button noselect"><img src="./images/ui/boutonMulti.png" draggable="false"></a>
+                <a class="leaderboard-button home-button noselect"><img src="./images/leaderboard/leaderboard.png" draggable="false"></a> 
             </div>
 
             <aside class="popup username">
@@ -53,8 +54,8 @@
         </div>
 
         <div id="room-select-screen" class="screen">
-            <a class="back-button home-button"><img src="./images/ui/retour.png" draggable="false"></a>
-            <a class="room-create-button"><img src="./images/ui/boutonSolo.png" draggable="false"></a>    
+            <a class="back-button home-button noselect"><img src="./images/ui/retour.png" draggable="false"></a>
+            <a class="room-create-button noselect"><img src="./images/ui/boutonSolo.png" draggable="false"></a>    
 
             <div class="search-container">
                 <label for="search-room">Recherche: </label>
@@ -79,7 +80,7 @@
         </div>
 
         <div id="create-room-screen" class="screen">
-            <a class="back-button home-button"><img src="./images/ui/retour.png" draggable="false"></a>
+            <a class="back-button home-button noselect"><img src="./images/ui/retour.png" draggable="false"></a>
 
             <form class="create-room-form">
                 <label for="name">Nom de la salle</label>
@@ -120,7 +121,7 @@
 
         <div id="leaderboard-screen" class="screen">
             <h1>Leaderboard</h1>
-            <a class="back-button home-button"><img src="./images/ui/retour.png" draggable="false"></a>  
+            <a class="back-button home-button noselect"><img src="./images/ui/retour.png" draggable="false"></a>  
         
             <div class="podium">
                 <div class="place second">
@@ -146,9 +147,9 @@
 
         <div id="credits-screen" class="screen">
 
-            <img class="logo-credits" src="./images/logo.png" draggable="false">
+            <img class="logo-credits noselect" src="./images/logo.png" draggable="false">
 
-            <img class="parchemin" src="./images/credits/parchemin.png" draggable="false">
+            <img class="parchemin noselect" src="./images/credits/parchemin.png" draggable="false">
             
             <div class="credits-content">
                 <h1>Crédits</h1>
@@ -180,7 +181,7 @@
                 </div>
             </div>
 
-            <a class="back-button home-button"><img src="./images/ui/retour.png" draggable="false"></a>  
+            <a class="back-button home-button noselect"><img src="./images/ui/retour.png" draggable="false"></a>  
         </div>
     </body>
 </html>
