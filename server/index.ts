@@ -76,13 +76,12 @@ function getRoomKey(roomId: number): string {
 }
 
 function broadcastGame(roomId: number, state: RoomState) {
-	// const playerInfo: Map<string, object> = new Map();
-	// state.players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
-	// io.to(getRoomKey(roomId)).emit('playerInfo', {
-	// 	players: Object.fromEntries(playerInfo),
-	// 	bullets: state.bulletPool.getActive().map(b => b.getAsJson()),
-	// });
-	io.to(getRoomKey(roomId)).emit('playerInfo', state.cachedPayload);
+	const playerInfo: Map<string, object> = new Map();
+	state.players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
+	io.to(getRoomKey(roomId)).emit('playerInfo', {
+		players: Object.fromEntries(playerInfo),
+		bullets: state.bulletPool.getActive().map(b => b.getAsJson()),
+	});
 }
 
 function broadcastMobs(roomId: number, mobs: Array<Entite>) {
@@ -164,7 +163,6 @@ io.on('connection', socket => {
 			socket.id,
 			new Player(socket.id, username, boundWidth, boundHeight)
 		);
-		state.updatePlayerCache(state.players.get(socket.id)!);
 		console.log(`${socket.id} joined room ${room.name}`);
 
 		broadcastRooms();
@@ -187,9 +185,7 @@ io.on('connection', socket => {
 		currentRoomId = room.id;
 		room.players.add(socket.id);
 		socket.join(getRoomKey(room.id));
-
 		state.players.set(socket.id, new Player(socket.id, username, boundWidth, boundHeight));
-		state.updatePlayerCache(state.players.get(socket.id)!);
 	
 		console.log(`${username} created solo room ${room.id}`);
 		socket.emit('join-room-success', room.id);
@@ -206,7 +202,6 @@ io.on('connection', socket => {
 		if (!player || player.isDead()) return;
 
 		player.move(data.dx, data.dy);
-		state.updatePlayerCache(player);
 		dirtyRooms.add(currentRoomId);
 	});
 
@@ -228,7 +223,6 @@ io.on('connection', socket => {
 			data.dy,
 			player.identifier
 		);
-		state.updateBulletCache();
 
 		broadcastGame(currentRoomId, state);
 	});
@@ -242,7 +236,6 @@ io.on('connection', socket => {
 		if (player) {
 			console.log(`${player.username} left room ${room.name}.`);
 			state.players.delete(socket.id);
-			state.removePlayerCache(socket.id);
 		}
 
 		room.players.delete(socket.id);
@@ -285,10 +278,8 @@ setInterval(() => {
 		const activeBefore = state.bulletPool.getActive().length;
 		state.bulletPool.updateAll();
 		const activeBullets = state.bulletPool.getActive();
-		state.updateBulletCache();
-
-		let playersChanged = dirtyRooms.has(roomId);
-		let mobsChanged = false;
+		let changed =
+			activeBefore !== activeBullets.length || dirtyRooms.has(roomId);
 
 		dirtyRooms.delete(roomId);
 
@@ -300,9 +291,8 @@ setInterval(() => {
 				if (player.identifier === bullet.ownerId) return;
 				if (player.collidesWith(bullet)) {
 					player.takeDamage(1);
-					state.updatePlayerCache(player);
 					bullet.active = false;
-					playersChanged = true;
+					changed = true;
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}
 			});
@@ -315,7 +305,7 @@ setInterval(() => {
 				if (mob.collidesWith(bullet)) {
 					mob.takeDamage(1);
 					bullet.active = false;
-					mobsChanged = true;
+					changed = true;
 					if (mob.isDead()){
 						mob.active = false;
 
@@ -336,18 +326,15 @@ setInterval(() => {
 			}
 
 			mob.move();
-			mobsChanged = true;
 
 			state.players.forEach(player => {
 				if (!player.active) return;
 				if (player.collidesWith(mob)) {
 					player.takeDamage(mob.damage);
-					state.updatePlayerCache(player);
-					playersChanged = true;
+					changed = true;
 
 					if (!manager?.isBoss(mob.name)) {
 						mob.active = false;
-						mobsChanged = true;
 					}else{
 						const knockbackDist = 150;
 						const angle = Math.atan2(player.y - mob.y, player.x - mob.x);
@@ -361,18 +348,19 @@ setInterval(() => {
 							Math.min(boundHeight - player.height, player.y + Math.sin(angle) * knockbackDist)
 						);
 					}
-					state.updatePlayerCache(player);
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}
 			});
 
-			if (mob.x < -mob.width) mob.active = false; mobsChanged = true;
+			if (mob.x < -mob.width) mob.active = false;
 		});
 
 		const t3 = performance.now();
 
-		if (playersChanged) broadcastGame(roomId, state);
-		if (mobsChanged) broadcastMobs(roomId, activeMobs)
+		if (changed || activeMobs.length > 0) {
+			broadcastGame(roomId, state);
+			broadcastMobs(roomId, activeMobs);
+		}
 
 		const t4 = performance.now();
 
