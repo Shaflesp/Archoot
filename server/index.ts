@@ -85,10 +85,14 @@ function broadcastGame(roomId: number, state: RoomState) {
 	io.to(getRoomKey(roomId)).emit('playerInfo', state.cachedPayload);
 }
 
-function broadcastMobs(roomId: number, mobs: Array<Entite>) {
-	const mobsInfo: object[] = [];
-	mobs.forEach(m => mobsInfo.push(m.getAsJson()));
-	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });
+// function broadcastMobs(roomId: number, mobs: Array<Entite>) {
+// 	const mobsInfo: object[] = [];
+// 	mobs.forEach(m => mobsInfo.push(m.getAsJson()));
+// 	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });
+// }
+
+function broadcastMobs(roomId: number, state: RoomState) {
+    io.to(getRoomKey(roomId)).emit('mobsInfo', state.cachedMobsPayload);
 }
 
 io.on('connection', socket => {
@@ -318,6 +322,7 @@ setInterval(() => {
 					mobsChanged = true;
 					if (mob.isDead()){
 						mob.active = false;
+						state.updateMobsCache(activeMobs);
 
 						const killer = state.players.get(bullet.ownerId);
 						if(killer) killer.score += 100;
@@ -347,6 +352,7 @@ setInterval(() => {
 
 					if (!manager?.isBoss(mob.name)) {
 						mob.active = false;
+						state.updateMobsCache(activeMobs);
 						mobsChanged = true;
 					}else{
 						const knockbackDist = 150;
@@ -366,13 +372,18 @@ setInterval(() => {
 				}
 			});
 
-			if (mob.x < -mob.width) mob.active = false; mobsChanged = true;
+			if (mob.x < -mob.width){
+				mob.active = false;
+				state.updateMobsCache(activeMobs);
+				mobsChanged = true;
+			}
+			state.updateMobsCache(activeMobs);
 		});
 
 		const t3 = performance.now();
 
 		if (playersChanged) broadcastGame(roomId, state);
-		if (mobsChanged) broadcastMobs(roomId, activeMobs)
+		if (mobsChanged) broadcastMobs(roomId, state)
 
 		const t4 = performance.now();
 
