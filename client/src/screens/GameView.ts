@@ -1,18 +1,18 @@
 import type { Socket } from 'socket.io-client';
 import type { ViewManager } from '../ViewManager.ts';
-import  { CanvasView, type View } from './View.ts';
+import { CanvasView, type View } from './View.ts';
 import { Leaderboard } from '../../../server/Leaderboard.ts';
 
 interface PlayerData {
-    identifier: string;
-    username: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-	  lives : number;
-		active : number;
-	score : number;
+	identifier: string;
+	username: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	lives: number;
+	active: number;
+	score: number;
 }
 
 interface BulletData {
@@ -27,12 +27,12 @@ interface BulletData {
 }
 
 interface MobsData {
-	name:string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    speed: number;
+	name: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	speed: number;
 	// image: HTMLImageElement;
 }
 
@@ -61,7 +61,7 @@ export class GameView extends CanvasView implements View {
 	private rightClickTarget: { x: number; y: number } | null = null;
 
 	private lastMoveEmit: number = 0;
-	private readonly MOVE_RATE = 1000 / 60
+	private readonly MOVE_RATE = 1000 / 60;
 
 	private readonly mobsSrcs: string[] = [
 		'/images/sprites/pie.gif',
@@ -140,7 +140,10 @@ export class GameView extends CanvasView implements View {
 		if (this.rightClickTarget !== null) {
 			const now = Date.now();
 			if (now - this.lastMoveEmit >= this.MOVE_RATE) {
-				const dir = this.getDirection(this.rightClickTarget.x, this.rightClickTarget.y);
+				const dir = this.getDirection(
+					this.rightClickTarget.x,
+					this.rightClickTarget.y
+				);
 				if (dir) {
 					this.socket.emit('move', dir);
 					this.lastMoveEmit = now;
@@ -301,7 +304,7 @@ export class GameView extends CanvasView implements View {
 				this.flashDuration = 10;
 			}
 			if (this.lastLives !== 0 && me.lives === 0) {
-				console.log("chevre");
+				console.log('chevre');
 				this.handlePlayerDeath(me);
 			}
 
@@ -314,7 +317,7 @@ export class GameView extends CanvasView implements View {
 		this.deathPopup.classList.add('visible');
 
 		this.leaderboard.addPlayer(player.username, player.score);
-		
+
 		console.log(`Score de ${player.score} enregistré pour ${player.username}`);
 	}
 
