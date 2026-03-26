@@ -70,7 +70,6 @@ function getRoomKey(roomId: number): string {
 }
 
 function broadcastGame(roomId: number, state: RoomState) {
-	const t0 = performance.now();
 	const playerInfo: Map<string, object> = new Map();
 	state.players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
 

@@ -9,8 +9,6 @@ export default class GameManager {
 	private readonly bossPoolMap: Map<string, Pool<Entite>>;
 	level: number = 1;
 
-	private spawnCooldown: number = 0;
-
 	constructor(state: RoomState) {
 		this.state = state;
 		this.bossPoolMap = new Map([
@@ -31,11 +29,6 @@ export default class GameManager {
 	spawnMob() {
 		if (this.state.players.size === 0) return; // si aucun joueur, on ff
 		if (this.bossSpawn) return;
-
-		if (this.spawnCooldown > 0) {
-			this.spawnCooldown--;
-			return;
-		}
 
 		const score = this.getTotalScore();
 
@@ -81,7 +74,6 @@ export default class GameManager {
 	bossDead() {
 		this.bossSpawn = false;
 		this.level++;
-		this.spawnCooldown = 5;
 		console.log('Boss tué ! Gain de niveau');
 	}
 
