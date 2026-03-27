@@ -6,7 +6,7 @@ import Bonus from "../client/src/bonus/Bonus.ts";
 import PotionDegats from "../client/src/bonus/PotionDegats.ts";
 import PotionSoin from "../client/src/bonus/PotionSoin.ts";
 import PotionRapidite from "../client/src/bonus/PotionRapidite.ts";
-import PotionTirRapide from "../client/src/bonus/PotionTirRapide.ts";
+import PotionTirMultiple from "../client/src/bonus/PotionTirMultiple.ts";
 
 const boundWidth: number = 1680;
 const boundHeight: number = 800;
@@ -83,10 +83,11 @@ export default class GameManager {
 	bossDead() {
 		this.bossSpawn = false;
 		this.level++;
+		this.clearMobs();
 		console.log('Boss tué ! Gain de niveau');
 
 		const nbPotions = Math.floor(Math.random()*3)+2; // entre 2 et 4 potions à générer
-		const typesPotions = [PotionDegats, PotionSoin, PotionRapidite, PotionTirRapide];
+		const typesPotions = [PotionDegats, PotionSoin, PotionRapidite, PotionTirMultiple];
 
 		for(let i = 0 ; i < nbPotions; i++){
 			const RandomP = typesPotions[Math.floor(Math.random()* typesPotions.length)]; // => type de potion en, aléa

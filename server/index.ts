@@ -261,21 +261,34 @@ io.on('connection', socket => {
 		const player = state.players.get(socket.id);
 		if (!player || player.isDead()) return;
 
-		const bullet = state.bulletPool.acquire();
-		if (!bullet) return;
+		/* Rafale de tir */
+		const shotx=data.dx;
+		const shoty=data.dy;
 
-		const playerDamage = player.damage;
+		for(let i = 0; i < player.arrowsPerClick; i++){
+			setTimeout(()=> {
+				if(!player || player.isDead()) return;
 
-		bullet.fire(
-			player.x + player.width / 2,
-			player.y + player.height / 2,
-			data.dx,
-			data.dy,
-			player.identifier,
-			playerDamage
-		);
+				const bullet = state.bulletPool.acquire();
+				if (!bullet) return;
 
-		broadcastGame(currentRoomId, state);
+				const playerDamage = player.damage;
+
+				bullet.fire(
+					player.x + player.width / 2,
+					player.y + player.height / 2,
+					// data.dx,
+					// data.dy,
+					shotx,
+					shoty,
+					player.identifier,
+					playerDamage
+				);
+
+				broadcastGame(currentRoomId!, state);
+
+			}, i*100);	
+		}
 	});
 
 	function removeFromRoom(roomId: number) {

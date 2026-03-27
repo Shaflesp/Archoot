@@ -19,6 +19,7 @@ export class Player {
 	score: number;
 	bonusList:Bonus[]=[];
 	damage = 1;
+	arrowsPerClick = 1;
 
 	constructor(id: string, username: string, width: number, height: number) {
 		this.bounds = { width, height };
