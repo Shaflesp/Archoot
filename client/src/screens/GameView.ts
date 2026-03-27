@@ -308,7 +308,7 @@ export class GameView extends CanvasView implements View {
 		}
 	};
 
-	private async handlePlayerDeath(player: PlayerData) {
+	private handlePlayerDeath(player: PlayerData) {
 		this.deathPopup.style.display = 'flex';
 		this.deathPopup.classList.add('visible');
 
