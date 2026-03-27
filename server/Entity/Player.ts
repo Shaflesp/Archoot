@@ -18,6 +18,7 @@ export class Player {
 	invincibleUntil: number;
 	score: number;
 	bonusList:Bonus[]=[];
+	damage = 1;
 
 	constructor(id: string, username: string, width: number, height: number) {
 		this.bounds = { width, height };

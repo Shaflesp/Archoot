@@ -8,7 +8,7 @@ export default class PotionDegats extends Bonus {
 
     giveBonus(player: Player): void {
         player.bonusList.push(this);
-        // faire en sorte que les flèches octroient plus de dégats
+        player.damage += this.power;
         this.active=false;
     }
 

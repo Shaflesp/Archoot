@@ -264,12 +264,15 @@ io.on('connection', socket => {
 		const bullet = state.bulletPool.acquire();
 		if (!bullet) return;
 
+		const playerDamage = player.damage;
+
 		bullet.fire(
 			player.x + player.width / 2,
 			player.y + player.height / 2,
 			data.dx,
 			data.dy,
-			player.identifier
+			player.identifier,
+			playerDamage
 		);
 
 		broadcastGame(currentRoomId, state);
@@ -362,7 +365,7 @@ setInterval(() => {
 				if (!mob.active) return;
 				if (!bullet.active) return;
 				if (mob.collidesWith(bullet)) {
-					mob.takeDamage(1);
+					mob.takeDamage(bullet.damage);
 					bullet.active = false;
 					mobsChanged = true;
 					bulletsChanged = true;
