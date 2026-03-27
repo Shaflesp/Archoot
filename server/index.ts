@@ -393,6 +393,7 @@ setInterval(() => {
 							manager.bossDead();
 							bonusesChanged=true;
 							playersChanged=true;
+							broadcastMobs(roomId, state.getAllActiveMobs());
 						} 
 					}
 				}
