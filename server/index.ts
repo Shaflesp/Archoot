@@ -318,19 +318,17 @@ setInterval(() => {
 		const manager = gameManagers.get(roomId);
 		const activeMobs = state.getAllActiveMobs();
 
+		const activeBefore = state.bulletPool.getActive().length;
 		state.bulletPool.updateAll();
 		const activeBullets = state.bulletPool.getActive();
 
 		let playersChanged = dirtyRooms.has(roomId);
 		let mobsChanged = false;
+		let bulletsChanged = activeBefore !== activeBullets.length;
 
 		dirtyRooms.delete(roomId);
 
 		const t1 = performance.now();
-
-		let totalPlayerBullet: DOMHighResTimeStamp = performance.now();
-		let totalMobBulllet: DOMHighResTimeStamp = performance.now();
-		let totalBullet: number = performance.now();
 
 		activeBullets.forEach(bullet => {
 			state.players.forEach(player => {
@@ -340,9 +338,9 @@ setInterval(() => {
 					player.takeDamage(1);
 					bullet.active = false;
 					playersChanged = true;
+					bulletsChanged = true;
 					if (player.isDead()) console.log(`${player.username} eliminated.`);
 				}
-				totalPlayerBullet += performance.now();
 			});
 
 			if (!bullet.active) return;
@@ -354,6 +352,8 @@ setInterval(() => {
 					mob.takeDamage(1);
 					bullet.active = false;
 					mobsChanged = true;
+					bulletsChanged = true;
+
 					if (mob.isDead()) {
 						mob.active = false;
 
@@ -362,19 +362,9 @@ setInterval(() => {
 						if (manager?.isBoss(mob.name)) manager.bossDead();
 					}
 				}
-				totalMobBulllet += performance.now();
 			});
 		});
-		totalBullet = totalPlayerBullet + totalMobBulllet - t1;
-
-		console.log('\n');
-		console.log(`  BulletTotal:       ${totalBullet.toFixed(2)}ms`);
-		console.log(
-			`  PlayerTotal:       ${(totalPlayerBullet - t1).toFixed(2)}ms`
-		);
-		console.log(
-			`  MobTotal:       ${(totalMobBulllet - totalPlayerBullet).toFixed(2)}ms`
-		);
+		if (activeBullets.length > 0) bulletsChanged = true;
 
 		const t2 = performance.now();
 
@@ -425,21 +415,21 @@ setInterval(() => {
 
 		const t3 = performance.now();
 
-		if (playersChanged) broadcastGame(roomId, state);
+		if (playersChanged || bulletsChanged) broadcastGame(roomId, state);
 		const t4 = performance.now();
 		if (mobsChanged) broadcastMobs(roomId, activeMobs);
 		const t5 = performance.now();
 
 		const total = t5 - t0;
-		// if (total > 5) {
-		// 	console.log("\n\n");
-		// 	console.log(`[Room ${roomId}] SLOW TICK ${total.toFixed(2)}ms`);
-		// 	console.log(`  setup:      ${(t1 - t0).toFixed(2)}ms`);
-		// 	console.log(`  bullets:    ${(t2 - t1).toFixed(2)}ms`);
-		// 	console.log(`  mobs:       ${(t3 - t2).toFixed(2)}ms`);
-		// 	console.log(`  broadcastGame:  ${(t4 - t3).toFixed(2)}ms`);
-		// 	console.log(`  broadcastMob:  ${(t5 - t4).toFixed(2)}ms`);
-		// }
+		if (total > 5) {
+			console.log('\n\n');
+			console.log(`[Room ${roomId}] SLOW TICK ${total.toFixed(2)}ms`);
+			console.log(`  setup:      ${(t1 - t0).toFixed(2)}ms`);
+			console.log(`  bullets:    ${(t2 - t1).toFixed(2)}ms`);
+			console.log(`  mobs:       ${(t3 - t2).toFixed(2)}ms`);
+			console.log(`  broadcastGame:  ${(t4 - t3).toFixed(2)}ms`);
+			console.log(`  broadcastMob:  ${(t5 - t4).toFixed(2)}ms`);
+		}
 	});
 }, 1000 / 60);
 
