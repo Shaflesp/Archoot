@@ -301,7 +301,6 @@ export class GameView extends CanvasView implements View {
 				this.flashDuration = 10;
 			}
 			if (this.lastLives !== 0 && me.lives === 0) {
-				console.log('chevre');
 				this.handlePlayerDeath(me);
 			}
 

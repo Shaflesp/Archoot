@@ -226,8 +226,8 @@ io.on('connection', socket => {
 	});
 
 	socket.on('add-score', (p: PlayerData) => {
-		leaderboard.addPlayer(p.username, p.score);
-		console.log(`Score ajouté: ${p.username}, ${p.score}`);
+		//leaderboard.addPlayer(p.username, p.score);
+		console.log(`Score ajouté`);
 	});
 
 	socket.on('move', (data: { dx: number; dy: number }) => {
