@@ -118,6 +118,17 @@ function broadcastMobs(roomId: number, mobs: Array<Entite>) {
 	// }
 }
 
+function broadcastBonuses(roomId:number){
+	const manager = gameManagers.get(roomId);
+	if(!manager) return;
+
+	const bonusData = manager.activeBonuses
+		.filter(b => b.active === true)
+		.map( b => (b.getAsJSON()));
+
+	io.to(getRoomKey(roomId)).emit('bonusInfo', {bonuses : bonusData});
+}
+
 io.on('connection', socket => {
 	broadcastRooms();
 
@@ -317,6 +328,7 @@ setInterval(() => {
 
 		const manager = gameManagers.get(roomId);
 		const activeMobs = state.getAllActiveMobs();
+		const activeBonus = manager?.getAllActiveBonuses();
 
 		const activeBefore = state.bulletPool.getActive().length;
 		state.bulletPool.updateAll();
@@ -325,6 +337,7 @@ setInterval(() => {
 		let playersChanged = dirtyRooms.has(roomId);
 		let mobsChanged = false;
 		let bulletsChanged = activeBefore !== activeBullets.length;
+		let bonusesChanged = false;
 
 		dirtyRooms.delete(roomId);
 
@@ -356,10 +369,15 @@ setInterval(() => {
 
 					if (mob.isDead()) {
 						mob.active = false;
+						mobsChanged = true;
 
 						const killer = state.players.get(bullet.ownerId);
 						if (killer) killer.score += 100;
-						if (manager?.isBoss(mob.name)) manager.bossDead();
+						if (manager?.isBoss(mob.name)) {
+							manager.bossDead();
+							bonusesChanged=true;
+							playersChanged=true;
+						} 
 					}
 				}
 			});
@@ -429,6 +447,33 @@ setInterval(() => {
 			console.log(`  mobs:       ${(t3 - t2).toFixed(2)}ms`);
 			console.log(`  broadcastGame:  ${(t4 - t3).toFixed(2)}ms`);
 			console.log(`  broadcastMob:  ${(t5 - t4).toFixed(2)}ms`);
+		}
+
+		/* Bonus */
+		activeBonus?.forEach(b => {
+			// console.log(`Bonus ${b.name} position: ${b.x},${b.y} Taille: ${b.width}x${b.height}`);
+			state.players.forEach(p => {
+				if(!p.active || !b.active) return;
+
+				const collide = (
+					p.x < b.x + b.width &&
+					p.x + p.width > b.x &&
+					p.y < b.y + b.height &&
+					p.y + p.height > b.y
+				);
+
+				if(collide) {
+					b.giveBonus(p);
+					b.active=false;
+					playersChanged=true;
+					bonusesChanged = true;
+				}
+			})
+		})
+
+		if(bonusesChanged){
+			broadcastBonuses(roomId);
+			broadcastGame(roomId, state);
 		}
 	});
 }, 1000 / 60);

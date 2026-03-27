@@ -2,12 +2,21 @@ import type RoomState from "./RoomState";
 import type { Player } from './Entity/Player.ts';
 import type { Entite } from '../client/src/entite/Entite.ts';
 import type { Pool } from './Entity/Pool.ts';
+import Bonus from "../client/src/bonus/Bonus.ts";
+import PotionDegats from "../client/src/bonus/PotionDegats.ts";
+import PotionSoin from "../client/src/bonus/PotionSoin.ts";
+import PotionRapidite from "../client/src/bonus/PotionRapidite.ts";
+import PotionTirRapide from "../client/src/bonus/PotionTirRapide.ts";
+
+const boundWidth: number = 1680;
+const boundHeight: number = 800;
 
 export default class GameManager {
 	state: RoomState;
 	bossSpawn: boolean = false;
 	private readonly bossPoolMap: Map<string, Pool<Entite>>;
 	level: number = 1;
+	activeBonuses: Bonus[] = [];
 
 	constructor(state: RoomState) {
 		this.state = state;
@@ -75,6 +84,19 @@ export default class GameManager {
 		this.bossSpawn = false;
 		this.level++;
 		console.log('Boss tué ! Gain de niveau');
+
+		const nbPotions = Math.floor(Math.random()*3)+2; // entre 2 et 4 potions à générer
+		const typesPotions = [PotionDegats, PotionSoin, PotionRapidite, PotionTirRapide];
+
+		for(let i = 0 ; i < nbPotions; i++){
+			const RandomP = typesPotions[Math.floor(Math.random()* typesPotions.length)]; // => type de potion en, aléa
+			const x = (boundWidth/2) + 50 * i; // pour décallé les potions 
+			const y = (boundHeight/2) + 10 * i; // idem
+
+			const p = new RandomP(x, y);
+			p.active = true;
+			this.activeBonuses.push(p);
+		}
 	}
 
 	/* pour faire dispawn les mobs pdt un boss */
@@ -101,4 +123,8 @@ export default class GameManager {
 		}
 		return closest;
 	}
+
+    getAllActiveBonuses(): Bonus[] {
+        return this.activeBonuses.filter(b => b.active === true);
+    }
 }

@@ -1,12 +1,14 @@
 import type { Player } from "../../../server/Entity/Player";
-import type Bonus from "./Bonus";
+import Bonus from "./Bonus.ts";
 
-export default class PotionRapidite implements Bonus{
+export default class PotionRapidite extends Bonus{
     power:number= 2;
     img: string = '/images/bonus/bonusBleu.png';
+    name = 'PotionRapidite';
 
     giveBonus(player: Player): void {
         player.bonusList.push(this);
         player.movementSpeed+=this.power;
+        this.active=false;
     }
 }

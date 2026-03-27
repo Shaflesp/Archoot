@@ -35,6 +35,15 @@ interface MobsData {
 	// image: HTMLImageElement;
 }
 
+interface BonusData {
+	name:string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    img: string;
+}
+
 export class GameView extends CanvasView implements View {
 	socket: Socket;
 	sm: ViewManager;
@@ -42,11 +51,13 @@ export class GameView extends CanvasView implements View {
 	playerInfo: Map<string, PlayerData> = new Map();
 	bulletInfo: Array<BulletData> = [];
 	mobsInfo: Array<MobsData> = [];
+	bonusInfo: Array<BonusData> = [];
 
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
 	private coeurImage: HTMLImageElement;
+	private bonusImage: HTMLImageElement[]=[];
 
 	private deathPopup: HTMLElement;
 	private escPopup: HTMLElement;
@@ -73,6 +84,13 @@ export class GameView extends CanvasView implements View {
 		'/images/sprites/Mygalomane.png', // à changer pour tyrus
 	];
 
+	private readonly bonusSrcs:string[] = [
+		'/images/bonus/bonusRouge.png',
+		'/images/bonus/bonusVert.png',
+		'/images/bonus/bonusBleu.png',
+		'/images/bonus/bonusJaune.png',
+	];
+
 	private running: boolean = false;
 
 	constructor(sm: ViewManager, socket: Socket) {
@@ -95,6 +113,12 @@ export class GameView extends CanvasView implements View {
 			img.src = src;
 			this.mobsImages.push(img);
 		});
+
+		this.bonusSrcs.forEach(src => {
+			const img = new Image();
+			img.src = src;
+			this.bonusImage.push(img);
+		})
 
 		/* Gestion du retour accueil */
 		this.element
@@ -155,6 +179,7 @@ export class GameView extends CanvasView implements View {
 		this.element.style.display = 'flex';
 		this.socket.on('playerInfo', this.onPlayerInfo);
 		this.socket.on('mobsInfo', this.onMobsInfo);
+		this.socket.on('bonusInfo', this.onBonusInfo);
 
 		window.addEventListener('keydown', this.onKeyDown);
 		window.addEventListener('keyup', this.onKeyUp);
@@ -175,6 +200,7 @@ export class GameView extends CanvasView implements View {
 
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
+		this.socket.off('bonusInfo');
 
 		window.removeEventListener('keydown', this.onKeyDown);
 		window.removeEventListener('keyup', this.onKeyUp);
@@ -187,6 +213,7 @@ export class GameView extends CanvasView implements View {
 		this.keysHeld.clear();
 		this.lastLives = null;
 		this.rightClickTarget = null;
+		this.bonusInfo=[];
 	}
 
 	private openPopup(popup: HTMLElement) {
@@ -324,6 +351,10 @@ export class GameView extends CanvasView implements View {
 		this.mobsInfo = info.mobs;
 	};
 
+	private onBonusInfo = (info: { bonuses: Array<BonusData> }) => {
+        this.bonusInfo = info.bonuses;
+    };
+
 	private getMobImage(mob: MobsData): HTMLImageElement {
 		switch (mob.name) {
 			case 'pie':
@@ -346,10 +377,35 @@ export class GameView extends CanvasView implements View {
 		}
 	}
 
+	private getBonusImage(name :string):HTMLImageElement {
+		switch (name){
+			case 'PotionDegats' :
+				return this.bonusImage[0];
+			case 'PotionSoin' :
+				return this.bonusImage[1];
+			case 'PotionRapidite' :
+				return this.bonusImage[2];
+			case 'PotionTirRapide' :
+				return this.bonusImage[3];
+			default :
+				return this.bonusImage[1]; 
+		}
+	}
+
 	private draw() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		if (!this.playerImage.complete) return;
+
+		this.bonusInfo.forEach( (b: BonusData) => {
+			const img = this.getBonusImage(b.name);
+			if (img && img.complete && img.naturalWidth !== 0) {
+        		this.ctx.drawImage(img, b.x, b.y, b.width, b.height);
+    		} else {
+				this.ctx.fillStyle = 'purple';
+				this.ctx.fillRect(b.x, b.y, b.width, b.height);
+   			}
+		});
 
 		this.mobsInfo.forEach((m: MobsData) => {
 			this.ctx.drawImage(this.getMobImage(m), m.x, m.y, m.width, m.height);

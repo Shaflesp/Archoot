@@ -1,8 +1,31 @@
 import type { Player } from "../../../server/Entity/Player"
 
-export default interface Bonus {
-    power:number
-    img:string;
+export default abstract class Bonus {
+    x: number;
+    y: number;
+    width: number = 50;
+    height: number = 50;
+    active: boolean =false;
     
-    giveBonus(player:Player):void;
+    abstract name:string;
+    abstract power: number;
+    abstract img: string;
+    
+    constructor(x:number, y:number){
+        this.x=x;
+        this.y=y;
+    }
+
+    abstract giveBonus(player: Player): void;
+
+    getAsJSON(){
+        return {
+			name: this.name,
+			x: this.x,
+			y: this.y,
+			width: this.width,
+			height: this.height,
+			img: this.img,
+		};
+    }
 }
