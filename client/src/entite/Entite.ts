@@ -64,10 +64,4 @@ export abstract class Entite implements Collidable {
 	needsTarget(): boolean {
 		return false;
 	}
-
-	getMobImage():HTMLImageElement {
-		const image = new Image();
-		image.src=this.img;
-		return image;
-	}
 }
