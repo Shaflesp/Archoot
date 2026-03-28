@@ -78,45 +78,19 @@ function getRoomKey(roomId: number): string {
 }
 
 function broadcastGame(roomId: number, state: RoomState) {
-	const t0 = performance.now();
 	const playerInfo: Map<string, object> = new Map();
 	state.players.forEach(p => playerInfo.set(p.identifier, p.getAsJson()));
-	const t1 = performance.now();
-	let t2 = performance.now();
-	let t3 = performance.now();
 
 	io.to(getRoomKey(roomId)).emit('playerInfo', {
 		players: Object.fromEntries(playerInfo),
-		t2: performance.now(),
 		bullets: state.bulletPool.getActive().map(b => b.getAsJson()),
-		t3: performance.now(),
 	});
-
-	const total = t3 - t0;
-	// if (total > 1){
-	// 	console.log(`[BroadCastGame SLOW TICK ${total.toFixed(2)}ms`);
-	// 	console.log(`  playersForEach:    ${(t1 - t0).toFixed(2)}ms`);
-	// 	console.log(`  playersEntries:    ${(t2 - t1).toFixed(2)}ms`);
-	// 	console.log(`  Bullet:            ${(t3 - t2).toFixed(2)}ms`);
-	// }
 }
 
 function broadcastMobs(roomId: number, mobs: Array<Entite>) {
-	const t0 = performance.now();
-
 	const mobsInfo: object[] = [];
 	mobs.forEach(m => mobsInfo.push(m.getAsJson()));
-	const t1 = performance.now();
-	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });
-	const t2 = performance.now();
-
-	const total = t2 - t0;
-	// if (total > 1){
-	// 	console.log(`[BroadCastMobs SLOW TICK ${total.toFixed(2)}ms`);
-	// 	console.log(`  mobsForEach:    ${(t1 - t0).toFixed(2)}ms`);
-	// 	console.log(`  MobEmit    ${(t2 - t1).toFixed(2)}ms`);
-	// }
-}
+	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });}
 
 function broadcastBonuses(roomId:number){
 	const manager = gameManagers.get(roomId);
@@ -262,32 +236,28 @@ io.on('connection', socket => {
 		if (!player || player.isDead()) return;
 
 		/* Rafale de tir */
-		const shotx=data.dx;
-		const shoty=data.dy;
+		const shotDx=data.dx;
+		const shotDy=data.dy;
 
-		for(let i = 0; i < player.arrowsPerClick; i++){
-			setTimeout(()=> {
-				if(!player || player.isDead()) return;
+		for (let i = 0; i < player.arrowsPerClick; i++) {
+			setTimeout(() => {
+				if (!state.players.has(socket.id)) return;
+				if (player.isDead()) return;
 
 				const bullet = state.bulletPool.acquire();
 				if (!bullet) return;
 
-				const playerDamage = player.damage;
-
 				bullet.fire(
 					player.x + player.width / 2,
 					player.y + player.height / 2,
-					// data.dx,
-					// data.dy,
-					shotx,
-					shoty,
+					shotDx,
+					shotDy,
 					player.identifier,
-					playerDamage
+					player.damage
 				);
 
 				broadcastGame(currentRoomId!, state);
-
-			}, i*100);	
+			}, i * 100);
 		}
 	});
 
@@ -340,8 +310,6 @@ setInterval(() => {
 	roomStates.forEach((state, roomId) => {
 		if (state.players.size === 0) return;
 
-		const t0 = performance.now();
-
 		const manager = gameManagers.get(roomId);
 		const activeMobs = state.getAllActiveMobs();
 		const activeBonus = manager?.getAllActiveBonuses();
@@ -357,8 +325,7 @@ setInterval(() => {
 
 		dirtyRooms.delete(roomId);
 
-		const t1 = performance.now();
-
+		/* Bullets */
 		activeBullets.forEach(bullet => {
 			state.players.forEach(player => {
 				if (!player.active) return;
@@ -393,16 +360,14 @@ setInterval(() => {
 							manager.bossDead();
 							bonusesChanged=true;
 							playersChanged=true;
-							broadcastMobs(roomId, state.getAllActiveMobs());
-						} 
+						}
 					}
 				}
 			});
 		});
 		if (activeBullets.length > 0) bulletsChanged = true;
 
-		const t2 = performance.now();
-
+		/* Mobs */
 		activeMobs.forEach(mob => {
 			if (mob.needsTarget()) {
 				const target = manager?.getClosestPlayer(mob);
@@ -444,54 +409,34 @@ setInterval(() => {
 				}
 			});
 
-			if (mob.x < -mob.width) mob.active = false;
-			mobsChanged = true;
+			if (mob.x < -mob.width) {
+				mob.active = false;
+				mobsChanged = true;
+			}
 		});
-
-		const t3 = performance.now();
-
-		if (playersChanged || bulletsChanged) broadcastGame(roomId, state);
-		const t4 = performance.now();
-		if (mobsChanged) broadcastMobs(roomId, activeMobs);
-		const t5 = performance.now();
-
-		const total = t5 - t0;
-		if (total > 5) {
-			console.log('\n\n');
-			console.log(`[Room ${roomId}] SLOW TICK ${total.toFixed(2)}ms`);
-			console.log(`  setup:      ${(t1 - t0).toFixed(2)}ms`);
-			console.log(`  bullets:    ${(t2 - t1).toFixed(2)}ms`);
-			console.log(`  mobs:       ${(t3 - t2).toFixed(2)}ms`);
-			console.log(`  broadcastGame:  ${(t4 - t3).toFixed(2)}ms`);
-			console.log(`  broadcastMob:  ${(t5 - t4).toFixed(2)}ms`);
-		}
 
 		/* Bonus */
 		activeBonus?.forEach(b => {
-			// console.log(`Bonus ${b.name} position: ${b.x},${b.y} Taille: ${b.width}x${b.height}`);
 			state.players.forEach(p => {
-				if(!p.active || !b.active) return;
+				if (!p.active || !b.active) return;
 
-				const collide = (
+				if (
 					p.x < b.x + b.width &&
 					p.x + p.width > b.x &&
 					p.y < b.y + b.height &&
 					p.y + p.height > b.y
-				);
-
-				if(collide) {
+				) {
 					b.giveBonus(p);
-					b.active=false;
-					playersChanged=true;
+					b.active = false;
+					playersChanged = true;
 					bonusesChanged = true;
 				}
-			})
-		})
+			});
+		});
 
-		if(bonusesChanged){
-			broadcastBonuses(roomId);
-			broadcastGame(roomId, state);
-		}
+		if (playersChanged || bulletsChanged) broadcastGame(roomId, state);
+		if (mobsChanged) broadcastMobs(roomId, activeMobs);
+		if (bonusesChanged) broadcastBonuses(roomId);
 	});
 }, 1000 / 60);
 
