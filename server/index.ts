@@ -89,7 +89,7 @@ function broadcastGame(roomId: number, state: RoomState) {
 
 function broadcastMobs(roomId: number, mobs: Array<Entite>) {
 	const mobsInfo: object[] = [];
-	mobs.forEach(m => mobsInfo.push(m.getAsJson()));
+	mobs.filter(m => m.active).forEach(m => mobsInfo.push(m.getAsJson()));
 	io.to(getRoomKey(roomId)).emit('mobsInfo', { mobs: mobsInfo });}
 
 function broadcastBonuses(roomId:number){
