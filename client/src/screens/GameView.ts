@@ -213,6 +213,10 @@ export class GameView extends CanvasView implements View {
 		this.keysHeld.clear();
 		this.lastLives = null;
 		this.rightClickTarget = null;
+
+		this.playerInfo.clear();
+		this.bulletInfo = [];
+		this.mobsInfo = [];
 		this.bonusInfo=[];
 	}
 
