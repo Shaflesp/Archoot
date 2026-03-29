@@ -4,13 +4,14 @@ export default class RucheHour extends Entite {
 	name = 'Ruche Hour';
 	width = 300;
 	height = 300;
-	x = 0;
-	y = 0;
 
-	speed = 0;
-	movementSpeed = 0;
-	readonly baseSpeed: number = 0;
-	readonly baseMovementSpeed: number = 0;
+	x = -this.width + 1;
+	y = this.boundHeight / 4;
+
+	speed = 1;
+	movementSpeed = 1;
+	readonly baseSpeed: number = 1;
+	readonly baseMovementSpeed: number = 1;
 
 	health = 150;
 	maxHp;
@@ -26,14 +27,10 @@ export default class RucheHour extends Entite {
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
 		this.maxHp = this.health;
-
-		this.x = -this.width + 1;
-		this.y = this.boundHeight / 2 - this.height / 2;
 	}
 
 	move(): void {
 		if (this.x < 0) {
-			console.log(this.x)
 			this.x += this.speed;
 			if (this.x > 0) {
 				this.x = 0;
@@ -63,8 +60,8 @@ export default class RucheHour extends Entite {
 	reset(): void {
 		this.width = 300;
 		this.height = 200;
-		this.x = 0;
-		this.y = 0;
+		this.x = -this.width + 1;
+		this.y = this.boundHeight / 4;
 		this.health = 150;
 		this.active = true;
 
