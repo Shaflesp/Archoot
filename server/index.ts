@@ -29,14 +29,18 @@ const registeredUsernames: Set<string> = new Set();
 const leaderboard = new Leaderboard();
 leaderboard.load();
 
+const port = 8080;
+httpServer.listen(port, () => {
+	console.log(`Server is running at http://localhost:${port}.`);
+});
+
+const io = new IOServer(httpServer, { cors: { origin: true } });
+
 function createRoom(
 	name: string,
 	capacityMax: number,
 	solo: boolean = false
 ): RoomServer {
-	const state = new RoomState(boundWidth, boundHeight);
-	const manager = new GameManager(state);
-
 	const r: RoomServer = {
 		id: ++roomIdCpt,
 		name,
@@ -44,6 +48,9 @@ function createRoom(
 		players: new Set(),
 		solo,
 	};
+
+	const state = new RoomState(boundWidth, boundHeight);
+	const manager = new GameManager(state, io, getRoomKey(r.id));
 	rooms.set(r.id, r);
 	roomStates.set(r.id, state);
 	gameManagers.set(r.id, manager);
@@ -51,13 +58,6 @@ function createRoom(
 }
 
 createRoom('Coconut [DO NOT DELETE]', 4);
-
-const port = 8080;
-httpServer.listen(port, () => {
-	console.log(`Server is running at http://localhost:${port}.`);
-});
-
-const io = new IOServer(httpServer, { cors: { origin: true } });
 
 function broadcastRooms(
 	target: { emit: (event: string, data: object) => void } = io,

@@ -62,6 +62,15 @@ interface DeathEffect {
 	animator: SpriteAnimator;
 }
 
+interface BossWarning {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	name: string;
+}
+
+
 interface BonusData {
 	name: string;
 	x: number;
@@ -75,10 +84,16 @@ export class GameView extends CanvasView implements View {
 	socket: Socket;
 	sm: ViewManager;
 
+	private startTime: number = 0;
+
 	playerInfo: Map<string, PlayerData> = new Map();
 	bulletInfo: Array<BulletData> = [];
 	mobsInfo: Array<MobsData> = [];
 	bonusInfo: Array<BonusData> = [];
+
+	private bossWarning: BossWarning | null = null;
+	private bossWarningTimer: number = 0;
+	private readonly WARNING_DURATION = 180; // 3s
 
 	private readonly bossNames = new Set([
 		'Mygalomane',
@@ -86,8 +101,6 @@ export class GameView extends CanvasView implements View {
 		'Brainstorming',
 		'Le Tyrus',
 	]);
-
-	private startTime: number = 0;
 
 	private playerImages: {
 		up: HTMLImageElement;
@@ -276,6 +289,12 @@ export class GameView extends CanvasView implements View {
 		this.deathEffects.forEach(e => e.animator.update());
 		this.deathEffects = this.deathEffects.filter(e => !e.animator.isDone());
 
+		if (this.bossWarningTimer > 0) {
+			this.bossWarningTimer--;
+			if (this.bossWarningTimer === 0) this.bossWarning = null;
+		}
+
+
 		if (this.rightClickTarget !== null) {
 			const now = Date.now();
 			if (now - this.lastMoveEmit >= this.MOVE_RATE) {
@@ -301,10 +320,14 @@ export class GameView extends CanvasView implements View {
 		body.style.backgroundBlendMode = 'darken';
 
 		this.element.style.display = 'flex';
+
+		this.startTime = Date.now();
+
 		this.socket.on('playerInfo', this.onPlayerInfo);
 		this.socket.on('mobsInfo', this.onMobsInfo);
 		this.socket.on('bonusInfo', this.onBonusInfo);
-		this.startTime = Date.now();
+
+		this.socket.on('boss-warning', this.onBossWarning);
 
 		window.addEventListener('keydown', this.onKeyDown);
 		window.addEventListener('keyup', this.onKeyUp);
@@ -326,6 +349,10 @@ export class GameView extends CanvasView implements View {
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
 		this.socket.off('bonusInfo', this.onBonusInfo);
+
+		this.socket.off('boss-warning', this.onBossWarning);
+		this.bossWarning = null;
+		this.bossWarningTimer = 0;
 
 		window.removeEventListener('keydown', this.onKeyDown);
 		window.removeEventListener('keyup', this.onKeyUp);
@@ -534,6 +561,11 @@ export class GameView extends CanvasView implements View {
 		this.bonusInfo = info.bonuses;
 	};
 
+	private onBossWarning = (warning: BossWarning) => {
+		this.bossWarning = warning;
+		this.bossWarningTimer = this.WARNING_DURATION;
+	};
+
 	private loadImages(srcs: string[]): HTMLImageElement[] {
 		return srcs.map(src => {
 			const img = new Image();
@@ -570,6 +602,7 @@ export class GameView extends CanvasView implements View {
 
 	private draw() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.drawBossWarning();
 
 		this.bonusInfo.forEach((b: BonusData) => {
 			const img = this.bonusImageMap.get(b.name);
@@ -831,6 +864,39 @@ export class GameView extends CanvasView implements View {
 		this.ctx.fillText(text, x + barWidth / 2, y + barHeight / 2 + 2);
 
 		this.ctx.shadowBlur = 0;
+
+		this.ctx.restore();
+	}
+
+	private drawBossWarning() {
+		if (!this.bossWarning) return;
+
+		const w = this.bossWarning;
+
+		const pulse = Math.abs(Math.sin(this.bossWarningTimer * 0.15));
+
+		this.ctx.save();
+
+		this.ctx.fillStyle = `rgba(255, 0, 0, ${0.15 * pulse})`;
+		this.ctx.fillRect(w.x, w.y, w.width, w.height);
+
+		this.ctx.strokeStyle = `rgba(255, 50, 50, ${0.8 * pulse})`;
+		this.ctx.lineWidth = 4;
+		this.ctx.setLineDash([15, 10]);
+		this.ctx.strokeRect(w.x, w.y, w.width, w.height);
+		this.ctx.setLineDash([]);
+
+		this.ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
+		this.ctx.font = 'bold 28px Arial';
+		this.ctx.textAlign = 'center';
+		this.ctx.textBaseline = 'middle';
+		this.ctx.shadowColor = 'red';
+		this.ctx.shadowBlur = 10;
+		this.ctx.fillText(
+			`⚠ ${w.name} arrive ⚠`,
+			w.x + w.width / 2,
+			w.y + w.height / 2
+		);
 
 		this.ctx.restore();
 	}

@@ -6,7 +6,7 @@ export default class LeTyrus extends Entite {
 	width = 450;
 	height = 450;
 	x = this.boundWidth / 2 - this.width / 2;
-	y = this.boundHeight / 2 - this.height / 2;
+	y = this.boundHeight - this.height;
 
 	speed = 1;
 	movementSpeed = 0;
@@ -126,14 +126,14 @@ export default class LeTyrus extends Entite {
 		this.width = 450;
 		this.height = 450;
 		this.x = this.boundWidth / 2 - this.width / 2;
-		this.y = this.boundHeight / 2 - this.height / 2;
+		this.y = this.boundHeight - this.height;
 		this.health = 500;
 		this.active = true;
 
 		this.phase = 'idle';
-		// this.phaseTimer = 0;
-		// this.jumpVx = 0;
-		// this.jumpVy = 0;
+		this.phaseTimer = 0;
+		this.jumpVx = 0;
+		this.jumpVy = 0;
 
 		this.speed = this.baseSpeed;
 		this.movementSpeed = this.baseMovementSpeed;

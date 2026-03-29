@@ -1,3 +1,4 @@
+import type { Server } from 'socket.io';
 import type RoomState from "./RoomState";
 import type { Player } from './Entity/Player.ts';
 import type { Entite } from '../client/src/entite/Entite.ts';
@@ -13,6 +14,8 @@ const boundHeight: number = 800;
 
 export default class GameManager {
 	state: RoomState;
+	io: Server;
+	roomKey: string;
 	bossSpawn: boolean = false;
 	private readonly bossPoolMap: Map<string, Pool<Entite>>;
 	level: number = 1;
@@ -20,9 +23,11 @@ export default class GameManager {
 	cycleStartScore: number = 0;
 	activeBonuses: Bonus[] = [];
 
-	constructor(state: RoomState) {
+	constructor(state: RoomState, io: Server, roomKey: string) {
 		this.state = state;
-		this.bossPoolMap = new Map<string,Pool<Entite>>([
+		this.io = io;
+		this.roomKey = roomKey;
+		this.bossPoolMap = new Map<string, Pool<Entite>>([
 			['Mygalomane', this.state.mygaloPool],
 			['Ruche Hour', this.state.ruchePool],
 			['Brainstorming', this.state.brainPool],
@@ -99,10 +104,23 @@ export default class GameManager {
 		if (this.bossSpawn) return;
 		this.clearMobs();
 		const boss = this.bossPoolMap.get(name)?.acquire();
-		if (boss) {
+		if (!boss) return;
+
+		this.io.to(this.roomKey).emit('boss-warning', {
+			x: boss.x,
+			y: boss.y,
+			width: boss.width,
+			height: boss.height,
+			name: boss.name,
+		});
+
+		boss.active = false;
+
+		setTimeout(() => {
+			boss.active = true;
 			this.bossSpawn = true;
 			console.log(`Boss en cours : ${boss.name}`);
-		}
+		}, 3000);
 	}
 
 	isBoss(name: string): boolean {
