@@ -10,6 +10,7 @@
 #home-screen {
     display: flex;
     position: relative;
+    z-index: 1;
 }
 
 .username-field {
@@ -59,17 +60,42 @@
     cursor: pointer;
 }
 
+.logo-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    gap: clamp(5px, 2vw, 40px);
+
+    z-index: 10;
+}
+
+.logo-text {
+    font-size: clamp(0.5rem, 3vw, 3rem);
+    white-space: nowrap;
+}
+
 .logo-home {
-    display: block;
-    max-width: 200px;
+    width: clamp(50px, 15vw, 200px);
     height: auto;
-    margin: 1%;
 }
 
 .character {
     display: block;
-    max-width: 350px;
-    height: auto;
+    height: 110vh;  
+    width: auto;
+
+    position: fixed;         
+    bottom: 0;                
+    left: 50%;
+    transform: translateX(-50%);
+    
+    z-index: 0;               
+    
+    pointer-events: none;  
 }
 
 .bottom-menu {
@@ -97,5 +123,4 @@
     filter: brightness(1.3) contrast(1.1);
     transform:scale(1.1);
 }
-
 
