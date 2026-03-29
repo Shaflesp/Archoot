@@ -11,6 +11,9 @@ const sm = new ViewManager();
 
 const socket = io(window.location.hostname + ':8080');
 
+const splash = document.getElementById('splash-screen')!;
+const splashText = document.querySelector<HTMLElement>('.splash-text')!;
+
 sm.add('home-screen', new HomeView(sm, socket));
 sm.add('game-screen', new GameView(sm, socket));
 sm.add('leaderboard-screen', new LeaderboardView(sm));
@@ -18,4 +21,22 @@ sm.add('credits-screen', new CreditsView(sm));
 sm.add('search-room', new RoomsView(sm, socket));
 sm.add('create-room-screen', new CreateRoomView(sm, socket));
 
-sm.show('home-screen');
+splashText.textContent = 'Fait avec amour par...';
+
+setTimeout(() => {
+	splashText.classList.add('hidden');
+}, 1000);
+
+setTimeout(() => {
+	splashText.textContent = "L'Equipe 5";
+	splashText.classList.remove('hidden');
+}, 1500);
+
+setTimeout(() => {
+	splash.classList.add('fade-out');
+}, 3000);
+
+setTimeout(() => {
+	splash.remove();
+	sm.show('home-screen');
+}, 5000);

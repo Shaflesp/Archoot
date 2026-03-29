@@ -1,0 +1,44 @@
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 100;
+
+    opacity: 1;
+    transition: opacity 2s ease;
+}
+
+#splash-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.splash-text {
+    color: white;
+
+    font-weight: bold;
+    font-size: 26px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+    text-shadow: 
+        2px 0 #000, -2px 0 #000000,
+        0 2px #000, 0 -2px #000,
+        1px 1px #000, -1px -1px #000,
+        1px -1px #000, -1px 1px #000000;
+
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.splash-text.hidden {
+    opacity: 0;
+}
