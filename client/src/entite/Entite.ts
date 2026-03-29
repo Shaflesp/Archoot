@@ -9,6 +9,7 @@ export abstract class Entite implements Collidable {
 	active: boolean = false;
 
 	abstract name: string;
+	id: number = 0;
 	abstract x: number;
 	abstract y: number;
 	abstract width: number;
@@ -45,6 +46,7 @@ export abstract class Entite implements Collidable {
 	getAsJson() {
 		return {
 			name: this.name,
+			id: this.id,
 			x: this.x,
 			y: this.y,
 			width: this.width,
@@ -78,5 +80,5 @@ export abstract class Entite implements Collidable {
 
 	shoot(_acquireBullet: () => Bullet | null): void {}
 
-	hitPlayers(_players: Map<string, Player>,): void {}
+	hitPlayers(_players: Map<string, Player>): void {}
 }

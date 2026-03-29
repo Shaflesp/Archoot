@@ -31,6 +31,7 @@ interface BulletData {
 
 interface MobsData {
 	name: string;
+	id: number;
 	x: number;
 	y: number;
 	width: number;
@@ -53,6 +54,14 @@ interface MobsData {
 	}[];
 }
 
+interface DeathEffect {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	animator: SpriteAnimator;
+}
+
 interface BonusData {
 	name: string;
 	x: number;
@@ -71,6 +80,13 @@ export class GameView extends CanvasView implements View {
 	mobsInfo: Array<MobsData> = [];
 	bonusInfo: Array<BonusData> = [];
 
+	private readonly bossNames = new Set([
+		'Mygalomane',
+		'Ruche Hour',
+		'Brainstorming',
+		'Le Tyrus',
+	]);
+
 	private startTime: number = 0;
 
 	private playerImages: {
@@ -82,17 +98,20 @@ export class GameView extends CanvasView implements View {
 	private bulletImage: HTMLImageElement;
 	private rockImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
+	private deathEffects: Array<DeathEffect> = [];
 	private rucheImages: HTMLImageElement[] = [];
+	private coeurImage: HTMLImageElement;
+	private bonusImage: HTMLImageElement[] = [];
 
 	private pieAnimator: SpriteAnimator | null = null;
 	private pieSheet: HTMLImageElement;
 	private beeAnimator: SpriteAnimator | null = null;
 	private beeSheet: HTMLImageElement;
-	//private poofAnimator: SpriteAnimator | null = null;
-	//private poofSheet: HTMLImageElement;
+	private poofSheet: HTMLImageElement;
 
-	private coeurImage: HTMLImageElement;
-	private bonusImage: HTMLImageElement[] = [];
+	private readonly mobImageMap: Map<string, HTMLImageElement>;
+	private readonly rucheImageMap: Map<string, HTMLImageElement>;
+	private readonly bonusImageMap: Map<string, HTMLImageElement>;
 
 	private deathPopup: HTMLElement;
 	private escPopup: HTMLElement;
@@ -162,11 +181,9 @@ export class GameView extends CanvasView implements View {
 		this.rockImage = new Image();
 		this.rockImage.src = '/images/cailloutyrus.png';
 
-		this.mobsSrcs.forEach(src => {
-			const img = new Image();
-			img.src = src;
-			this.mobsImages.push(img);
-		});
+		this.mobsImages = this.loadImages(this.mobsSrcs);
+		this.rucheImages = this.loadImages(this.rucheSrcs);
+		this.bonusImage = this.loadImages(this.bonusSrcs);
 
 		this.pieSheet = new Image();
 		this.pieSheet.onload = () => {
@@ -180,17 +197,8 @@ export class GameView extends CanvasView implements View {
 		};
 		this.pieSheet.src = '/images/sprites/pie_sheet.png';
 
-		// this.poofSheet = new Image();
-		// this.poofSheet.onload = () => {
-		// 	this.poofAnimator = new SpriteAnimator(
-		// 		this.poofSheet,
-		// 		4,
-		// 		this.poofSheet.width / 4,
-		// 		this.poofSheet.height,
-		// 		5
-		// 	);
-		// };
-		// this.poofSheet.src = '/images/sprites/poof_sheet.png';
+		this.poofSheet = new Image();
+		this.poofSheet.src = '/images/sprites/poof_sheet.png';
 
 		this.beeSheet = new Image();
 		this.beeSheet.onload = () => {
@@ -204,17 +212,26 @@ export class GameView extends CanvasView implements View {
 		};
 		this.beeSheet.src = '/images/sprites/bee_sheet.png';
 
-		this.rucheSrcs.forEach(src => {
-			const img = new Image();
-			img.src = src;
-			this.rucheImages.push(img);
-		});
+		this.mobImageMap = new Map([
+			['pie', this.mobsImages[0]],
+			['galinette cendrée', this.mobsImages[1]],
+			['Mygalomane', this.mobsImages[6]],
+			['Brainstorming', this.mobsImages[7]],
+			['Le Tyrus', this.mobsImages[8]],
+		]);
 
-		this.bonusSrcs.forEach(src => {
-			const img = new Image();
-			img.src = src;
-			this.bonusImage.push(img);
-		});
+		this.rucheImageMap = new Map([
+			['green', this.rucheImages[0]],
+			['orange', this.rucheImages[1]],
+			['red', this.rucheImages[2]],
+		]);
+
+		this.bonusImageMap = new Map([
+			['PotionDegats', this.bonusImage[0]],
+			['PotionSoin', this.bonusImage[1]],
+			['PotionRapidite', this.bonusImage[2]],
+			['PotionTirRapide', this.bonusImage[3]],
+		]);
 
 		/* Gestion du retour accueil */
 		this.element
@@ -256,6 +273,8 @@ export class GameView extends CanvasView implements View {
 		if (!this.running) return;
 
 		this.pieAnimator?.update();
+		this.deathEffects.forEach(e => e.animator.update());
+		this.deathEffects = this.deathEffects.filter(e => !e.animator.isDone());
 
 		if (this.rightClickTarget !== null) {
 			const now = Date.now();
@@ -306,7 +325,7 @@ export class GameView extends CanvasView implements View {
 
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
-		this.socket.off('bonusInfo');
+		this.socket.off('bonusInfo', this.onBonusInfo);
 
 		window.removeEventListener('keydown', this.onKeyDown);
 		window.removeEventListener('keyup', this.onKeyUp);
@@ -399,7 +418,7 @@ export class GameView extends CanvasView implements View {
 		x: number,
 		y: number
 	): { dx: number; dy: number } | null {
-		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
+		const me = this.getMe();
 		if (!me) return null;
 
 		const centerX = me.x + me.width / 2;
@@ -432,7 +451,7 @@ export class GameView extends CanvasView implements View {
 		this.bulletInfo = info.bullets;
 
 		//si collision = flash rouge
-		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
+		const me = this.getMe();
 		if (me) {
 			if (this.lastLives !== null && me.lives < this.lastLives) {
 				this.flashDuration = 10;
@@ -444,6 +463,12 @@ export class GameView extends CanvasView implements View {
 			this.lastLives = me.lives;
 		}
 	};
+
+	private getMe(): PlayerData | null {
+		return this.socket.id
+			? (this.playerInfo.get(this.socket.id) ?? null)
+			: null;
+	}
 
 	private handlePlayerDeath(player: PlayerData) {
 		this.deathPopup.style.display = 'flex';
@@ -481,12 +506,41 @@ export class GameView extends CanvasView implements View {
 	}
 
 	private onMobsInfo = (info: { mobs: Array<MobsData> }) => {
+		const newIds = new Set(info.mobs.map(m => m.id));
+
+		this.mobsInfo.forEach(m => {
+			if (!newIds.has(m.id) && this.poofSheet.complete) {
+				this.deathEffects.push({
+					x: m.x,
+					y: m.y,
+					width: m.width,
+					height: m.height,
+					animator: new SpriteAnimator(
+						this.poofSheet,
+						4,
+						this.poofSheet.width / 4,
+						this.poofSheet.height,
+						5,
+						false
+					),
+				});
+			}
+		});
+
 		this.mobsInfo = info.mobs;
 	};
 
 	private onBonusInfo = (info: { bonuses: Array<BonusData> }) => {
 		this.bonusInfo = info.bonuses;
 	};
+
+	private loadImages(srcs: string[]): HTMLImageElement[] {
+		return srcs.map(src => {
+			const img = new Image();
+			img.src = src;
+			return img;
+		});
+	}
 
 	private getPlayerImage(p: PlayerData): {
 		image: HTMLImageElement;
@@ -508,58 +562,17 @@ export class GameView extends CanvasView implements View {
 	}
 
 	private getMobImage(mob: MobsData): HTMLImageElement {
-		switch (mob.name) {
-			case 'pie':
-				return this.mobsImages[0];
-			case 'galinette cendrée':
-				return this.mobsImages[1];
-			case 'araignée':
-				const index = (Math.floor(mob.x) % 4) + 2; // pour régler pb d'affichage sur le canva
-				return this.mobsImages[index];
-			case 'Mygalomane':
-				return this.mobsImages[6];
-			case 'Brainstorming':
-				return this.mobsImages[7];
-			case 'Le Tyrus':
-				return this.mobsImages[8];
-			default:
-				return this.mobsImages[3];
+		if (mob.name === 'araignée') {
+			return this.mobsImages[(Math.floor(mob.x) % 4) + 2];
 		}
-	}
-
-	private getRucheImage(phase: string): HTMLImageElement {
-		switch (phase) {
-			case 'green':
-				return this.rucheImages[0];
-			case 'orange':
-				return this.rucheImages[1];
-			case 'red':
-				return this.rucheImages[2];
-			default:
-				return this.rucheImages[0];
-		}
-	}
-
-	private getBonusImage(name: string): HTMLImageElement {
-		switch (name) {
-			case 'PotionDegats':
-				return this.bonusImage[0];
-			case 'PotionSoin':
-				return this.bonusImage[1];
-			case 'PotionRapidite':
-				return this.bonusImage[2];
-			case 'PotionTirRapide':
-				return this.bonusImage[3];
-			default:
-				return this.bonusImage[1];
-		}
+		return this.mobImageMap.get(mob.name) ?? this.mobsImages[3];
 	}
 
 	private draw() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		this.bonusInfo.forEach((b: BonusData) => {
-			const img = this.getBonusImage(b.name);
+			const img = this.bonusImageMap.get(b.name);
 			if (img && img.complete && img.naturalWidth !== 0) {
 				this.ctx.drawImage(img, b.x, b.y, b.width, b.height);
 			} else {
@@ -572,6 +585,7 @@ export class GameView extends CanvasView implements View {
 			this.drawExtras(m);
 			this.drawMob(m);
 		});
+		this.drawDeathEffects();
 
 		this.playerInfo.forEach((p: PlayerData) => {
 			if (!p.active) {
@@ -581,17 +595,13 @@ export class GameView extends CanvasView implements View {
 
 			const { image, flipped } = this.getPlayerImage(p);
 
-			this.ctx.save();
-
-			if (flipped) {
-				this.ctx.translate(p.x + p.width, p.y);
-				this.ctx.scale(-1, 1);
-				this.ctx.drawImage(image, 0, 0, p.width, p.height);
-			} else {
-				this.ctx.drawImage(image, p.x, p.y, p.width, p.height);
-			}
-
-			this.ctx.restore();
+			this.drawFlipped(
+				() => this.ctx.drawImage(image, 0, 0, p.width, p.height),
+				p.x,
+				p.y,
+				p.width,
+				flipped
+			);
 
 			this.ctx.font = '24px Arial';
 			this.ctx.fillStyle = p.active ? 'white' : 'red';
@@ -601,7 +611,7 @@ export class GameView extends CanvasView implements View {
 			this.ctx.filter = 'none';
 		});
 
-		const me = this.socket.id ? this.playerInfo.get(this.socket.id) : null;
+		const me = this.getMe();
 		if (me) {
 			for (let i = 0; i < me.lives; i++) {
 				this.ctx.drawImage(
@@ -670,10 +680,7 @@ export class GameView extends CanvasView implements View {
 			this.flashDuration--;
 		}
 
-		const bossNames = ['Mygalomane', 'Ruche Hour', 'Brainstorming', 'Le Tyrus'];
-		const currentBoss = this.mobsInfo.find((m: MobsData) =>
-			bossNames.includes(m.name)
-		);
+		const currentBoss = this.mobsInfo.find(m => this.bossNames.has(m.name));
 
 		if (currentBoss) {
 			this.drawBossBar(currentBoss);
@@ -694,25 +701,34 @@ export class GameView extends CanvasView implements View {
 		if (m.name === 'pie' && this.pieAnimator) {
 			this.pieAnimator.draw(this.ctx, 0, 0, m.width, m.height);
 		} else if (m.name === 'Ruche Hour' && m.phase) {
-			this.ctx.drawImage(this.getRucheImage(m.phase), 0, 0, m.width, m.height);
-
+			this.ctx.drawImage(
+				this.rucheImageMap.get(m.phase) ?? this.rucheImages[0],
+				0,
+				0,
+				m.width,
+				m.height
+			);
 		} else if (m.name === 'Le Tyrus' && m.phase) {
-			const img = this.getMobImage(m);
+			const img = this.mobImageMap.get(m.name) ?? this.mobsImages[3];
 
 			this.ctx.save();
-			const centerX =  m.width / 2;
-			const centerY =  m.height / 2;
+			const centerX = m.width / 2;
+			const centerY = m.height / 2;
 			this.ctx.translate(centerX, centerY);
 			if (m.phase === 'jumping') {
 				this.ctx.scale(0.85, 1.15);
-
 			} else if (m.phase === 'landing' || m.phase === 'stunned') {
 				this.ctx.scale(1.15, 0.85);
 			}
 
-			this.ctx.drawImage(img, -(m.width / 2), -(m.height / 2), m.width, m.height);
+			this.ctx.drawImage(
+				img,
+				-(m.width / 2),
+				-(m.height / 2),
+				m.width,
+				m.height
+			);
 			this.ctx.restore();
-
 		} else {
 			this.ctx.drawImage(this.getMobImage(m), 0, 0, m.width, m.height);
 		}
@@ -720,11 +736,11 @@ export class GameView extends CanvasView implements View {
 		this.ctx.restore();
 	}
 
-	// private drawDeathAnimation(m: MobsData) {
-	// 	this.ctx.save();
-	// 	this.poofAnimator?.draw(this.ctx, 0, 0, m.width, m.height);
-	// 	this.ctx.restore();
-	// }
+	private drawDeathEffects() {
+		this.deathEffects.forEach(e => {
+			e.animator.draw(this.ctx, e.x, e.y, e.width, e.height);
+		});
+	}
 
 	private drawExtras(m: MobsData): void {
 		if (m.name === 'Mygalomane' && m.cables) {
@@ -742,16 +758,16 @@ export class GameView extends CanvasView implements View {
 				const alpha = Math.max(0, cable.life / cable.maxLife);
 				this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
 
-					this.ctx.stroke();
-					this.ctx.restore();
-				});
-			}else if (
-				m.name === 'Brainstorming' &&
-				m.phase === 'shooting' &&
-				m.beamAngle
-			) {
-				const cx = m.x + m.width / 2;
-				const cy = m.y + m.height / 2;
+				this.ctx.stroke();
+				this.ctx.restore();
+			});
+		} else if (
+			m.name === 'Brainstorming' &&
+			m.phase === 'shooting' &&
+			m.beamAngle
+		) {
+			const cx = m.x + m.width / 2;
+			const cy = m.y + m.height / 2;
 
 			this.ctx.shadowBlur = 20;
 			this.ctx.shadowColor = 'magenta';
@@ -816,6 +832,24 @@ export class GameView extends CanvasView implements View {
 
 		this.ctx.shadowBlur = 0;
 
+		this.ctx.restore();
+	}
+
+	private drawFlipped(
+		draw: () => void,
+		x: number,
+		y: number,
+		width: number,
+		flipped: boolean
+	) {
+		this.ctx.save();
+		if (flipped) {
+			this.ctx.translate(x + width, y);
+			this.ctx.scale(-1, 1);
+		} else {
+			this.ctx.translate(x, y);
+		}
+		draw();
 		this.ctx.restore();
 	}
 }

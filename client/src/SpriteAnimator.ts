@@ -1,41 +1,58 @@
-// SpriteAnimator.ts
 export class SpriteAnimator {
 	private frameIndex: number = 0;
 	private tickCount: number = 0;
-	private readonly ticksPerFrame: number;
 
-	private readonly frameCount: number;
-	private readonly frameWidth: number;
-	private readonly frameHeight: number;
+	private image: HTMLImageElement;
 
-	private readonly image: HTMLImageElement;
+	private frameCount: number;
+	private frameWidth: number;
+	private frameHeight: number;
+	private ticksPerFrame: number = 6;
+
+	private loop: boolean;
+	private done: boolean = false;
 
 	constructor(
 		image: HTMLImageElement,
 		frameCount: number,
 		frameWidth: number,
 		frameHeight: number,
-		ticksPerFrame: number = 6 // plus c'est bas plus c'est rapide
+		ticksPerFrame: number = 6,
+		loop: boolean = true // ADD THIS
 	) {
 		this.image = image;
 		this.frameCount = frameCount;
 		this.frameWidth = frameWidth;
 		this.frameHeight = frameHeight;
 		this.ticksPerFrame = ticksPerFrame;
+		this.loop = loop;
 	}
 
 	update() {
+		if (this.done) return;
+
 		this.tickCount++;
-		if (this.tickCount > this.ticksPerFrame) {
+		if (this.tickCount >= this.ticksPerFrame) {
 			this.tickCount = 0;
-			this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+
+			if (this.frameIndex < this.frameCount - 1) {
+				this.frameIndex++;
+			} else if (this.loop) {
+				this.frameIndex = 0; // only loop if allowed
+			} else {
+				this.done = true; // stop here
+			}
 		}
+	}
+
+	isDone(): boolean {
+		return this.done;
 	}
 
 	draw(
 		ctx: CanvasRenderingContext2D,
-		dx: number,
-		dy: number,
+		x: number,
+		y: number,
 		width: number,
 		height: number
 	) {
@@ -45,8 +62,8 @@ export class SpriteAnimator {
 			0,
 			this.frameWidth,
 			this.frameHeight,
-			dx,
-			dy,
+			x,
+			y,
 			width,
 			height
 		);

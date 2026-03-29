@@ -3,6 +3,8 @@ import type { Collidable } from './Collidable.ts';
 export class Bullet implements Collidable {
 	private bounds: { width: number; height: number };
 
+	id:number = 0;
+
 	x: number;
 	y: number;
 	width: number = 30;
