@@ -12,7 +12,7 @@ export default class Galinette extends Entite {
 	readonly baseSpeed: number = 6;
 	readonly baseMovementSpeed: number = 2;
 
-	health = 10;
+	health = 7;
 	maxHp;
 	damage = 1;
 	shootSpeed = 0;

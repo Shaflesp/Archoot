@@ -12,7 +12,7 @@ export default class Pie extends Entite {
 	readonly baseSpeed: number = 1;
 	readonly baseMovementSpeed: number = 2;
 
-	health = 30;
+	health = 15;
 	maxHp;
 	damage = 1;
 	shootSpeed = 0;
