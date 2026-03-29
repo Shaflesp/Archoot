@@ -7,7 +7,7 @@ export default class Galinette extends Entite {
 	height = 50;
 	x = 0;
 	y = 0;
-	speed = 10;
+	speed = 6;
 	movementSpeed = 2;
 	health = 10;
 	damage = 1;

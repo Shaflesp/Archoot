@@ -10,7 +10,7 @@ export default class Mygalomane extends Entite {
 	y = (this.boundHeight / 2) - (this.height / 2);
 	speed = 3;
 	movementSpeed = 0;
-	health = 100;
+	health = 50;
 	damage = 1;
 	shootSpeed = 3;
 
@@ -49,7 +49,7 @@ export default class Mygalomane extends Entite {
         this.height = 200;
         this.x = (this.boundWidth / 2) - (this.width / 2);
         this.y = (this.boundHeight / 2) - (this.height / 2);
-		this.health = 100;
+		this.health = 50;
 		this.active = true;
 	}
 }

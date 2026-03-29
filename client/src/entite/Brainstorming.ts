@@ -10,7 +10,7 @@ export default class Brainstorming extends Entite {
 	y = this.boundHeight / 2 - this.height / 2;
 	speed = 6;
 	movementSpeed = 2;
-	health = 500;
+	health = 300;
 	damage = 2;
 	shootSpeed = 1;
 
@@ -49,7 +49,7 @@ export default class Brainstorming extends Entite {
 		this.height = 200;
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight/ 2 - this.height / 2;
-		this.health = 500;
+		this.health = 300;
 		this.active = true;
 	}
 }

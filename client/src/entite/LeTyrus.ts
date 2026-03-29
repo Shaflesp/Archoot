@@ -9,7 +9,7 @@ export default class LeTyrus extends Entite {
 	y = this.boundHeight / 2 - this.height / 2;
 	speed = 1;
 	movementSpeed = 0;
-	health = 2000;
+	health = 500;
 	damage = 1;
 	shootSpeed = 3;
 	target = null;
@@ -26,7 +26,7 @@ export default class LeTyrus extends Entite {
 		this.height = 200;
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight / 2 - this.height / 2;
-		this.health = 2000;
+		this.health = 500;
 		this.active = true;
 	}
 }
