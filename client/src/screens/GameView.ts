@@ -556,6 +556,8 @@ export class GameView extends CanvasView implements View {
 	}
 
 	private drawBossBar(boss: MobsData): void {
+		this.ctx.save();
+
 		const barWidth = 600;
 		const barHeight = 30;
 		const x = (this.canvas.width - barWidth) / 2;
@@ -587,5 +589,7 @@ export class GameView extends CanvasView implements View {
 		this.ctx.fillText(text, x + barWidth / 2, y + barHeight / 2 + 2);
 
 		this.ctx.shadowBlur = 0;
+
+		this.ctx.restore();
 	}
 }
