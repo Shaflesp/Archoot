@@ -380,29 +380,31 @@ setInterval(() => {
 
 			mob.move();
 			if (mob instanceof RucheHour) {
-				mob.shootTimer++;
+				if (mob.x === 0) {
+					mob.shootTimer++;
 
-				if (mob.shootTimer >= 15) {
-					mob.shootTimer = 0;
+					if (mob.shootTimer >= 15) {
+						mob.shootTimer = 0;
 
-					const vectors = mob.getVectors();
-					vectors.forEach((vec: { dx: number; dy: number }) => {
-						const bullet = state.bulletPool.acquire();
+						const vectors = mob.getVectors();
+						vectors.forEach((vec: { dx: number; dy: number }) => {
+							const bullet = state.bulletPool.acquire();
 
-						if (bullet) {
-							const centerX = mob.x + mob.width / 2 - bullet.width / 2;
-							const centerY = mob.y + mob.height / 2 - bullet.height / 2;
+							if (bullet) {
+								const centerX = mob.x + mob.width / 2 - bullet.width / 2;
+								const centerY = mob.y + mob.height / 2 - bullet.height / 2;
 
-							bullet.fire(
-								centerX,
-								centerY,
-								vec.dx,
-								vec.dy,
-								mob.name,
-								mob.damage
-							);
-						}
-					});
+								bullet.fire(
+									centerX,
+									centerY,
+									vec.dx,
+									vec.dy,
+									mob.name,
+									mob.damage
+								);
+							}
+						});
+					}
 				}
 			}
 			mobsChanged = true;

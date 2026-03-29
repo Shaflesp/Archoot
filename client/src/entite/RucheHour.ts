@@ -4,8 +4,8 @@ export default class RucheHour extends Entite {
 	name = 'Ruche Hour';
 	width = 300;
 	height = 300;
-	x = this.boundWidth / 2 - this.width / 2;
-	y = this.boundHeight / 2 - this.height / 2;
+	x = 0;
+	y = 0;
 
 	speed = 0;
 	movementSpeed = 0;
@@ -19,17 +19,28 @@ export default class RucheHour extends Entite {
 	target = null;
 
 	private currentAngle: number = 0;
-	private rotationSpeed: number = 0.05;
-	private numberOfRays: number = 4;
+	private rotationSpeed: number = 0.10;
+	private numberOfRays: number = 8;
 	shootTimer: number =0;
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
 		this.maxHp = this.health;
+
+		this.x = -this.width + 1;
+		this.y = this.boundHeight / 2 - this.height / 2;
 	}
 
 	move(): void {
-		this.currentAngle += this.rotationSpeed;
+		if (this.x < 0) {
+			console.log(this.x)
+			this.x += this.speed;
+			if (this.x > 0) {
+				this.x = 0;
+			}
+		} else {
+			this.currentAngle += this.rotationSpeed;
+		}
 	}
 
 	getVectors(): { dx: number; dy: number }[] {
@@ -52,8 +63,8 @@ export default class RucheHour extends Entite {
 	reset(): void {
 		this.width = 300;
 		this.height = 200;
-		this.x = this.boundWidth / 2 - this.width / 2;
-		this.y = this.boundHeight / 2 - this.height / 2;
+		this.x = 0;
+		this.y = 0;
 		this.health = 150;
 		this.active = true;
 
