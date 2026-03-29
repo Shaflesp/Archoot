@@ -110,7 +110,8 @@ export default class RucheHour extends Entite {
 				vec.dx,
 				vec.dy,
 				this.name,
-				this.damage
+				this.damage,
+				4
 			);
 		});
 	}

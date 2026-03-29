@@ -261,7 +261,8 @@ io.on('connection', socket => {
 					shotDx,
 					shotDy,
 					player.identifier,
-					player.damage
+					player.damage,
+					8
 				);
 
 				broadcastGame(currentRoomId!, state);

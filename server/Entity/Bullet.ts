@@ -11,7 +11,7 @@ export class Bullet implements Collidable {
 	dy: number;
 	ownerId: string;
 	active: boolean;
-	speed: number;
+	speed: number = 0;
 	damage:number = 1;
 
 	constructor(width: number, height: number) {
@@ -23,10 +23,9 @@ export class Bullet implements Collidable {
 		this.dy = 0;
 		this.ownerId = '';
 		this.active = false;
-		this.speed = 8;
 	}
 
-	fire(x: number, y: number, dx: number, dy: number, ownerId: string, damage:number) {
+	fire(x: number, y: number, dx: number, dy: number, ownerId: string, damage:number, speed: number) {
 		this.x = x;
 		this.y = y;
 		this.dx = dx;
@@ -34,6 +33,7 @@ export class Bullet implements Collidable {
 		this.ownerId = ownerId;
 		this.active = true;
 		this.damage = damage;
+		this.speed = speed;
 	}
 
 	update() {
