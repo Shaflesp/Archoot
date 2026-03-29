@@ -1,4 +1,5 @@
 import { Entite } from './Entite.ts';
+import type { Player } from '../../../server/Entity/Player.ts';
 
 export interface WebCable {
 	startX: number;
@@ -95,6 +96,34 @@ export default class Mygalomane extends Entite {
 
 		this.cables.forEach(c => c.life--);
 		this.cables = this.cables.filter(c => c.life > 0);
+	}
+
+	hitPlayers(players: Map<string, Player>): void {
+		const cableThickness = 5;
+
+		this.cables.forEach(cable => {
+			players.forEach(player => {
+				if (!player.active) return;
+
+				const px = player.x + player.width / 2;
+				const py = player.y + player.height / 2;
+
+				const lineLenSq = Math.pow(cable.endX - cable.startX, 2) + Math.pow(cable.endY - cable.startY, 2);
+				if (lineLenSq === 0) return;
+
+				let t = ((px - cable.startX) * (cable.endX - cable.startX) + (py - cable.startY) * (cable.endY - cable.startY)) / lineLenSq;
+				t = Math.max(0, Math.min(1, t));
+
+				const closestX = cable.startX + t * (cable.endX - cable.startX);
+				const closestY = cable.startY + t * (cable.endY - cable.startY);
+
+				const dist = Math.hypot(px - closestX, py - closestY);
+
+				if (dist < player.width / 2 + cableThickness) {
+					player.takeDamage(this.damage);
+				}
+			});
+		});
 	}
 
 	reset(): void {
