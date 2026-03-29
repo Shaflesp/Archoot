@@ -9,7 +9,7 @@ export default class Pie extends Entite {
 	height = 50;
 	speed = 1;
 	movementSpeed = 2;
-	health = 5;
+	health = 30;
 	damage = 1;
 	shootSpeed = 0;
 	target: { x: number; y: number } | null;
@@ -37,7 +37,7 @@ export default class Pie extends Entite {
 	reset(): void {
 		this.x = Math.random() * 1600;
 		this.y = Math.random() * 700;
-		this.health = 5;
+		this.health = 30;
 		this.active = true;
 	}
 

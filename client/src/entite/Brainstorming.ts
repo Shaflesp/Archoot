@@ -49,7 +49,7 @@ export default class Brainstorming extends Entite {
 		this.height = 200;
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight/ 2 - this.height / 2;
-		this.health = 15;
+		this.health = 500;
 		this.active = true;
 	}
 }

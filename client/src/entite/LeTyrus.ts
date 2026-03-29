@@ -26,7 +26,7 @@ export default class LeTyrus extends Entite {
 		this.height = 200;
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight / 2 - this.height / 2;
-		this.health = 25;
+		this.health = 2000;
 		this.active = true;
 	}
 }

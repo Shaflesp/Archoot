@@ -9,7 +9,7 @@ export default class RucheHour extends Entite {
 	y = this.boundHeight / 2 - this.height / 2;
 	speed = 4;
 	movementSpeed = 3;
-	health = 200;
+	health = 250;
 	damage = 1;
 	shootSpeed = 4;
 	target = null;
@@ -53,7 +53,7 @@ export default class RucheHour extends Entite {
 		this.height = 200;
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight / 2 - this.height / 2;
-		this.health = 30;
+		this.health = 250;
 		this.active = true;
 	}
 }
