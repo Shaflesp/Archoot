@@ -78,9 +78,5 @@ export abstract class Entite implements Collidable {
 
 	shoot(_acquireBullet: () => Bullet | null): void {}
 
-	hitPlayers(
-		_players: Map<string, Player>,
-		_boundWidth: number,
-		_boundHeight: number
-	): void {}
+	hitPlayers(_players: Map<string, Player>,): void {}
 }

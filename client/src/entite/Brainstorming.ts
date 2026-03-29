@@ -96,11 +96,7 @@ export default class Brainstorming extends Entite {
 		this.movementSpeed = this.baseMovementSpeed;
 	}
 
-	hitPlayers(
-		players: Map<string, Player>,
-		boundWidth: number,
-		boundHeight: number
-	): void {
+	hitPlayers(players: Map<string, Player>,): void {
 		if (this.phase !== 'shooting') return;
 
 		const cx = this.x + this.width / 2;
@@ -128,22 +124,6 @@ export default class Brainstorming extends Entite {
 
 				if (dist < player.width / 2 + beamThickness) {
 					player.takeDamage(this.damage);
-
-					const pushAngle = Math.atan2(py - cy, px - cx);
-					player.x = Math.max(
-						0,
-						Math.min(
-							boundWidth - player.width,
-							player.x + Math.cos(pushAngle) * 150
-						)
-					);
-					player.y = Math.max(
-						0,
-						Math.min(
-							boundHeight - player.height,
-							player.y + Math.sin(pushAngle) * 150
-						)
-					);
 					break;
 				}
 			}

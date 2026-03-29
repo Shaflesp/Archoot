@@ -386,7 +386,7 @@ setInterval(() => {
 
 			mob.move();
 			mob.shoot(() => state.bulletPool.acquire());
-			mob.hitPlayers(state.players, boundWidth, boundHeight);
+			mob.hitPlayers(state.players);
 			playersChanged = true;
 			mobsChanged = true;
 
