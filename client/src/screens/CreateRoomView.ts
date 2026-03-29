@@ -55,6 +55,11 @@ export class CreateRoomView implements View {
 	}
 
 	show(): void {
+		const body = document.body;
+		body.style.backgroundImage = "url('/images/fondAccueil.gif')";
+		body.style.backgroundColor = "transparent";
+		body.style.backgroundBlendMode = "normal";
+
 		this.element.style.display = 'flex';
 		this.socket.on('join-room-success', this.onJoinRoomSuccess);
 		this.handleForm();

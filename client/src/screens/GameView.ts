@@ -228,6 +228,12 @@ export class GameView extends CanvasView implements View {
 	};
 
 	show(): void {
+		const body = document.body;
+		body.style.backgroundImage = "url('/images/fondJeu.gif')";
+
+		body.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+		body.style.backgroundBlendMode = "darken";
+
 		this.element.style.display = 'flex';
 		this.socket.on('playerInfo', this.onPlayerInfo);
 		this.socket.on('mobsInfo', this.onMobsInfo);

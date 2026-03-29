@@ -71,6 +71,11 @@ export class HomeView implements View {
 	}
 
 	show(): void {
+		const body = document.body;
+		body.style.backgroundImage = "url('/images/fondAccueil.gif')";
+		body.style.backgroundColor = "transparent";
+		body.style.backgroundBlendMode = "normal";
+
 		this.element.style.display = 'flex';
 		this.socket.on('register_success', this.onRegisterSuccess);
 		this.socket.on('register_error', this.onRegisterError);

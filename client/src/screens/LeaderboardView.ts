@@ -56,6 +56,11 @@ export class LeaderboardView implements View {
 	}
 
 	async show(): Promise<void> {
+		const body = document.body;
+		body.style.backgroundImage = "url('/images/fondAccueil.gif')";
+		body.style.backgroundColor = "transparent";
+		body.style.backgroundBlendMode = "normal";
+
 		this.element.style.display = 'flex';
 		try {
 			const response = await fetch('/server/leaderboard.json');
