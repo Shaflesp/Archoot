@@ -55,6 +55,8 @@ export class GameView extends CanvasView implements View {
 	mobsInfo: Array<MobsData> = [];
 	bonusInfo: Array<BonusData> = [];
 
+	private startTime : number = 0;
+
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
@@ -201,6 +203,7 @@ export class GameView extends CanvasView implements View {
 		this.socket.on('playerInfo', this.onPlayerInfo);
 		this.socket.on('mobsInfo', this.onMobsInfo);
 		this.socket.on('bonusInfo', this.onBonusInfo);
+		this.startTime = Date.now();
 
 		window.addEventListener('keydown', this.onKeyDown);
 		window.addEventListener('keyup', this.onKeyUp);
@@ -364,9 +367,32 @@ export class GameView extends CanvasView implements View {
 		this.deathPopup.style.display = 'flex';
 		this.deathPopup.classList.add('visible');
 
+		const durationMs = Date.now() - this.startTime;
+		const totalSeconds = Math.floor(durationMs / 1000);
+		
+		const timeBonus = totalSeconds * 10;
+    	const combatScore = player.score;
+    	const totalScore = combatScore + timeBonus;
+		
+		const minutes = Math.floor(totalSeconds / 60);
+		const seconds = totalSeconds % 60;
+		const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+		const killedEnemies = Math.floor(player.score / 100);
+		
+    	const statElement = this.deathPopup.querySelector('#death-stats');
+
+		if (statElement) {
+			statElement.innerHTML = `
+            <p>Temps : <strong>${timeString}</strong> (+${timeBonus} pts)</p>
+            <p>Monstres : <strong>${killedEnemies}</strong> (${combatScore} pts)</p>
+            <hr>
+            <p>Score Final : <strong style="font-size: 1.5em;">${totalScore}</strong></p>
+        `;
+		}
+
 		this.socket.emit('add-score', {
 			username: player.username,
-			score: player.score,
+			score: totalScore,
 		});
 
 		console.log(`Score de ${player.score} enregistré pour ${player.username}`);
