@@ -17,11 +17,14 @@ body {
 }
 
 h1 {
-    color: #451110;
     font-size: 3.5em;
     text-align: center;
     font-weight: bolder;
     letter-spacing: 3px;
+
+    color: white;
+    text-shadow: 4px 0 #000, -4px 0 #000000, 0 4px #000, 0 -4px #000,
+               2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000000;
 }
 
 .screen {
