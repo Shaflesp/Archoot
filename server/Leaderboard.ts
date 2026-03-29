@@ -1,5 +1,4 @@
 import fs from 'fs';
-//import path from 'path';
 
 interface ScoreEntry {
 	username: string;
@@ -10,14 +9,17 @@ interface ScoreEntry {
 export class Leaderboard {
 	private scores: ScoreEntry[] = [];
 	private readonly MAX: number = 10;
-	private FILE_PATH: string = '/server/leaderboard.json';
+	private FILE_PATH: string = 'server/leaderboard.json';
 
-	public async load(): Promise<ScoreEntry[]> {
-		const response = await fetch(this.FILE_PATH);
-		if (response.ok) {
-			this.scores = await response.json();
+	public load(): void {
+		try {
+			if (fs.existsSync(this.FILE_PATH)) {
+				const data = fs.readFileSync(this.FILE_PATH, 'utf-8');
+				this.scores = JSON.parse(data);
+			}
+		} catch (error) {
+			console.log('No existing leaderboard found, starting fresh.');
 		}
-		return this.scores;
 	}
 
 	public addPlayer(player: string, score: number): void {
@@ -41,11 +43,11 @@ export class Leaderboard {
 	public save(): void {
 		const leaderdata = JSON.stringify(this.scores, null, 2);
 
-		fs.writeFile('server/leaderboard.json', leaderdata, err => {
+		fs.writeFile(this.FILE_PATH, leaderdata, err => {
 			if (err) {
 				console.log('Error writing file:', err);
 			} else {
-				console.log('Successfully wrote file');
+				console.log('Successfully wrote leaderboard file');
 			}
 		});
 		console.log(leaderdata);
