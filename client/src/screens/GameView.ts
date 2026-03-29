@@ -35,6 +35,8 @@ interface MobsData {
 	speed: number;
 	dx: number;
 	dy: number;
+	hp: number;
+	maxHp: number;
 }
 
 interface BonusData {
@@ -522,6 +524,15 @@ export class GameView extends CanvasView implements View {
 			this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 			this.flashDuration--;
 		}
+
+		const bossNames = ['Mygalomane', 'Ruche Hour', 'Brainstorming', 'Le Tyrus'];
+		const currentBoss = this.mobsInfo.find((m: MobsData) =>
+			bossNames.includes(m.name)
+		);
+
+		if (currentBoss) {
+			this.drawBossBar(currentBoss);
+		}
 	}
 
 	private drawMob(m: MobsData) {
@@ -542,5 +553,39 @@ export class GameView extends CanvasView implements View {
 		}
 
 		this.ctx.restore();
+	}
+
+	private drawBossBar(boss: MobsData): void {
+		const barWidth = 600;
+		const barHeight = 30;
+		const x = (this.canvas.width - barWidth) / 2;
+		const y = 20; // Distance from the top of the screen
+
+		this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+		this.ctx.fillRect(x, y, barWidth, barHeight);
+
+		const currentHp = boss.hp || 0;
+		const maxHp = boss.maxHp || 1;
+		const hpRatio = Math.max(0, currentHp / maxHp);
+
+		this.ctx.fillStyle = 'red';
+		this.ctx.fillRect(x, y, barWidth * hpRatio, barHeight);
+
+		this.ctx.strokeStyle = 'white';
+		this.ctx.lineWidth = 2;
+		this.ctx.strokeRect(x, y, barWidth, barHeight);
+
+		// 4. Draw Boss Name and HP Text
+		this.ctx.fillStyle = 'white';
+		this.ctx.font = 'bold 20px Arial';
+		this.ctx.textAlign = 'center';
+		this.ctx.textBaseline = 'middle';
+		this.ctx.shadowColor = 'black';
+		this.ctx.shadowBlur = 4;
+
+		const text = `${boss.name} - ${Math.ceil(currentHp)} / ${maxHp}`;
+		this.ctx.fillText(text, x + barWidth / 2, y + barHeight / 2 + 2);
+
+		this.ctx.shadowBlur = 0;
 	}
 }

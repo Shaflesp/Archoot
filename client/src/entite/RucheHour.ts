@@ -13,6 +13,7 @@ export default class RucheHour extends Entite {
 	readonly baseMovementSpeed: number = 2;
 
 	health = 150;
+	maxHp;
 	damage = 1;
 	shootSpeed = 4;
 	target = null;
@@ -22,6 +23,7 @@ export default class RucheHour extends Entite {
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		this.maxHp = this.health;
 		this.verticalDir = Math.random() < 0.5 ? 1 : -1;
 	}
 

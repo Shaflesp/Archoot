@@ -14,6 +14,7 @@ export default class Brainstorming extends Entite {
 	readonly baseMovementSpeed: number = 2;
 
 	health = 300;
+	maxHp;
 	damage = 2;
 	shootSpeed = 1;
 
@@ -22,6 +23,7 @@ export default class Brainstorming extends Entite {
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		this.maxHp = this.health;
 	}
 
 	move(): void {

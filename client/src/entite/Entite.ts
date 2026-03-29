@@ -12,6 +12,8 @@ export abstract class Entite implements Collidable {
 	abstract width: number;
 	abstract height: number;
 	abstract health: number;
+	abstract maxHp: number;
+
 	abstract damage: number;
 	abstract shootSpeed: number;
 
@@ -48,6 +50,8 @@ export abstract class Entite implements Collidable {
 			speed: this.speed,
 			dx: this.target ? this.target.x - this.x : -1,
 			dy: this.target ? this.target.y - this.y : 0,
+			hp: this.health,
+			maxHp: this.maxHp,
 		};
 	}
 

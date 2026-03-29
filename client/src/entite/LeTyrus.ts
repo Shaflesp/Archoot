@@ -13,12 +13,14 @@ export default class LeTyrus extends Entite {
 	readonly baseMovementSpeed: number = 0;
 
 	health = 500;
+	maxHp;
 	damage = 1;
 	shootSpeed = 3;
 	target = null;
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		this.maxHp = this.health;
 	}
 
 	move(): void {}
