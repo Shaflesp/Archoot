@@ -2,14 +2,17 @@ import { Entite } from './Entite.ts';
 
 export default class Brainstorming extends Entite {
 	target = null;
-	img='/images/sprites/Brainstorming.png';
 	name = 'Brainstorming';
 	width = 200;
 	height = 200;
 	x = this.boundWidth / 2 - this.width / 2;
 	y = this.boundHeight / 2 - this.height / 2;
+
 	speed = 6;
 	movementSpeed = 2;
+	readonly baseSpeed: number = 6;
+	readonly baseMovementSpeed: number = 2;
+
 	health = 300;
 	damage = 2;
 	shootSpeed = 1;
@@ -51,5 +54,8 @@ export default class Brainstorming extends Entite {
 		this.y = this.boundHeight/ 2 - this.height / 2;
 		this.health = 300;
 		this.active = true;
+
+		this.speed = this.baseSpeed;
+		this.movementSpeed = this.baseMovementSpeed;
 	}
 }

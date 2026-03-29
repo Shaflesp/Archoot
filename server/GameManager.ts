@@ -16,6 +16,8 @@ export default class GameManager {
 	bossSpawn: boolean = false;
 	private readonly bossPoolMap: Map<string, Pool<Entite>>;
 	level: number = 1;
+	difficulty: number = 1;
+	cycleStartScore: number = 0;
 	activeBonuses: Bonus[] = [];
 
 	constructor(state: RoomState) {
@@ -39,26 +41,37 @@ export default class GameManager {
 		if (this.state.players.size === 0) return; // si aucun joueur, on ff
 		if (this.bossSpawn) return;
 
-		const score = this.getTotalScore();
+		const cycleScore = this.getTotalScore() - this.cycleStartScore;
+		const scale = this.difficulty;
 
 		if (this.level === 1) {
 			/* NIVEAU 1 : araignées + boss Mygalo */
-			score < 500
-				? this.safeAcquire(this.state.spiderPool)
-				: this.spawnBoss('Mygalomane');
+			if (cycleScore < 500 * scale) {
+				this.spawnMultiple(() => this.safeAcquire(this.state.spiderPool));
+			} else {
+				this.spawnBoss('Mygalomane');
+			}
 		} else if (this.level === 2) {
 			/* NIVEAU 2 : Galinette + Ruche Hour */
-			score < 1500
-				? this.safeAcquire(this.state.galinettePool)
-				: this.spawnBoss('Ruche Hour');
+			if (cycleScore < 1500 * scale) {
+				this.spawnMultiple(() => this.safeAcquire(this.state.galinettePool));
+			} else {
+				this.spawnBoss('Ruche Hour');
+			}
 		} else if (this.level === 3) {
 			/* NIVEAU 3 : pie + Brainstorming */
-			score < 2500
-				? this.safeAcquire(this.state.piePool)
-				: this.spawnBoss('Brainstorming');
+			if (cycleScore < 2500 * scale) {
+				this.spawnMultiple(() => this.safeAcquire(this.state.piePool));
+			} else {
+				this.spawnBoss('Brainstorming');
+			}
 		} else if (this.level === 4) {
 			/* NIVEAU 4 : tous + le tyrus */
-			score < 3500 ? this.safeAcquire(this.getRandomMobPool()): this.spawnBoss('Le Tyrus');
+			if (cycleScore < 3500 * scale) {
+				this.spawnMultiple(() => this.safeAcquire(this.getRandomMobPool()));
+			} else {
+				this.spawnBoss('Le Tyrus');
+			}
 		}
 	}
 
@@ -71,6 +84,13 @@ export default class GameManager {
 			return this.state.galinettePool;
 		} else {
 			return this.state.piePool;
+		}
+	}
+
+	private spawnMultiple(spawner: () => void) {
+		const count = Math.min(this.difficulty, 3); // cap at 3 per tick
+		for (let i = 0; i < count; i++) {
+			spawner();
 		}
 	}
 
@@ -94,7 +114,6 @@ export default class GameManager {
 	/* màj des variables quand boss tué */
 	bossDead() {
 		this.bossSpawn = false;
-		this.level++;
 		this.clearMobs();
 		console.log('Boss tué ! Gain de niveau');
 
@@ -115,6 +134,15 @@ export default class GameManager {
 			const p = new RandomP(x, y);
 			p.active = true;
 			this.activeBonuses.push(p);
+		}
+
+		if (this.level < 4) {
+			this.level++;
+		} else {
+			this.level = 1;
+			this.difficulty++;
+			this.cycleStartScore = this.getTotalScore();
+			console.log(`Nouveau cycle ! Difficulté: ${this.difficulty}`);
 		}
 	}
 
@@ -151,6 +179,9 @@ export default class GameManager {
 	private safeAcquire<T extends Entite>(pool: Pool<T>): T | null {
 		const mob = pool.acquire();
 		if (!mob) return null;
+
+		mob.speed = mob.speed * this.difficulty;
+		mob.movementSpeed = mob.movementSpeed * this.difficulty;
 
 		const activePlayers = Array.from(this.state.players.values()).filter(
 			p => p.active

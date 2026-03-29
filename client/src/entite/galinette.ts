@@ -2,13 +2,16 @@ import { Entite } from './Entite.ts';
 
 export default class Galinette extends Entite {
 	name = 'galinette cendrée';
-	img = '/images/sprites/galinette.png';
 	width = 50;
 	height = 50;
 	x = 0;
 	y = 0;
+
 	speed = 6;
 	movementSpeed = 2;
+	readonly baseSpeed: number = 6;
+	readonly baseMovementSpeed: number = 2;
+
 	health = 10;
 	damage = 1;
 	shootSpeed = 0;
@@ -25,8 +28,11 @@ export default class Galinette extends Entite {
 
 	reset(): void {
 		this.x = 0;
-		this.y=Math.random() * (this.boundHeight - this.height);		
+		this.y=Math.random() * (this.boundHeight - this.height);
 		this.health = 10;
 		this.active = true;
+
+		this.speed = this.baseSpeed;
+		this.movementSpeed = this.baseMovementSpeed;
 	}
 }

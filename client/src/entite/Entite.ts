@@ -7,16 +7,19 @@ export abstract class Entite implements Collidable {
 	active: boolean = false;
 
 	abstract name: string;
-	abstract img:string;
 	abstract x: number;
 	abstract y: number;
 	abstract width: number;
 	abstract height: number;
-	abstract movementSpeed: number;
 	abstract health: number;
 	abstract damage: number;
 	abstract shootSpeed: number;
+
+	abstract movementSpeed: number;
 	abstract speed: number;
+	abstract baseSpeed: number;
+	abstract baseMovementSpeed: number;
+
 	target: { x: number; y: number } | null = null;
 
 	constructor(boundWidth: number, boundHeight: number) {

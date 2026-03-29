@@ -2,13 +2,16 @@ import { Entite } from './Entite.ts';
 
 export default class Pie extends Entite {
 	name = 'pie';
-	img='/images/sprites/pie.gif';
 	x = Math.random() * this.boundWidth - 50;
 	y = Math.random() * this.boundHeight - 50;
 	width = 50;
 	height = 50;
+
 	speed = 1;
 	movementSpeed = 2;
+	readonly baseSpeed: number = 1;
+	readonly baseMovementSpeed: number = 2;
+
 	health = 30;
 	damage = 1;
 	shootSpeed = 0;
@@ -39,6 +42,9 @@ export default class Pie extends Entite {
 		this.y = Math.random() * 700;
 		this.health = 30;
 		this.active = true;
+
+		this.speed = this.baseSpeed;
+		this.movementSpeed = this.baseMovementSpeed;
 	}
 
 	needsTarget(): boolean {
