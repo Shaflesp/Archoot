@@ -616,7 +616,7 @@ export class GameView extends CanvasView implements View {
 			this.ctx.shadowColor = 'magenta';
 			this.ctx.lineCap = 'round';
 
-			const rays:number = 12;
+			const rays:number = 8;
 			for (let i:number = 0; i < rays; i++) {
 				const angle:number = (m.beamAngle || 0) + (i * Math.PI * 2) / rays;
 

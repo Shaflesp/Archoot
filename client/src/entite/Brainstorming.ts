@@ -76,7 +76,7 @@ export default class Brainstorming extends Entite {
 
 	getVectors(): number[] {
 		const vectors = [];
-		const rays = 12;
+		const rays = 8;
 		for (let i = 0; i < rays; i++) {
 			vectors.push(this.beamAngle + (i * Math.PI * 2) / rays);
 		}
