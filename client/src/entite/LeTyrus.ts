@@ -2,8 +2,8 @@ import { Entite } from './Entite.ts';
 
 export default class LeTyrus extends Entite {
 	name = 'Le Tyrus';
-	width = 200;
-	height = 200;
+	width = 450;
+	height = 450;
 	x = this.boundWidth / 2 - this.width / 2;
 	y = this.boundHeight / 2 - this.height / 2;
 
@@ -26,8 +26,8 @@ export default class LeTyrus extends Entite {
 	move(): void {}
 
 	reset(): void {
-		this.width = 200;
-		this.height = 200;
+		this.width = 450;
+		this.height = 450;
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight / 2 - this.height / 2;
 		this.health = 500;

@@ -93,9 +93,8 @@ export class GameView extends CanvasView implements View {
 		'/images/sprites/spider3.png',
 		'/images/sprites/spider4.png',
 		'/images/sprites/Mygalomane.png', // 6
-		'/images/sprites/Ruche_Hour_Green.png',
 		'/images/sprites/Brainstorming.png',
-		'/images/sprites/Mygalomane.png', // à changer pour tyrus
+		'/images/sprites/LeTyrus.png', // à changer pour tyrus
 	];
 
 	private readonly rucheSrcs: string[] = [

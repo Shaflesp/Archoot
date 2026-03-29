@@ -2,8 +2,8 @@ import { Entite } from './Entite.ts';
 
 export default class RucheHour extends Entite {
 	name = 'Ruche Hour';
-	width = 300;
-	height = 300;
+	width = 400;
+	height = 400;
 
 	x = -this.width + 1;
 	y = this.boundHeight / 4;
@@ -80,8 +80,8 @@ export default class RucheHour extends Entite {
 	}
 
 	reset(): void {
-		this.width = 300;
-		this.height = 200;
+		this.width = 400;
+		this.height = 400;
 		this.x = -this.width + 1;
 		this.y = this.boundHeight / 4;
 		this.health = 150;
