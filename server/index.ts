@@ -246,6 +246,12 @@ io.on('connection', socket => {
 				if (!state.players.has(socket.id)) return;
 				if (player.isDead()) return;
 
+				const rucheBoss = state
+					.getAllActiveMobs()
+					.find(m => m.name === 'Ruche Hour') as RucheHour;
+				const playersCanShoot = !(rucheBoss && rucheBoss.phase === 'green');
+				if (!playersCanShoot) return;
+
 				const bullet = state.bulletPool.acquire();
 				if (!bullet) return;
 
@@ -380,7 +386,7 @@ setInterval(() => {
 
 			mob.move();
 			if (mob instanceof RucheHour) {
-				if (mob.x === 0) {
+				if (mob.x === 0 && (mob.phase === 'green' || mob.phase === 'orange')) {
 					mob.shootTimer++;
 
 					if (mob.shootTimer >= 15) {

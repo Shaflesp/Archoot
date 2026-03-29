@@ -20,9 +20,12 @@ export default class RucheHour extends Entite {
 	target = null;
 
 	private currentAngle: number = 0;
-	private rotationSpeed: number = 0.10;
+	private rotationSpeed: number = 0.1;
 	private numberOfRays: number = 8;
-	shootTimer: number =0;
+	shootTimer: number = 0;
+
+	phase: 'green' | 'orange' | 'red' = 'green';
+	phaseTimer: number = 0;
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
@@ -37,6 +40,25 @@ export default class RucheHour extends Entite {
 			}
 		} else {
 			this.currentAngle += this.rotationSpeed;
+			this.updatePhase();
+		}
+	}
+
+	private updatePhase(): void {
+		this.phaseTimer++;
+
+		if (this.phase === 'green' && this.phaseTimer >= 400) {
+			// ~6.5 secondes
+			this.phase = 'orange';
+			this.phaseTimer = 0;
+		} else if (this.phase === 'orange' && this.phaseTimer >= 120) {
+			// 2 secondes
+			this.phase = 'red';
+			this.phaseTimer = 0;
+		} else if (this.phase === 'red' && this.phaseTimer >= 180) {
+			// 3 secondes
+			this.phase = 'green';
+			this.phaseTimer = 0;
 		}
 	}
 
@@ -67,5 +89,12 @@ export default class RucheHour extends Entite {
 
 		this.speed = this.baseSpeed;
 		this.movementSpeed = this.baseMovementSpeed;
+	}
+
+	getAsJson() {
+		return {
+			...super.getAsJson(),
+			phase: this.phase,
+		};
 	}
 }

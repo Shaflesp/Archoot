@@ -37,6 +37,7 @@ interface MobsData {
 	dy: number;
 	hp: number;
 	maxHp: number;
+	phase?: string;
 }
 
 interface BonusData {
@@ -62,6 +63,7 @@ export class GameView extends CanvasView implements View {
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
+	private rucheImages: HTMLImageElement[] = [];
 
 	private pieAnimator: SpriteAnimator | null = null;
 	private pieSheet: HTMLImageElement;
@@ -91,10 +93,16 @@ export class GameView extends CanvasView implements View {
 		'/images/sprites/spider3.png',
 		'/images/sprites/spider4.png',
 		'/images/sprites/Mygalomane.png', // 6
-		'/images/sprites/RucheHour.png',
+		'/images/sprites/Ruche_Hour_Green.png',
 		'/images/sprites/Brainstorming.png',
 		'/images/sprites/Mygalomane.png', // à changer pour tyrus
 	];
+
+	private readonly rucheSrcs: string[] = [
+		'images/sprites/Ruche_Hour_Green.png',
+		'images/sprites/Ruche_Hour_Orange.png',
+		'images/sprites/Ruche_Hour_Red.png'
+	]
 
 	private readonly bonusSrcs: string[] = [
 		'/images/bonus/bonusRouge.png',
@@ -149,6 +157,12 @@ export class GameView extends CanvasView implements View {
 			);
 		};
 		this.beeSheet.src = '/images/sprites/bee_sheet.png';
+
+		this.rucheSrcs.forEach(src => {
+			const img = new Image();
+			img.src = src;
+			this.rucheImages.push(img);
+		});
 
 		this.bonusSrcs.forEach(src => {
 			const img = new Image();
@@ -433,14 +447,21 @@ export class GameView extends CanvasView implements View {
 				return this.mobsImages[index];
 			case 'Mygalomane':
 				return this.mobsImages[6];
-			case 'Ruche Hour':
-				return this.mobsImages[7];
 			case 'Brainstorming':
-				return this.mobsImages[8];
+				return this.mobsImages[7];
 			case 'Le Tyrus':
-				return this.mobsImages[9];
+				return this.mobsImages[8];
 			default:
 				return this.mobsImages[3];
+		}
+	}
+
+	private getRucheImage(phase: string): HTMLImageElement {
+		switch (phase){
+			case 'green': return this.rucheImages[0];
+			case 'orange': return this.rucheImages[1];
+			case 'red': return this.rucheImages[2];
+			default: return this.rucheImages[0];
 		}
 	}
 
@@ -577,6 +598,8 @@ export class GameView extends CanvasView implements View {
 
 		if (m.name === 'pie' && this.pieAnimator) {
 			this.pieAnimator.draw(this.ctx, 0, 0, m.width, m.height);
+		} else if (m.name === 'Ruche Hour' && m.phase) {
+			this.ctx.drawImage(this.getRucheImage(m.phase), 0, 0, m.width, m.height);
 		} else {
 			this.ctx.drawImage(this.getMobImage(m), 0, 0, m.width, m.height);
 		}
