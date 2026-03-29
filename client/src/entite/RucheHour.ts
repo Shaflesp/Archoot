@@ -7,50 +7,41 @@ export default class RucheHour extends Entite {
 	x = this.boundWidth / 2 - this.width / 2;
 	y = this.boundHeight / 2 - this.height / 2;
 
-	speed = 3;
-	movementSpeed = 2;
-	readonly baseSpeed: number = 3;
-	readonly baseMovementSpeed: number = 2;
+	speed = 0;
+	movementSpeed = 0;
+	readonly baseSpeed: number = 0;
+	readonly baseMovementSpeed: number = 0;
 
 	health = 150;
 	maxHp;
 	damage = 1;
-	shootSpeed = 4;
+	shootSpeed = 10;
 	target = null;
 
-	private horizontalDir: number = -1;
-	private verticalDir: number = 1;
+	private currentAngle: number = 0;
+	private rotationSpeed: number = 0.05;
+	private numberOfRays: number = 4;
+	shootTimer: number =0;
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
 		this.maxHp = this.health;
-		this.verticalDir = Math.random() < 0.5 ? 1 : -1;
 	}
 
 	move(): void {
-		this.x += this.speed * this.horizontalDir;
-
-		if (this.x <= 0 && this.horizontalDir === -1) {
-			this.horizontalDir = 1;
-			this.shiftVertically();
-		} else if (
-			this.x >= this.boundWidth - this.width &&
-			this.horizontalDir === 1
-		) {
-			this.horizontalDir = -1;
-			this.shiftVertically();
-		}
+		this.currentAngle += this.rotationSpeed;
 	}
 
-	private shiftVertically(): void {
-		const step = 60;
-
-		if (this.y + step * this.verticalDir > this.boundHeight - this.height) {
-			this.verticalDir = -1;
-		} else if (this.y + step * this.verticalDir < 0) {
-			this.verticalDir = 1;
+	getVectors(): { dx: number; dy: number }[] {
+		const vectors = [];
+		for (let i = 0; i < this.numberOfRays; i++) {
+			const angle = this.currentAngle + (i * Math.PI * 2) / this.numberOfRays;
+			vectors.push({
+				dx: Math.cos(angle),
+				dy: Math.sin(angle),
+			});
 		}
-		this.y += step * this.verticalDir;
+		return vectors;
 	}
 
 	takeDamage(amount: number): void {
@@ -68,8 +59,5 @@ export default class RucheHour extends Entite {
 
 		this.speed = this.baseSpeed;
 		this.movementSpeed = this.baseMovementSpeed;
-
-		this.horizontalDir = -1;
-		this.verticalDir = Math.random() < 0.5 ? 1 : -1;
 	}
 }

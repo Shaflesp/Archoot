@@ -65,6 +65,8 @@ export class GameView extends CanvasView implements View {
 
 	private pieAnimator: SpriteAnimator | null = null;
 	private pieSheet: HTMLImageElement;
+	private beeAnimator: SpriteAnimator | null = null;
+	private beeSheet: HTMLImageElement;
 
 	private coeurImage: HTMLImageElement;
 	private bonusImage: HTMLImageElement[] = [];
@@ -135,6 +137,18 @@ export class GameView extends CanvasView implements View {
 			);
 		};
 		this.pieSheet.src = '/images/sprites/pie_sheet.png';
+
+		this.beeSheet = new Image();
+		this.beeSheet.onload = () => {
+			this.beeAnimator = new SpriteAnimator(
+				this.beeSheet,
+				2,
+				this.beeSheet.width / 2,
+				this.beeSheet.height,
+				2
+			);
+		};
+		this.beeSheet.src = '/images/sprites/bee_sheet.png';
 
 		this.bonusSrcs.forEach(src => {
 			const img = new Image();
@@ -501,6 +515,10 @@ export class GameView extends CanvasView implements View {
 			this.ctx.restore();
 		}
 
+		if (this.beeAnimator) {
+			this.beeAnimator.update();
+		}
+
 		this.bulletInfo.forEach((b: BulletData) => {
 			const angle = Math.atan2(b.dy, b.dx) + Math.PI / 4;
 			const centerX = b.x + b.width / 2;
@@ -509,13 +527,24 @@ export class GameView extends CanvasView implements View {
 			this.ctx.save();
 			this.ctx.translate(centerX, centerY);
 			this.ctx.rotate(angle);
-			this.ctx.drawImage(
-				this.bulletImage,
-				-b.width / 2,
-				-b.height / 2,
-				b.width,
-				b.height
-			);
+
+			if (b.ownerId === 'Ruche Hour') {
+				this.beeAnimator!.draw(
+					this.ctx,
+					-b.width / 2,
+					-b.height / 2,
+					b.width,
+					b.height
+				);
+			} else {
+				this.ctx.drawImage(
+					this.bulletImage,
+					-b.width / 2,
+					-b.height / 2,
+					b.width,
+					b.height
+				);
+			}
 			this.ctx.restore();
 		});
 

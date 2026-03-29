@@ -6,6 +6,7 @@ import type { RoomServer } from './RoomServer.ts';
 import RoomState from './RoomState.ts';
 import GameManager from './GameManager.ts';
 import type { Entite } from '../client/src/entite/Entite.ts';
+import RucheHour from '../client/src/entite/RucheHour.ts';
 import type { PlayerData } from './Entity/PlayerData.ts';
 import { Leaderboard } from './Leaderboard.ts';
 
@@ -345,6 +346,8 @@ setInterval(() => {
 			activeMobs.forEach(mob => {
 				if (!mob.active) return;
 				if (!bullet.active) return;
+				if (bullet.ownerId === mob.name) return;
+
 				if (mob.collidesWith(bullet)) {
 					mob.takeDamage(bullet.damage);
 					bullet.active = false;
@@ -376,6 +379,32 @@ setInterval(() => {
 			}
 
 			mob.move();
+			if (mob instanceof RucheHour) {
+				mob.shootTimer++;
+
+				if (mob.shootTimer >= 15) {
+					mob.shootTimer = 0;
+
+					const vectors = mob.getVectors();
+					vectors.forEach((vec: { dx: number; dy: number }) => {
+						const bullet = state.bulletPool.acquire();
+
+						if (bullet) {
+							const centerX = mob.x + mob.width / 2 - bullet.width / 2;
+							const centerY = mob.y + mob.height / 2 - bullet.height / 2;
+
+							bullet.fire(
+								centerX,
+								centerY,
+								vec.dx,
+								vec.dy,
+								mob.name,
+								mob.damage
+							);
+						}
+					});
+				}
+			}
 			mobsChanged = true;
 
 			state.players.forEach(player => {

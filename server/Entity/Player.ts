@@ -18,8 +18,8 @@ export class Player {
 	invincibleUntil: number;
 	score: number;
 	bonusList:Bonus[]=[];
-	damage = 1;
-	arrowsPerClick = 1;
+	damage = 100;
+	arrowsPerClick = 10;
 
 	constructor(id: string, username: string, width: number, height: number) {
 		this.bounds = { width, height };
@@ -32,7 +32,7 @@ export class Player {
 		this.username = username ? username : 'placeholder';
 		this.identifier = id;
 
-		this.lives = 5;
+		this.lives = 50;
 		this.invincibleUntil = 0;
 		this.score = 0;
 	}
