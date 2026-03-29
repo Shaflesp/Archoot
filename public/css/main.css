@@ -1,0 +1,58 @@
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image: url("../images/fondAccueil.gif");
+    background-size:cover;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+h1 {
+    color: #451110;
+    font-size: 3.5em;
+    text-align: center;
+    font-weight: bolder;
+    letter-spacing: 3px;
+}
+
+.screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 100px;
+    z-index: 10;
+    cursor: pointer;
+    width: 300px;
+    height: auto;
+    display: inline-block;
+}
+
+.back-button img {
+   width: 65%;
+   display: block;
+   transition: transform 0.5s ease-in-out;
+}
+
+.back-button:hover{
+        transform:scale(1.1);
+}
+
+
+
