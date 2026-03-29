@@ -1,4 +1,5 @@
 import { Entite } from './Entite.ts';
+import type { Player } from '../../../server/Entity/Player.ts';
 
 export default class Brainstorming extends Entite {
 	target = null;
@@ -93,6 +94,60 @@ export default class Brainstorming extends Entite {
 
 		this.speed = this.baseSpeed;
 		this.movementSpeed = this.baseMovementSpeed;
+	}
+
+	hitPlayers(
+		players: Map<string, Player>,
+		boundWidth: number,
+		boundHeight: number
+	): void {
+		if (this.phase !== 'shooting') return;
+
+		const cx = this.x + this.width / 2;
+		const cy = this.y + this.height / 2;
+		const beamThickness = 20;
+
+		players.forEach(player => {
+			if (!player.active) return;
+
+			const px = player.x + player.width / 2;
+			const py = player.y + player.height / 2;
+
+			for (const angle of this.getVectors()) {
+				const dx = Math.cos(angle);
+				const dy = Math.sin(angle);
+				const vx = px - cx;
+				const vy = py - cy;
+				const dot = vx * dx + vy * dy;
+
+				if (dot <= 0) continue;
+
+				const rx = cx + dot * dx;
+				const ry = cy + dot * dy;
+				const dist = Math.hypot(px - rx, py - ry);
+
+				if (dist < player.width / 2 + beamThickness) {
+					player.takeDamage(this.damage);
+
+					const pushAngle = Math.atan2(py - cy, px - cx);
+					player.x = Math.max(
+						0,
+						Math.min(
+							boundWidth - player.width,
+							player.x + Math.cos(pushAngle) * 150
+						)
+					);
+					player.y = Math.max(
+						0,
+						Math.min(
+							boundHeight - player.height,
+							player.y + Math.sin(pushAngle) * 150
+						)
+					);
+					break;
+				}
+			}
+		});
 	}
 
 	getAsJson() {

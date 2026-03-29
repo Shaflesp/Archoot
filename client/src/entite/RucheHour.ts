@@ -1,4 +1,5 @@
 import { Entite } from './Entite.ts';
+import type { Bullet } from '../../../server/Entity/Bullet.ts';
 
 export default class RucheHour extends Entite {
 	name = 'Ruche Hour';
@@ -89,6 +90,29 @@ export default class RucheHour extends Entite {
 
 		this.speed = this.baseSpeed;
 		this.movementSpeed = this.baseMovementSpeed;
+	}
+
+	shoot(_acquireBullet: () => Bullet | null): void {
+		if (this.x !== 0) return;
+		if (this.phase !== 'green' && this.phase !== 'orange') return;
+
+		this.shootTimer++;
+		if (this.shootTimer < 15) return;
+		this.shootTimer = 0;
+
+		this.getVectors().forEach((vec: { dx: number; dy: number }) => {
+			const bullet = _acquireBullet();
+			if (!bullet) return;
+
+			bullet.fire(
+				this.x + this.width / 2 - bullet.width / 2,
+				this.y + this.height / 2 - bullet.height / 2,
+				vec.dx,
+				vec.dy,
+				this.name,
+				this.damage
+			);
+		});
 	}
 
 	getAsJson() {

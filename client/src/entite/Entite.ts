@@ -1,4 +1,6 @@
 import type {Collidable} from "../../../server/Entity/Collidable.ts";
+import type {Player} from "../../../server/Entity/Player.ts";
+import type {Bullet} from "../../../server/Entity/Bullet.ts";
 
 export abstract class Entite implements Collidable {
 	boundWidth: number;
@@ -73,4 +75,12 @@ export abstract class Entite implements Collidable {
 	needsTarget(): boolean {
 		return false;
 	}
+
+	shoot(_acquireBullet: () => Bullet | null): void {}
+
+	hitPlayers(
+		_players: Map<string, Player>,
+		_boundWidth: number,
+		_boundHeight: number
+	): void {}
 }
