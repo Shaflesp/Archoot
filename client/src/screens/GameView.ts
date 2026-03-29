@@ -1,7 +1,7 @@
 import type { Socket } from 'socket.io-client';
 import type { ViewManager } from '../ViewManager.ts';
 import { CanvasView, type View } from './View.ts';
-import {SpriteAnimator} from "../SpriteAnimator.ts";
+import { SpriteAnimator } from '../SpriteAnimator.ts';
 
 interface PlayerData {
 	identifier: string;
@@ -54,12 +54,12 @@ interface MobsData {
 }
 
 interface BonusData {
-	name:string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    img: string;
+	name: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	img: string;
 }
 
 export class GameView extends CanvasView implements View {
@@ -87,6 +87,8 @@ export class GameView extends CanvasView implements View {
 	private pieSheet: HTMLImageElement;
 	private beeAnimator: SpriteAnimator | null = null;
 	private beeSheet: HTMLImageElement;
+	private poofAnimator: SpriteAnimator | null = null;
+	private poofSheet: HTMLImageElement;
 
 	private coeurImage: HTMLImageElement;
 	private bonusImage: HTMLImageElement[] = [];
@@ -178,6 +180,18 @@ export class GameView extends CanvasView implements View {
 			);
 		};
 		this.pieSheet.src = '/images/sprites/pie_sheet.png';
+
+		this.poofSheet = new Image();
+		this.poofSheet.onload = () => {
+			this.poofAnimator = new SpriteAnimator(
+				this.poofSheet,
+				4,
+				this.poofSheet.width / 4,
+				this.poofSheet.height,
+				5
+			);
+		};
+		this.poofSheet.src = '/images/sprites/poof_sheet.png';
 
 		this.beeSheet = new Image();
 		this.beeSheet.onload = () => {
@@ -555,10 +569,9 @@ export class GameView extends CanvasView implements View {
 			}
 		});
 
-
-
 		this.mobsInfo.forEach((m: MobsData) => {
-			this.drawExtras(m)
+			this.drawExtras(m);
+
 			this.drawMob(m);
 		});
 
@@ -683,60 +696,68 @@ export class GameView extends CanvasView implements View {
 		this.ctx.restore();
 	}
 
-	private drawExtras(m: MobsData):void {
-			if (m.name === 'Mygalomane' && m.cables) {
-				m.cables.forEach(cable => {
-					this.ctx.save();
-					this.ctx.beginPath();
-					this.ctx.moveTo(cable.startX, cable.startY);
-					this.ctx.lineTo(cable.endX, cable.endY);
+	private drawDeathAnimation(m: MobsData) {
+		this.ctx.save();
 
-					// Make them look like webs
-					this.ctx.lineWidth = 3;
-					this.ctx.lineCap = 'round';
-					this.ctx.shadowBlur = 5;
-					this.ctx.shadowColor = 'white';
+		this.poofAnimator?.draw(this.ctx, 0, 0, m.width, m.height);
 
-					const alpha = Math.max(0, cable.life / cable.maxLife);
-					this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+		this.ctx.restore();
+	}
 
-					this.ctx.stroke();
-					this.ctx.restore();
-				});
-			}else if (
-				m.name === 'Brainstorming' &&
-				m.phase === 'shooting' &&
-				m.beamAngle
-			) {
-				const cx = m.width / 2;
-				const cy = m.height / 2;
+	private drawExtras(m: MobsData): void {
+		if (m.name === 'Mygalomane' && m.cables) {
+			m.cables.forEach(cable => {
+				this.ctx.save();
+				this.ctx.beginPath();
+				this.ctx.moveTo(cable.startX, cable.startY);
+				this.ctx.lineTo(cable.endX, cable.endY);
 
-				this.ctx.shadowBlur = 20;
-				this.ctx.shadowColor = 'magenta';
+				// Make them look like webs
+				this.ctx.lineWidth = 3;
 				this.ctx.lineCap = 'round';
+				this.ctx.shadowBlur = 5;
+				this.ctx.shadowColor = 'white';
 
-				const rays: number = 8;
-				for (let i: number = 0; i < rays; i++) {
-					const angle: number = (m.beamAngle || 0) + (i * Math.PI * 2) / rays;
+				const alpha = Math.max(0, cable.life / cable.maxLife);
+				this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
 
-					this.ctx.beginPath();
-					this.ctx.moveTo(cx, cy);
+				this.ctx.stroke();
+				this.ctx.restore();
+			});
+		} else if (
+			m.name === 'Brainstorming' &&
+			m.phase === 'shooting' &&
+			m.beamAngle
+		) {
+			const cx = m.width / 2;
+			const cy = m.height / 2;
 
-					this.ctx.lineTo(
-						cx + Math.cos(angle) * 3000,
-						cy + Math.sin(angle) * 3000
-					);
+			this.ctx.shadowBlur = 20;
+			this.ctx.shadowColor = 'magenta';
+			this.ctx.lineCap = 'round';
 
-					this.ctx.lineWidth = 25;
-					this.ctx.strokeStyle = 'rgba(255, 100, 255, 0.7)';
-					this.ctx.stroke();
+			const rays: number = 8;
+			for (let i: number = 0; i < rays; i++) {
+				const angle: number = (m.beamAngle || 0) + (i * Math.PI * 2) / rays;
 
-					this.ctx.shadowBlur = 0;
-					this.ctx.lineWidth = 8;
-					this.ctx.strokeStyle = 'white';
-					this.ctx.stroke();
-				}
+				this.ctx.beginPath();
+				this.ctx.moveTo(cx, cy);
+
+				this.ctx.lineTo(
+					cx + Math.cos(angle) * 3000,
+					cy + Math.sin(angle) * 3000
+				);
+
+				this.ctx.lineWidth = 25;
+				this.ctx.strokeStyle = 'rgba(255, 100, 255, 0.7)';
+				this.ctx.stroke();
+
+				this.ctx.shadowBlur = 0;
+				this.ctx.lineWidth = 8;
+				this.ctx.strokeStyle = 'white';
+				this.ctx.stroke();
 			}
+		}
 	}
 
 	private drawBossBar(boss: MobsData): void {
