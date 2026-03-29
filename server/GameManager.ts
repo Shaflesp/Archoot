@@ -102,10 +102,12 @@ export default class GameManager {
 	/* spawn du boss + notif console et boolean */
 	spawnBoss(name: string) {
 		if (this.bossSpawn) return;
+
 		this.clearMobs();
 		const boss = this.bossPoolMap.get(name)?.acquire();
 		if (!boss) return;
 
+		this.bossSpawn = true;
 		this.io.to(this.roomKey).emit('boss-warning', {
 			x: boss.x,
 			y: boss.y,
@@ -118,7 +120,6 @@ export default class GameManager {
 
 		setTimeout(() => {
 			boss.active = true;
-			this.bossSpawn = true;
 			console.log(`Boss en cours : ${boss.name}`);
 		}, 3000);
 	}

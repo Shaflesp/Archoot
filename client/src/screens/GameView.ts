@@ -554,6 +554,12 @@ export class GameView extends CanvasView implements View {
 			}
 		});
 
+		const hasBoss = this.mobsInfo.some(m => this.bossNames.has(m.name));
+		if (hasBoss) {
+			this.bossWarning = null;
+			this.bossWarningTimer = 0;
+		}
+
 		this.mobsInfo = info.mobs;
 	};
 
