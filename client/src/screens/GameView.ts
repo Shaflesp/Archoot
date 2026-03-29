@@ -80,6 +80,7 @@ export class GameView extends CanvasView implements View {
 	};
 
 	private bulletImage: HTMLImageElement;
+	private rockImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
 	private rucheImages: HTMLImageElement[] = [];
 
@@ -87,8 +88,8 @@ export class GameView extends CanvasView implements View {
 	private pieSheet: HTMLImageElement;
 	private beeAnimator: SpriteAnimator | null = null;
 	private beeSheet: HTMLImageElement;
-	private poofAnimator: SpriteAnimator | null = null;
-	private poofSheet: HTMLImageElement;
+	//private poofAnimator: SpriteAnimator | null = null;
+	//private poofSheet: HTMLImageElement;
 
 	private coeurImage: HTMLImageElement;
 	private bonusImage: HTMLImageElement[] = [];
@@ -152,16 +153,14 @@ export class GameView extends CanvasView implements View {
 		side.src = this.playerSrcs[2];
 		this.playerImages = { up, down, side };
 
-		[up, down, side].forEach(img => {
-			img.onerror = () =>
-				console.error(`Failed to load player image: ${img.src}`);
-		});
-
 		this.coeurImage = new Image();
 		this.coeurImage.src = '/images/coeur.png';
 
 		this.bulletImage = new Image();
 		this.bulletImage.src = '/images/Arrow.png';
+
+		this.rockImage = new Image();
+		this.rockImage.src = '/images/cailloutyrus.png';
 
 		this.mobsSrcs.forEach(src => {
 			const img = new Image();
@@ -181,17 +180,17 @@ export class GameView extends CanvasView implements View {
 		};
 		this.pieSheet.src = '/images/sprites/pie_sheet.png';
 
-		this.poofSheet = new Image();
-		this.poofSheet.onload = () => {
-			this.poofAnimator = new SpriteAnimator(
-				this.poofSheet,
-				4,
-				this.poofSheet.width / 4,
-				this.poofSheet.height,
-				5
-			);
-		};
-		this.poofSheet.src = '/images/sprites/poof_sheet.png';
+		// this.poofSheet = new Image();
+		// this.poofSheet.onload = () => {
+		// 	this.poofAnimator = new SpriteAnimator(
+		// 		this.poofSheet,
+		// 		4,
+		// 		this.poofSheet.width / 4,
+		// 		this.poofSheet.height,
+		// 		5
+		// 	);
+		// };
+		// this.poofSheet.src = '/images/sprites/poof_sheet.png';
 
 		this.beeSheet = new Image();
 		this.beeSheet.onload = () => {
@@ -571,7 +570,6 @@ export class GameView extends CanvasView implements View {
 
 		this.mobsInfo.forEach((m: MobsData) => {
 			this.drawExtras(m);
-
 			this.drawMob(m);
 		});
 
@@ -646,6 +644,14 @@ export class GameView extends CanvasView implements View {
 					b.width,
 					b.height
 				);
+			} else if (b.ownerId === 'Le Tyrus') {
+				this.ctx.drawImage(
+					this.rockImage,
+					-b.width / 2,
+					-b.height / 2,
+					b.width,
+					b.height
+				);
 			} else {
 				this.ctx.drawImage(
 					this.bulletImage,
@@ -689,6 +695,24 @@ export class GameView extends CanvasView implements View {
 			this.pieAnimator.draw(this.ctx, 0, 0, m.width, m.height);
 		} else if (m.name === 'Ruche Hour' && m.phase) {
 			this.ctx.drawImage(this.getRucheImage(m.phase), 0, 0, m.width, m.height);
+
+		} else if (m.name === 'Le Tyrus' && m.phase) {
+			const img = this.getMobImage(m);
+
+			this.ctx.save();
+			const centerX =  m.width / 2;
+			const centerY =  m.height / 2;
+			this.ctx.translate(centerX, centerY);
+			if (m.phase === 'jumping') {
+				this.ctx.scale(0.85, 1.15);
+
+			} else if (m.phase === 'landing' || m.phase === 'stunned') {
+				this.ctx.scale(1.15, 0.85);
+			}
+
+			this.ctx.drawImage(img, -(m.width / 2), -(m.height / 2), m.width, m.height);
+			this.ctx.restore();
+
 		} else {
 			this.ctx.drawImage(this.getMobImage(m), 0, 0, m.width, m.height);
 		}
@@ -696,13 +720,11 @@ export class GameView extends CanvasView implements View {
 		this.ctx.restore();
 	}
 
-	private drawDeathAnimation(m: MobsData) {
-		this.ctx.save();
-
-		this.poofAnimator?.draw(this.ctx, 0, 0, m.width, m.height);
-
-		this.ctx.restore();
-	}
+	// private drawDeathAnimation(m: MobsData) {
+	// 	this.ctx.save();
+	// 	this.poofAnimator?.draw(this.ctx, 0, 0, m.width, m.height);
+	// 	this.ctx.restore();
+	// }
 
 	private drawExtras(m: MobsData): void {
 		if (m.name === 'Mygalomane' && m.cables) {
@@ -712,7 +734,6 @@ export class GameView extends CanvasView implements View {
 				this.ctx.moveTo(cable.startX, cable.startY);
 				this.ctx.lineTo(cable.endX, cable.endY);
 
-				// Make them look like webs
 				this.ctx.lineWidth = 3;
 				this.ctx.lineCap = 'round';
 				this.ctx.shadowBlur = 5;
@@ -721,16 +742,16 @@ export class GameView extends CanvasView implements View {
 				const alpha = Math.max(0, cable.life / cable.maxLife);
 				this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
 
-				this.ctx.stroke();
-				this.ctx.restore();
-			});
-		} else if (
-			m.name === 'Brainstorming' &&
-			m.phase === 'shooting' &&
-			m.beamAngle
-		) {
-			const cx = m.width / 2;
-			const cy = m.height / 2;
+					this.ctx.stroke();
+					this.ctx.restore();
+				});
+			}else if (
+				m.name === 'Brainstorming' &&
+				m.phase === 'shooting' &&
+				m.beamAngle
+			) {
+				const cx = m.x + m.width / 2;
+				const cy = m.y + m.height / 2;
 
 			this.ctx.shadowBlur = 20;
 			this.ctx.shadowColor = 'magenta';

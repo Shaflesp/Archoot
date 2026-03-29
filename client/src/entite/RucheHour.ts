@@ -97,7 +97,7 @@ export default class RucheHour extends Entite {
 		if (this.phase !== 'green' && this.phase !== 'orange') return;
 
 		this.shootTimer++;
-		if (this.shootTimer < 15) return;
+		if (this.shootTimer < 20) return;
 		this.shootTimer = 0;
 
 		this.getVectors().forEach((vec: { dx: number; dy: number }) => {

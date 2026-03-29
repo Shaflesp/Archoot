@@ -21,7 +21,7 @@ export class Player {
 	invincibleUntil: number;
 	score: number;
 	bonusList: Bonus[] = [];
-	damage = 1;
+	damage = 100;
 	arrowsPerClick = 1;
 
 	constructor(id: string, username: string, width: number, height: number) {
@@ -30,12 +30,12 @@ export class Player {
 		this.movementSpeed = 10;
 		this.x = width / 2;
 		this.y = height / 2;
-		this.width = 100; //a ajuster selon la taille que l'on veut pour la hitbox /Sprite
-		this.height = 100;
+		this.width = 70; //a ajuster selon la taille que l'on veut pour la hitbox /Sprite
+		this.height = 70;
 		this.username = username ? username : 'placeholder';
 		this.identifier = id;
 
-		this.lives = 5;
+		this.lives = 50;
 		this.invincibleUntil = 0;
 		this.score = 0;
 	}

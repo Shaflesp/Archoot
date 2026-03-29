@@ -22,7 +22,7 @@ export default class GameManager {
 
 	constructor(state: RoomState) {
 		this.state = state;
-		this.bossPoolMap = new Map([
+		this.bossPoolMap = new Map<string,Pool<Entite>>([
 			['Mygalomane', this.state.mygaloPool],
 			['Ruche Hour', this.state.ruchePool],
 			['Brainstorming', this.state.brainPool],

@@ -84,19 +84,7 @@ export default class Brainstorming extends Entite {
 		return vectors;
 	}
 
-	reset(): void {
-		this.width = 200;
-		this.height = 200;
-		this.x = this.boundWidth / 2 - this.width / 2;
-		this.y = this.boundHeight / 2 - this.height / 2;
-		this.health = 300;
-		this.active = true;
-
-		this.speed = this.baseSpeed;
-		this.movementSpeed = this.baseMovementSpeed;
-	}
-
-	hitPlayers(players: Map<string, Player>,): void {
+	hitPlayers(players: Map<string, Player>): void {
 		if (this.phase !== 'shooting') return;
 
 		const cx = this.x + this.width / 2;
@@ -128,6 +116,18 @@ export default class Brainstorming extends Entite {
 				}
 			}
 		});
+	}
+
+	reset(): void {
+		this.width = 200;
+		this.height = 200;
+		this.x = this.boundWidth / 2 - this.width / 2;
+		this.y = this.boundHeight / 2 - this.height / 2;
+		this.health = 300;
+		this.active = true;
+
+		this.speed = this.baseSpeed;
+		this.movementSpeed = this.baseMovementSpeed;
 	}
 
 	getAsJson() {

@@ -366,7 +366,7 @@ setInterval(() => {
 						mobsChanged = true;
 
 						const killer = state.players.get(bullet.ownerId);
-						if (killer) killer.score += 100;
+						if (killer) killer.score += 500;
 						if (manager?.isBoss(mob.name)) {
 							manager.bossDead();
 							bonusesChanged=true;
