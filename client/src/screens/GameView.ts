@@ -38,6 +38,7 @@ interface MobsData {
 	hp: number;
 	maxHp: number;
 	phase?: string;
+	beamAngle? : number;
 }
 
 interface BonusData {
@@ -603,8 +604,39 @@ export class GameView extends CanvasView implements View {
 
 		if (m.name === 'pie' && this.pieAnimator) {
 			this.pieAnimator.draw(this.ctx, 0, 0, m.width, m.height);
+
 		} else if (m.name === 'Ruche Hour' && m.phase) {
 			this.ctx.drawImage(this.getRucheImage(m.phase), 0, 0, m.width, m.height);
+
+		} else if (m.name === 'Brainstorming' && m.phase === 'shooting' && m.beamAngle) {
+			const cx = m.width / 2;
+			const cy = m.height / 2;
+
+			this.ctx.shadowBlur = 20;
+			this.ctx.shadowColor = 'magenta';
+			this.ctx.lineCap = 'round';
+
+			const rays:number = 12;
+			for (let i:number = 0; i < rays; i++) {
+				const angle:number = (m.beamAngle || 0) + (i * Math.PI * 2) / rays;
+
+				this.ctx.beginPath();
+				this.ctx.moveTo(cx, cy);
+
+				this.ctx.lineTo(
+					cx + Math.cos(angle) * 3000,
+					cy + Math.sin(angle) * 3000
+				);
+
+				this.ctx.lineWidth = 25;
+				this.ctx.strokeStyle = 'rgba(255, 100, 255, 0.7)';
+				this.ctx.stroke();
+
+				this.ctx.shadowBlur = 0;
+				this.ctx.lineWidth = 8;
+				this.ctx.strokeStyle = 'white';
+				this.ctx.stroke();
+			}
 		} else {
 			this.ctx.drawImage(this.getMobImage(m), 0, 0, m.width, m.height);
 		}

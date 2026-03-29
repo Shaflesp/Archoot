@@ -7,6 +7,7 @@ import RoomState from './RoomState.ts';
 import GameManager from './GameManager.ts';
 import type { Entite } from '../client/src/entite/Entite.ts';
 import RucheHour from '../client/src/entite/RucheHour.ts';
+import Brainstorming from '../client/src/entite/Brainstorming.ts';
 import type { PlayerData } from './Entity/PlayerData.ts';
 import { Leaderboard } from './Leaderboard.ts';
 
@@ -411,6 +412,48 @@ setInterval(() => {
 							}
 						});
 					}
+				}
+			}
+			if (mob instanceof Brainstorming) {
+				if (mob.phase === 'shooting') {
+					const cx = mob.x + mob.width / 2;
+					const cy = mob.y + mob.height / 2;
+					const angles = mob.getVectors();
+					const beamThickness = 20;
+
+					state.players.forEach(player => {
+						if (!player.active) return;
+						const px = player.x + player.width / 2;
+						const py = player.y + player.height / 2;
+
+						for (const angle of angles) {
+							const dx = Math.cos(angle);
+							const dy = Math.sin(angle);
+							const vx = px - cx;
+							const vy = py - cy;
+							const dot = vx * dx + vy * dy;
+
+							if (dot > 0) {
+								const rx = cx + dot * dx;
+								const ry = cy + dot * dy;
+								const dist = Math.hypot(px - rx, py - ry);
+
+								if (dist < player.width / 2 + beamThickness) {
+									player.takeDamage(mob.damage);
+									playersChanged = true;
+
+									const pushAngle = Math.atan2(py - cy, px - cx);
+									const knockbackDist = 150;
+
+									player.x = Math.max(0, Math.min(boundWidth - player.width, player.x + Math.cos(pushAngle) * knockbackDist));
+									player.y = Math.max(0, Math.min(boundHeight - player.height, player.y + Math.sin(pushAngle) * knockbackDist));
+
+									if (player.isDead()) console.log(`${player.username} eliminated by laser.`);
+									break;
+								}
+							}
+						}
+					});
 				}
 			}
 			mobsChanged = true;
