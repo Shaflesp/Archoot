@@ -410,9 +410,13 @@ setInterval(() => {
 				}
 			});
 
-			if (mob.x < -mob.width) {
+			if (mob.x < -mob.width || mob.y < -mob.height || mob.y > boundHeight) {
 				mob.active = false;
 				mobsChanged = true;
+
+				if (manager && manager.isBoss(mob.name)) {
+					manager.bossDead();
+				}
 			}
 		});
 

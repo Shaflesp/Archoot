@@ -180,8 +180,8 @@ export default class GameManager {
 		const mob = pool.acquire();
 		if (!mob) return null;
 
-		mob.speed = mob.speed * this.difficulty;
-		mob.movementSpeed = mob.movementSpeed * this.difficulty;
+		mob.speed = mob.baseSpeed * this.difficulty;
+		mob.movementSpeed = mob.baseMovementSpeed * this.difficulty;
 
 		const activePlayers = Array.from(this.state.players.values()).filter(
 			p => p.active

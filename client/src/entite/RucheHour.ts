@@ -7,43 +7,48 @@ export default class RucheHour extends Entite {
 	x = this.boundWidth / 2 - this.width / 2;
 	y = this.boundHeight / 2 - this.height / 2;
 
-	speed = 4;
-	movementSpeed = 3;
-	readonly baseSpeed: number = 4;
-	readonly baseMovementSpeed: number = 3;
+	speed = 3;
+	movementSpeed = 2;
+	readonly baseSpeed: number = 3;
+	readonly baseMovementSpeed: number = 2;
 
 	health = 150;
 	damage = 1;
 	shootSpeed = 4;
 	target = null;
 
-	private dirX = 1;
+	private horizontalDir: number = -1;
+	private verticalDir: number = 1;
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		this.verticalDir = Math.random() < 0.5 ? 1 : -1;
 	}
 
 	move(): void {
-		this.x += this.dirX * this.speed;
+		this.x += this.speed * this.horizontalDir;
 
-		// bord droit
-		if (this.x + this.width >= this.boundWidth) {
-			this.dirX = -1;
-			this.y += 80;
-			this.x = this.boundWidth - this.width;
+		if (this.x <= 0 && this.horizontalDir === -1) {
+			this.horizontalDir = 1;
+			this.shiftVertically();
+		} else if (
+			this.x >= this.boundWidth - this.width &&
+			this.horizontalDir === 1
+		) {
+			this.horizontalDir = -1;
+			this.shiftVertically();
 		}
+	}
 
-		//bord gauche
-		if (this.x <= 0) {
-			this.dirX = 1;
-			this.y += 80;
-			this.x = 0;
-		}
+	private shiftVertically(): void {
+		const step = 60;
 
-		// tp en haut
-		if (this.y + this.height >= this.boundHeight) {
-			this.y = 0;
+		if (this.y + step * this.verticalDir > this.boundHeight - this.height) {
+			this.verticalDir = -1;
+		} else if (this.y + step * this.verticalDir < 0) {
+			this.verticalDir = 1;
 		}
+		this.y += step * this.verticalDir;
 	}
 
 	takeDamage(amount: number): void {
@@ -61,5 +66,8 @@ export default class RucheHour extends Entite {
 
 		this.speed = this.baseSpeed;
 		this.movementSpeed = this.baseMovementSpeed;
+
+		this.horizontalDir = -1;
+		this.verticalDir = Math.random() < 0.5 ? 1 : -1;
 	}
 }
