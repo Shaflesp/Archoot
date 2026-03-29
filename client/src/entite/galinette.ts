@@ -13,6 +13,7 @@ export default class Galinette extends Entite {
 	readonly baseMovementSpeed: number = 2;
 
 	health = 10;
+	maxHp;
 	damage = 1;
 	shootSpeed = 0;
 	target = null;
@@ -22,6 +23,7 @@ export default class Galinette extends Entite {
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		this.maxHp = this.health;
 		this.y = Math.random() * (this.boundHeight - this.height);
 		this.verticalDir = Math.random() < 0.5 ? 1 : -1;
 	}

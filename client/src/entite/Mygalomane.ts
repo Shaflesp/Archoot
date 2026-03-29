@@ -14,6 +14,7 @@ export default class Mygalomane extends Entite {
 	readonly baseMovementSpeed: number = 0;
 
 	health = 50;
+	maxHp;
 	damage = 1;
 	shootSpeed = 3;
 
@@ -22,6 +23,7 @@ export default class Mygalomane extends Entite {
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		this.maxHp = this.health;
 	}
 
 	move(): void {

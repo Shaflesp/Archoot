@@ -13,6 +13,7 @@ export default class Pie extends Entite {
 	readonly baseMovementSpeed: number = 2;
 
 	health = 30;
+	maxHp;
 	damage = 1;
 	shootSpeed = 0;
 	target: { x: number; y: number } | null;
@@ -20,6 +21,7 @@ export default class Pie extends Entite {
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
 		this.target = null;
+		this.maxHp = this.health;
 	}
 
 	move(): void {

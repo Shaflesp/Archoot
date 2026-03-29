@@ -14,6 +14,7 @@ export default class Spider extends Entite {
 	readonly baseMovementSpeed: number = 2;
 
 	health = 5;
+	maxHp;
 	damage = 1;
 	shootSpeed = 0;
 	private climbing = false;
@@ -21,6 +22,7 @@ export default class Spider extends Entite {
 
 	constructor(boundWith: number, boundHeight: number) {
 		super(boundWith, boundHeight);
+		this.maxHp = this.health;
 		const idx = Math.random() * 3 + 1;
 		this.img = `/images/sprites/spider${idx}.png`;
 	}
