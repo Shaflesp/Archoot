@@ -13,6 +13,9 @@ interface PlayerData {
 	lives: number;
 	active: number;
 	score: number;
+
+	dx: number;
+	dy: number;
 }
 
 interface BulletData {
@@ -59,9 +62,14 @@ export class GameView extends CanvasView implements View {
 	mobsInfo: Array<MobsData> = [];
 	bonusInfo: Array<BonusData> = [];
 
-	private startTime : number = 0;
+	private startTime: number = 0;
 
-	private playerImage: HTMLImageElement;
+	private playerImages: {
+		up: HTMLImageElement;
+		down: HTMLImageElement;
+		side: HTMLImageElement;
+	};
+
 	private bulletImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
 	private rucheImages: HTMLImageElement[] = [];
@@ -86,6 +94,12 @@ export class GameView extends CanvasView implements View {
 	private lastMoveEmit: number = 0;
 	private readonly MOVE_RATE = 1000 / 60;
 
+	private readonly playerSrcs: string[] = [
+		'images/sprites/John_Up.png',
+		'images/sprites/John_Down.png',
+		'images/sprites/John_Side.png',
+	];
+
 	private readonly mobsSrcs: string[] = [
 		'/images/sprites/pie_sheet.png',
 		'/images/sprites/galinette.png',
@@ -101,8 +115,8 @@ export class GameView extends CanvasView implements View {
 	private readonly rucheSrcs: string[] = [
 		'images/sprites/Ruche_Hour_Green.png',
 		'images/sprites/Ruche_Hour_Orange.png',
-		'images/sprites/Ruche_Hour_Red.png'
-	]
+		'images/sprites/Ruche_Hour_Red.png',
+	];
 
 	private readonly bonusSrcs: string[] = [
 		'/images/bonus/bonusRouge.png',
@@ -119,8 +133,18 @@ export class GameView extends CanvasView implements View {
 		this.socket = socket;
 		this.sm = sm;
 
-		this.playerImage = new Image();
-		this.playerImage.src = '/images/cobaye.png';
+		const up = new Image();
+		up.src = this.playerSrcs[0];
+		const down = new Image();
+		down.src = this.playerSrcs[1];
+		const side = new Image();
+		side.src = this.playerSrcs[2];
+		this.playerImages = { up, down, side };
+
+		[up, down, side].forEach(img => {
+			img.onerror = () =>
+				console.error(`Failed to load player image: ${img.src}`);
+		});
 
 		this.coeurImage = new Image();
 		this.coeurImage.src = '/images/coeur.png';
@@ -232,8 +256,8 @@ export class GameView extends CanvasView implements View {
 		const body = document.body;
 		body.style.backgroundImage = "url('/images/fondJeu.gif')";
 
-		body.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
-		body.style.backgroundBlendMode = "darken";
+		body.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+		body.style.backgroundBlendMode = 'darken';
 
 		this.element.style.display = 'flex';
 		this.socket.on('playerInfo', this.onPlayerInfo);
@@ -405,17 +429,17 @@ export class GameView extends CanvasView implements View {
 
 		const durationMs = Date.now() - this.startTime;
 		const totalSeconds = Math.floor(durationMs / 1000);
-		
+
 		const timeBonus = totalSeconds * 10;
-    	const combatScore = player.score;
-    	const totalScore = combatScore + timeBonus;
-		
+		const combatScore = player.score;
+		const totalScore = combatScore + timeBonus;
+
 		const minutes = Math.floor(totalSeconds / 60);
 		const seconds = totalSeconds % 60;
 		const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 		const killedEnemies = Math.floor(player.score / 100);
-		
-    	const statElement = this.deathPopup.querySelector('#death-stats');
+
+		const statElement = this.deathPopup.querySelector('#death-stats');
 
 		if (statElement) {
 			statElement.innerHTML = `
@@ -442,6 +466,25 @@ export class GameView extends CanvasView implements View {
 		this.bonusInfo = info.bonuses;
 	};
 
+	private getPlayerImage(p: PlayerData): {
+		image: HTMLImageElement;
+		flipped: boolean;
+	} {
+		const { dx, dy } = p;
+
+		if (Math.abs(dx) > Math.abs(dy)) {
+			return {
+				image: this.playerImages.side,
+				flipped: dx < 0,
+			};
+		}
+
+		if (dy < 0) return { image: this.playerImages.up, flipped: false };
+		if (dy > 0) return { image: this.playerImages.down, flipped: false };
+
+		return { image: this.playerImages.down, flipped: false };
+	}
+
 	private getMobImage(mob: MobsData): HTMLImageElement {
 		switch (mob.name) {
 			case 'pie':
@@ -463,11 +506,15 @@ export class GameView extends CanvasView implements View {
 	}
 
 	private getRucheImage(phase: string): HTMLImageElement {
-		switch (phase){
-			case 'green': return this.rucheImages[0];
-			case 'orange': return this.rucheImages[1];
-			case 'red': return this.rucheImages[2];
-			default: return this.rucheImages[0];
+		switch (phase) {
+			case 'green':
+				return this.rucheImages[0];
+			case 'orange':
+				return this.rucheImages[1];
+			case 'red':
+				return this.rucheImages[2];
+			default:
+				return this.rucheImages[0];
 		}
 	}
 
@@ -489,8 +536,6 @@ export class GameView extends CanvasView implements View {
 	private draw() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		if (!this.playerImage.complete) return;
-
 		this.bonusInfo.forEach((b: BonusData) => {
 			const img = this.getBonusImage(b.name);
 			if (img && img.complete && img.naturalWidth !== 0) {
@@ -511,7 +556,20 @@ export class GameView extends CanvasView implements View {
 				this.ctx.filter = 'grayscale(100%)';
 			}
 
-			this.ctx.drawImage(this.playerImage, p.x, p.y, p.width, p.height);
+			const { image, flipped } = this.getPlayerImage(p);
+
+			this.ctx.save();
+
+			if (flipped) {
+				this.ctx.translate(p.x + p.width, p.y);
+				this.ctx.scale(-1, 1);
+				this.ctx.drawImage(image, 0, 0, p.width, p.height);
+			} else {
+				this.ctx.drawImage(image, p.x, p.y, p.width, p.height);
+			}
+
+			this.ctx.restore();
+
 			this.ctx.font = '24px Arial';
 			this.ctx.fillStyle = p.active ? 'white' : 'red';
 			this.ctx.fillText(`${p.username} [${p.score || 0}]`, p.x, p.y - 10);
@@ -604,11 +662,13 @@ export class GameView extends CanvasView implements View {
 
 		if (m.name === 'pie' && this.pieAnimator) {
 			this.pieAnimator.draw(this.ctx, 0, 0, m.width, m.height);
-
 		} else if (m.name === 'Ruche Hour' && m.phase) {
 			this.ctx.drawImage(this.getRucheImage(m.phase), 0, 0, m.width, m.height);
-
-		} else if (m.name === 'Brainstorming' && m.phase === 'shooting' && m.beamAngle) {
+		} else if (
+			m.name === 'Brainstorming' &&
+			m.phase === 'shooting' &&
+			m.beamAngle
+		) {
 			const cx = m.width / 2;
 			const cy = m.height / 2;
 
@@ -616,9 +676,9 @@ export class GameView extends CanvasView implements View {
 			this.ctx.shadowColor = 'magenta';
 			this.ctx.lineCap = 'round';
 
-			const rays:number = 8;
-			for (let i:number = 0; i < rays; i++) {
-				const angle:number = (m.beamAngle || 0) + (i * Math.PI * 2) / rays;
+			const rays: number = 8;
+			for (let i: number = 0; i < rays; i++) {
+				const angle: number = (m.beamAngle || 0) + (i * Math.PI * 2) / rays;
 
 				this.ctx.beginPath();
 				this.ctx.moveTo(cx, cy);
