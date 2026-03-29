@@ -10,7 +10,7 @@ interface ScoreEntry {
 export class Leaderboard {
 	private scores: ScoreEntry[] = [];
 	private readonly MAX: number = 10;
-	private FILE_PATH: string = '/statistique/leaderboard.json';
+	private FILE_PATH: string = '/server/leaderboard.json';
 
 	public async load(): Promise<ScoreEntry[]> {
 		const response = await fetch(this.FILE_PATH);
@@ -41,7 +41,7 @@ export class Leaderboard {
 	public save(): void {
 		const leaderdata = JSON.stringify(this.scores, null, 2);
 
-		fs.writeFile('leaderboard.json', leaderdata, err => {
+		fs.writeFile('server/leaderboard.json', leaderdata, err => {
 			if (err) {
 				console.log('Error writing file:', err);
 			} else {
