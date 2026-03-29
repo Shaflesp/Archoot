@@ -1,6 +1,7 @@
 import type { Socket } from 'socket.io-client';
 import type { ViewManager } from '../ViewManager.ts';
 import { CanvasView, type View } from './View.ts';
+import {SpriteAnimator} from "../SpriteAnimator.ts";
 
 interface PlayerData {
 	identifier: string;
@@ -32,7 +33,8 @@ interface MobsData {
 	width: number;
 	height: number;
 	speed: number;
-	// image: HTMLImageElement;
+	dx: number;
+	dy: number;
 }
 
 interface BonusData {
@@ -56,8 +58,12 @@ export class GameView extends CanvasView implements View {
 	private playerImage: HTMLImageElement;
 	private bulletImage: HTMLImageElement;
 	private mobsImages: HTMLImageElement[] = [];
+
+	private pieAnimator: SpriteAnimator | null = null;
+	private pieSheet: HTMLImageElement;
+
 	private coeurImage: HTMLImageElement;
-	private bonusImage: HTMLImageElement[]=[];
+	private bonusImage: HTMLImageElement[] = [];
 
 	private deathPopup: HTMLElement;
 	private escPopup: HTMLElement;
@@ -72,7 +78,7 @@ export class GameView extends CanvasView implements View {
 	private readonly MOVE_RATE = 1000 / 60;
 
 	private readonly mobsSrcs: string[] = [
-		'/images/sprites/pie.gif',
+		'/images/sprites/pie_sheet.png',
 		'/images/sprites/galinette.png',
 		'/images/sprites/spider1.png',
 		'/images/sprites/spider2.png',
@@ -84,7 +90,7 @@ export class GameView extends CanvasView implements View {
 		'/images/sprites/Mygalomane.png', // à changer pour tyrus
 	];
 
-	private readonly bonusSrcs:string[] = [
+	private readonly bonusSrcs: string[] = [
 		'/images/bonus/bonusRouge.png',
 		'/images/bonus/bonusVert.png',
 		'/images/bonus/bonusBleu.png',
@@ -114,11 +120,23 @@ export class GameView extends CanvasView implements View {
 			this.mobsImages.push(img);
 		});
 
+		this.pieSheet = new Image();
+		this.pieSheet.onload = () => {
+			this.pieAnimator = new SpriteAnimator(
+				this.pieSheet,
+				4,
+				this.pieSheet.width / 4,
+				this.pieSheet.height,
+				5
+			);
+		};
+		this.pieSheet.src = '/images/sprites/pie_sheet.png';
+
 		this.bonusSrcs.forEach(src => {
 			const img = new Image();
 			img.src = src;
 			this.bonusImage.push(img);
-		})
+		});
 
 		/* Gestion du retour accueil */
 		this.element
@@ -158,6 +176,9 @@ export class GameView extends CanvasView implements View {
 
 	private gameLoop = () => {
 		if (!this.running) return;
+
+		this.pieAnimator?.update();
+
 		if (this.rightClickTarget !== null) {
 			const now = Date.now();
 			if (now - this.lastMoveEmit >= this.MOVE_RATE) {
@@ -217,7 +238,7 @@ export class GameView extends CanvasView implements View {
 		this.playerInfo.clear();
 		this.bulletInfo = [];
 		this.mobsInfo = [];
-		this.bonusInfo=[];
+		this.bonusInfo = [];
 	}
 
 	private openPopup(popup: HTMLElement) {
@@ -356,8 +377,8 @@ export class GameView extends CanvasView implements View {
 	};
 
 	private onBonusInfo = (info: { bonuses: Array<BonusData> }) => {
-        this.bonusInfo = info.bonuses;
-    };
+		this.bonusInfo = info.bonuses;
+	};
 
 	private getMobImage(mob: MobsData): HTMLImageElement {
 		switch (mob.name) {
@@ -381,18 +402,18 @@ export class GameView extends CanvasView implements View {
 		}
 	}
 
-	private getBonusImage(name :string):HTMLImageElement {
-		switch (name){
-			case 'PotionDegats' :
+	private getBonusImage(name: string): HTMLImageElement {
+		switch (name) {
+			case 'PotionDegats':
 				return this.bonusImage[0];
-			case 'PotionSoin' :
+			case 'PotionSoin':
 				return this.bonusImage[1];
-			case 'PotionRapidite' :
+			case 'PotionRapidite':
 				return this.bonusImage[2];
-			case 'PotionTirRapide' :
+			case 'PotionTirRapide':
 				return this.bonusImage[3];
-			default :
-				return this.bonusImage[1]; 
+			default:
+				return this.bonusImage[1];
 		}
 	}
 
@@ -401,18 +422,18 @@ export class GameView extends CanvasView implements View {
 
 		if (!this.playerImage.complete) return;
 
-		this.bonusInfo.forEach( (b: BonusData) => {
+		this.bonusInfo.forEach((b: BonusData) => {
 			const img = this.getBonusImage(b.name);
 			if (img && img.complete && img.naturalWidth !== 0) {
-        		this.ctx.drawImage(img, b.x, b.y, b.width, b.height);
-    		} else {
+				this.ctx.drawImage(img, b.x, b.y, b.width, b.height);
+			} else {
 				this.ctx.fillStyle = 'purple';
 				this.ctx.fillRect(b.x, b.y, b.width, b.height);
-   			}
+			}
 		});
 
 		this.mobsInfo.forEach((m: MobsData) => {
-			this.ctx.drawImage(this.getMobImage(m), m.x, m.y, m.width, m.height);
+			this.drawMob(m);
 		});
 
 		this.playerInfo.forEach((p: PlayerData) => {
@@ -475,5 +496,25 @@ export class GameView extends CanvasView implements View {
 			this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 			this.flashDuration--;
 		}
+	}
+
+	private drawMob(m: MobsData) {
+		this.ctx.save();
+
+		const flipped = m.dx > 0;
+		if (flipped) {
+			this.ctx.translate(m.x + m.width, m.y);
+			this.ctx.scale(-1, 1);
+		} else {
+			this.ctx.translate(m.x, m.y);
+		}
+
+		if (m.name === 'pie' && this.pieAnimator) {
+			this.pieAnimator.draw(this.ctx, 0, 0, m.width, m.height);
+		} else {
+			this.ctx.drawImage(this.getMobImage(m), 0, 0, m.width, m.height);
+		}
+
+		this.ctx.restore();
 	}
 }

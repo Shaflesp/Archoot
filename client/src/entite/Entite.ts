@@ -42,7 +42,9 @@ export abstract class Entite implements Collidable {
 			y: this.y,
 			width: this.width,
 			height: this.height,
-			img: this.img,
+			speed: this.speed,
+			dx: this.target ? this.target.x - this.x : -1,
+			dy: this.target ? this.target.y - this.y : 0,
 		};
 	}
 
