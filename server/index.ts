@@ -26,6 +26,7 @@ const gameManagers = new Map<number, GameManager>();
 const registeredUsernames: Set<string> = new Set();
 
 const leaderboard = new Leaderboard();
+leaderboard.load();
 
 function createRoom(
 	name: string,
