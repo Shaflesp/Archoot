@@ -800,39 +800,74 @@ export class GameView extends CanvasView implements View {
 				this.ctx.stroke();
 				this.ctx.restore();
 			});
-		} else if (
-			m.name === 'Brainstorming' &&
-			m.phase === 'shooting' &&
-			m.beamAngle
-		) {
+		} else if (m.name === 'Brainstorming' && m.phase && m.beamAngle) {
 			const cx = m.x + m.width / 2;
 			const cy = m.y + m.height / 2;
+			const rays = 8;
+			const length = 2000;
 
-			this.ctx.shadowBlur = 20;
-			this.ctx.shadowColor = 'magenta';
-			this.ctx.lineCap = 'round';
+			this.ctx.save();
 
-			const rays: number = 8;
-			for (let i: number = 0; i < rays; i++) {
-				const angle: number = (m.beamAngle || 0) + (i * Math.PI * 2) / rays;
+			if (m.phase === 'charging') {
+				this.ctx.beginPath();
+				this.ctx.setLineDash([10, 15]);
+				this.ctx.lineWidth = 2;
+				this.ctx.strokeStyle = 'rgba(255, 0, 255, 0.6)';
+
+				for (let i = 0; i < rays; i++) {
+					const angle = m.beamAngle + (i * Math.PI * 2) / rays;
+					this.ctx.moveTo(cx, cy);
+					this.ctx.lineTo(
+						cx + Math.cos(angle) * length,
+						cy + Math.sin(angle) * length
+					);
+				}
+				this.ctx.stroke(); // ONE stroke for all 8 warning lines
+			} else if (m.phase === 'shooting') {
+
+				const angles = [];
+				for (let i = 0; i < rays; i++) {
+					angles.push(m.beamAngle + (i * Math.PI * 2) / rays);
+				}
 
 				this.ctx.beginPath();
-				this.ctx.moveTo(cx, cy);
-
-				this.ctx.lineTo(
-					cx + Math.cos(angle) * 3000,
-					cy + Math.sin(angle) * 3000
-				);
-
-				this.ctx.lineWidth = 25;
-				this.ctx.strokeStyle = 'rgba(255, 100, 255, 0.7)';
+				this.ctx.lineWidth = 30;
+				this.ctx.strokeStyle = 'rgba(255, 0, 255, 0.15)';
+				angles.forEach(angle => {
+					this.ctx.moveTo(cx, cy);
+					this.ctx.lineTo(
+						cx + Math.cos(angle) * length,
+						cy + Math.sin(angle) * length
+					);
+				});
 				this.ctx.stroke();
 
-				this.ctx.shadowBlur = 0;
-				this.ctx.lineWidth = 8;
+				this.ctx.beginPath();
+				this.ctx.lineWidth = 15;
+				this.ctx.strokeStyle = 'rgba(255, 100, 255, 0.4)';
+				angles.forEach(angle => {
+					this.ctx.moveTo(cx, cy);
+					this.ctx.lineTo(
+						cx + Math.cos(angle) * length,
+						cy + Math.sin(angle) * length
+					);
+				});
+				this.ctx.stroke();
+
+				this.ctx.beginPath();
+				this.ctx.lineWidth = 6;
 				this.ctx.strokeStyle = 'white';
+				angles.forEach(angle => {
+					this.ctx.moveTo(cx, cy);
+					this.ctx.lineTo(
+						cx + Math.cos(angle) * length,
+						cy + Math.sin(angle) * length
+					);
+				});
 				this.ctx.stroke();
 			}
+
+			this.ctx.restore();
 		}
 	}
 

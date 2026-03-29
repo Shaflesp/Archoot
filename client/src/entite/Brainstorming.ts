@@ -19,7 +19,7 @@ export default class Brainstorming extends Entite {
 	damage = 2;
 	shootSpeed = 1;
 
-	phase: 'bouncing' | 'shooting' = 'bouncing';
+	phase: 'bouncing' | 'charging' | 'shooting' = 'bouncing';
 	phaseTimer: number = 0;
 	beamAngle: number = 0;
 
@@ -58,9 +58,16 @@ export default class Brainstorming extends Entite {
 
 			// 4s
 			if (this.phaseTimer >= 240) {
-				this.phase = 'shooting';
+				this.phase = 'charging';
 				this.phaseTimer = 0;
 			}
+		}else if (this.phase === 'charging') {
+				this.beamAngle += 0.005;
+
+				if (this.phaseTimer >= 60) {
+					this.phase = 'shooting';
+					this.phaseTimer = 0;
+				}
 		} else if (this.phase === 'shooting') {
 			// 1.5s
 			this.beamAngle += 0.008;
