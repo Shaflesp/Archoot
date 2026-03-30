@@ -19,7 +19,7 @@ describe('Entite', () => {
 		assert.equal(e.health, 0);
 	});
 
-	it('should detects deaths when entity is dead', () => {
+	it('should detect deaths when entity is dead', () => {
 		const e = new MockEntite(100, 100);
 
 		e.takeDamage(100);
