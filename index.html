@@ -63,11 +63,13 @@
 
         <div id="room-select-screen" class="screen">
             <a class="back-button home-button noselect"><img src="./images/ui/retour.png" draggable="false"></a>
-            <a class="room-create-button noselect"><img src="./images/ui/boutonCreerSalle.png" draggable="false"></a>    
+            <div class="rooms-header">
+                <a class="room-create-button noselect"><img src="./images/ui/boutonCreerSalle.png" draggable="false"></a>
 
-            <div class="search-container">
-                <label for="search-room">Recherche: </label>
-                <input name="search-room" id="search-room" class="search-room">
+                <div class="search-container">
+                    <label for="search-room">Recherche: </label>
+                    <input name="search-room" id="search-room" class="search-room">
+                </div>
             </div>
 
             <div class="room-list-scroll">
@@ -94,6 +96,11 @@
                 <label for="name">Nom de la salle</label>
                 <input type="text" name="name" id="name" class="create-input" maxlength="16">
                 <p class="name-warning warning"></p>
+
+                <label class="pvp-label">
+                    <input type="checkbox" name="pvp" class="pvp-checkbox">
+                    Activer le PvP
+                </label>
 
                 <label for="player-count">Nombre de joueurs</label>
                 <input type="number" id="player-count" name="player-count" class="create-input" min="2" max="8" value="2">
@@ -123,9 +130,15 @@
                     </div>
                     <p>Que souhaitez-vous faire ?</p>
                     <div class="death-buttons">
-                        <button class="spectate-button">Spectate</button>
-                        <button class="replay-button" style="display: none">Rejouer</button>
-                        <button class="leave-button">Quit</button>
+                        <button class="spectate-button death-menu-button">
+                            <img src="/images/ui/boutonSpectateur.png" alt="Replay">
+                        </button>
+                        <button class="replay-button death-menu-button" style="display: inline-block">
+                            <img src="/images/ui/replay.png" alt="Replay">
+                        </button>
+                        <button class="leave-button death-menu-button">
+                            <img src="/images/ui/retour.png" alt="Quit">
+                        </button>
                     </div>
                 </div>
             </div>

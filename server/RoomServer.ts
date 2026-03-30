@@ -2,6 +2,7 @@ export interface RoomServer {
 	id: number;
 	name: string;
 	capacityMax: number;
-	players: Set<string>; 
+	players: Set<string>;
 	solo: boolean;
+	pvp: boolean;
 }
