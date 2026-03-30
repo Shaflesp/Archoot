@@ -122,3 +122,8 @@
     filter: brightness(1.3) contrast(1.1);
     transform:scale(1.1);
 }
+
+.room-create-button img {
+    max-width: 50%;
+    height: auto;
+}

@@ -35,7 +35,7 @@ export class Player {
 		this.username = username ? username : 'placeholder';
 		this.identifier = id;
 
-		this.lives = 5;
+		this.lives = 1;
 		this.invincibleUntil = 0;
 		this.score = 0;
 	}

@@ -39,7 +39,8 @@ const io = new IOServer(httpServer, { cors: { origin: true } });
 function createRoom(
 	name: string,
 	capacityMax: number,
-	solo: boolean = false
+	solo: boolean = false,
+	pvp: boolean = false
 ): RoomServer {
 	const r: RoomServer = {
 		id: ++roomIdCpt,
@@ -47,6 +48,7 @@ function createRoom(
 		capacityMax,
 		players: new Set(),
 		solo,
+		pvp,
 	};
 
 	const state = new RoomState(boundWidth, boundHeight);
@@ -183,34 +185,37 @@ io.on('connection', socket => {
 		broadcastGame(roomId, state);
 	});
 
-	socket.on('create-room', (capacity: number, name: string = '') => {
-		const username = socket.data.username as string | undefined;
-		if (!username) {
-			socket.emit('room_error', 'You must register first.');
-			return;
+	socket.on(
+		'create-room',
+		(capacity: number, name: string = '', pvp: boolean = false) => {
+			const username = socket.data.username as string | undefined;
+			if (!username) {
+				socket.emit('room_error', 'You must register first.');
+				return;
+			}
+
+			if (currentRoomId !== null) removeFromRoom(currentRoomId);
+
+			const roomName = capacity == 1 ? `${username}'s game` : name;
+			const solo = capacity == 1;
+
+			const room = createRoom(roomName, capacity, solo, pvp);
+			const state = roomStates.get(room.id)!;
+
+			currentRoomId = room.id;
+			room.players.add(socket.id);
+			socket.join(getRoomKey(room.id));
+			state.players.set(
+				socket.id,
+				new Player(socket.id, username, boundWidth, boundHeight)
+			);
+
+			console.log(`${username} created solo room ${room.id}`);
+			socket.emit('join-room-success', { roomId: room.id, solo: room.solo });
+
+			broadcastGame(room.id, state);
 		}
-
-		if (currentRoomId !== null) removeFromRoom(currentRoomId);
-
-		const roomName = capacity == 1 ? `${username}'s game` : name;
-		const solo = capacity == 1;
-
-		const room = createRoom(roomName, capacity, solo);
-		const state = roomStates.get(room.id)!;
-
-		currentRoomId = room.id;
-		room.players.add(socket.id);
-		socket.join(getRoomKey(room.id));
-		state.players.set(
-			socket.id,
-			new Player(socket.id, username, boundWidth, boundHeight)
-		);
-
-		console.log(`${username} created solo room ${room.id}`);
-		socket.emit('join-room-success', {roomId: room.id, solo: room.solo});
-
-		broadcastGame(room.id, state);
-	});
+	);
 
 	socket.on('add-score', (p: PlayerData) => {
 		leaderboard.addPlayer(p.username, p.score);
@@ -339,6 +344,12 @@ setInterval(() => {
 			state.players.forEach(player => {
 				if (!player.active) return;
 				if (player.identifier === bullet.ownerId) return;
+
+				const room = rooms.get(roomId);
+				const isPlayerBullet = state.players.has(bullet.ownerId);
+
+				if (isPlayerBullet && room && !room.pvp) return;
+
 				if (player.collidesWith(bullet)) {
 					player.takeDamage(1);
 					bullet.active = false;

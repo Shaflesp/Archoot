@@ -128,7 +128,6 @@ export class GameView extends CanvasView implements View {
 
 	private deathPopup: HTMLElement;
 	private escPopup: HTMLElement;
-	private isSolo: boolean = false;
 	private replayButton: HTMLElement;
 
 	private flashDuration: number = 0;
@@ -372,7 +371,6 @@ export class GameView extends CanvasView implements View {
 		this.canvas.removeEventListener('mouseup', this.onMouseUp);
 		this.canvas.removeEventListener('contextmenu', e => e.preventDefault());
 
-		this.isSolo = false;
 		this.replayButton.style.display = 'none';
 
 		this.running = false;
@@ -387,7 +385,6 @@ export class GameView extends CanvasView implements View {
 	}
 
 	private onJoinRoomSuccess = (data: {roomId: number, solo: boolean}) => {
-		this.isSolo = this.isSolo;
 		this.replayButton.style.display = data.solo ? 'inline-block' : 'none';
 	};
 

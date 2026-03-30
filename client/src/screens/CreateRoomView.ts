@@ -24,8 +24,13 @@ export class CreateRoomView implements View {
 	playerCountWarning = document.querySelector(`.player-count-warning`)!;
 	submitWarning = document.querySelector(`.submit-warning`)!;
 
+	pvpCheckbox = document.querySelector<HTMLInputElement>(
+		`.create-room-form input[name="pvp"]`
+	);
+
 	capacityMax = 2;
 	name = '';
+	pvp = false;
 
 	constructor(sm: ViewManager, socket: Socket) {
 		this.socket = socket;
@@ -109,6 +114,10 @@ export class CreateRoomView implements View {
 		const nameValid = this.handleNameField();
 		const countValid = this.handleCountField();
 
+		if (this.pvpCheckbox) {
+			this.pvp = this.pvpCheckbox.checked;
+		}
+
 		if (!nameValid || !countValid) {
 			this.submitButton.disabled = true;
 			this.submitWarning.innerHTML = `L'un des champs est incorrect.`;
@@ -121,7 +130,7 @@ export class CreateRoomView implements View {
 	}
 
 	submit(): void {
-		this.socket.emit('create-room', this.capacityMax, this.name);
+		this.socket.emit('create-room', this.capacityMax, this.name, this.pvp);
 	}
 	private onJoinRoomSuccess = (_data: {roomId: number, solo: boolean}) => {
 			this.sm.show('game-screen');
