@@ -1,4 +1,4 @@
-import { Entite } from '../../entite/Entite';
+import { Entite } from '../../entite/Entite.ts';
 
 export class MockEntite extends Entite {
 	name = 'mock';
@@ -17,9 +17,7 @@ export class MockEntite extends Entite {
 	baseSpeed = 1;
 	baseMovementSpeed = 1;
 
-	move(): void {
-		// no-op
-	}
+	move(): void {}
 
 	reset(): void {
 		this.health = this.maxHp;
