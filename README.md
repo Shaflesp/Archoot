@@ -31,7 +31,7 @@ Archoot est un jeu de tir en 2D développé en **TypeScript**. L'objectif est d'
 * **Communication de l'équipe** : Bien que des créneaux d'autonomie dédiés aient été prévus dans notre emploi du temps pour avancer sur la SAE, la charge de travail globale de ce semestre a rendu la communication complexe. 
 Néanmoins, l'équipe a su se mobiliser efficacement pour faire avancer le projet et rendre un jeu fonctionnel. 
 * **Refactoring** : Terminer le refacto du code serait un gros point d'amélioration, afin de rendre notre code plus lisible et SOLID, ce qui pourrait donc améliorer sa maintenance et son évolution.  
-* **Gameplay** : Pour rendre notre jeu plus attirants, nous pourrions ajouter des sons (lors de la mort d'un ennemi, pax exemple), une musique de jeu, des background qui changent selon le niveau dans lequel on est.  
+* **Gameplay** : Pour rendre notre jeu plus attirant, nous pourrions ajouter des sons (lors de la mort d'un ennemi, par exemple), une musique de jeu, des backgrounds qui changent selon le niveau dans lequel on est.  
 
 ## 💪 Fierté de l'équipe 
 
@@ -39,7 +39,7 @@ Néanmoins, l'équipe a su se mobiliser efficacement pour faire avancer le proje
 * Bonne ambiance de travail
 * La créativité du groupe = tout est fait main ! 
 
-## 💭 Organisaton de l'équipe
+## 💭 Organisation de l'équipe
 
 * Issues Board de _GitLab_
 * https://docs.google.com/spreadsheets/d/167llkRf2gxNPeo8jfRlDnexuLY13bvpllJN2hl2ihes/edit?usp=sharing
