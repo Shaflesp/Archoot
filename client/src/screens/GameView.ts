@@ -293,6 +293,8 @@ export class GameView extends CanvasView implements View {
 	private gameLoop = () => {
 		if (!this.running) return;
 
+		this.emitMovement();
+
 		this.pieAnimator?.update();
 		this.deathEffects.forEach(e => e.animator.update());
 		this.deathEffects = this.deathEffects.filter(e => !e.animator.isDone());
@@ -407,7 +409,6 @@ export class GameView extends CanvasView implements View {
 			return;
 		}
 		this.keysHeld.add(e.key);
-		this.emitMovement();
 	};
 
 	private onKeyUp = (e: KeyboardEvent) => {
@@ -415,6 +416,9 @@ export class GameView extends CanvasView implements View {
 	};
 
 	private emitMovement() {
+		const now = Date.now();
+		if (now - this.lastMoveEmit < this.MOVE_RATE) return;
+		
 		const up = this.keysHeld.has('ArrowUp') || this.keysHeld.has('z');
 		const down = this.keysHeld.has('ArrowDown') || this.keysHeld.has('s');
 		const left = this.keysHeld.has('ArrowLeft') || this.keysHeld.has('q');
@@ -431,6 +435,8 @@ export class GameView extends CanvasView implements View {
 		if (dx === 0 && dy === 0) return;
 
 		const dist = Math.hypot(dx, dy);
+
+		this.lastMoveEmit = now;
 		this.socket.emit('move', { dx: dx / dist, dy: dy / dist });
 	}
 
