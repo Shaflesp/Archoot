@@ -88,8 +88,9 @@
     .death-buttons {
         display: flex;
         flex-direction: row;
-        gap: 12px;
-        margin-top: 4px;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 15px;
     }
 
     .death-menu-button {
