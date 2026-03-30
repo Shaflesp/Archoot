@@ -288,6 +288,8 @@ export class GameView extends CanvasView implements View {
 			socket.emit('player-leave');
 			socket.emit('create-room', 1);
 		})
+
+		this.socket.on('join-room-success', this.onJoinRoomSuccess);
 	}
 
 	private gameLoop = () => {
@@ -333,7 +335,6 @@ export class GameView extends CanvasView implements View {
 
 		this.startTime = Date.now();
 
-		this.socket.on('join-room-success', this.onJoinRoomSuccess);
 		this.socket.on('playerInfo', this.onPlayerInfo);
 		this.socket.on('mobsInfo', this.onMobsInfo);
 		this.socket.on('bonusInfo', this.onBonusInfo);
@@ -357,7 +358,6 @@ export class GameView extends CanvasView implements View {
 		this.closePopup(this.deathPopup);
 		this.closePopup(this.escPopup);
 
-		this.socket.off('join-room-success', this.onJoinRoomSuccess);
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
 		this.socket.off('bonusInfo', this.onBonusInfo);
