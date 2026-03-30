@@ -12,7 +12,13 @@ Archoot est un jeu de tir en 2D développé en **TypeScript**. L'objectif est d'
 
 ## Echange Client-Serveur (Diagramme de séquence)
 
-*A remplir*
+![Diagramme de séquence](./Diagramme.png)
+
+* _joinRoomSuccess_ : validation de l'entrée du joueur dans le salon de jeu.
+* _playerInfos_ : Transmissions des données actualisées des joueurs.
+* _mobsInfos_ : Transmission de la position et de l'état des monstres.
+* _bonusInfos_ : Transmissions des infos des bonus générés sur la carte.
+* _bossWarning_ : Événement pour alerter le joueur de l'arrivée imminente d'un boss. 
 
 ## 🕷️ Difficultés techniques
 
