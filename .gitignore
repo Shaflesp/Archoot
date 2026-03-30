@@ -26,4 +26,4 @@ dist-ssr
 
 ### Leaderboard
 
-leaderboard.json
+server/leaderboard.json
