@@ -128,6 +128,8 @@ export class GameView extends CanvasView implements View {
 
 	private deathPopup: HTMLElement;
 	private escPopup: HTMLElement;
+	private isSolo: boolean = false;
+	private replayButton: HTMLElement;
 
 	private flashDuration: number = 0;
 	private lastLives: number | null = null;
@@ -256,6 +258,7 @@ export class GameView extends CanvasView implements View {
 
 		this.deathPopup = this.element.querySelector<HTMLElement>('.death-popup')!;
 		this.escPopup = this.element.querySelector<HTMLElement>('.esc-popup')!;
+		this.replayButton = this.element.querySelector<HTMLElement>('.replay-button')!;
 
 		this.element
 			.querySelector<HTMLElement>('.spectate-button')
@@ -280,6 +283,12 @@ export class GameView extends CanvasView implements View {
 				socket.emit('player-leave');
 				sm.show('home-screen');
 			});
+
+		this.replayButton.addEventListener('click', () => {
+			this.closePopup(this.deathPopup);
+			socket.emit('player-leave');
+			socket.emit('create-room', 1);
+		})
 	}
 
 	private gameLoop = () => {
@@ -323,6 +332,7 @@ export class GameView extends CanvasView implements View {
 
 		this.startTime = Date.now();
 
+		this.socket.on('join-room-success', this.onJoinRoomSuccess);
 		this.socket.on('playerInfo', this.onPlayerInfo);
 		this.socket.on('mobsInfo', this.onMobsInfo);
 		this.socket.on('bonusInfo', this.onBonusInfo);
@@ -346,6 +356,7 @@ export class GameView extends CanvasView implements View {
 		this.closePopup(this.deathPopup);
 		this.closePopup(this.escPopup);
 
+		this.socket.off('join-room-success', this.onJoinRoomSuccess);
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
 		this.socket.off('bonusInfo', this.onBonusInfo);
@@ -361,6 +372,9 @@ export class GameView extends CanvasView implements View {
 		this.canvas.removeEventListener('mouseup', this.onMouseUp);
 		this.canvas.removeEventListener('contextmenu', e => e.preventDefault());
 
+		this.isSolo = false;
+		this.replayButton.style.display = 'none';
+
 		this.running = false;
 		this.keysHeld.clear();
 		this.lastLives = null;
@@ -371,6 +385,11 @@ export class GameView extends CanvasView implements View {
 		this.mobsInfo = [];
 		this.bonusInfo = [];
 	}
+
+	private onJoinRoomSuccess = (data: {roomId: number, solo: boolean}) => {
+		this.isSolo = this.isSolo;
+		this.replayButton.style.display = data.solo ? 'inline-block' : 'none';
+	};
 
 	private openPopup(popup: HTMLElement) {
 		popup.style.display = 'flex';

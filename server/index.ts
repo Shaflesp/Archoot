@@ -179,7 +179,7 @@ io.on('connection', socket => {
 		console.log(`${socket.id} joined room ${room.name}`);
 
 		broadcastRooms();
-		socket.emit('join-room-success', roomId);
+		socket.emit('join-room-success', {roomId: room.id, solo: room.solo});
 		broadcastGame(roomId, state);
 	});
 
@@ -207,7 +207,7 @@ io.on('connection', socket => {
 		);
 
 		console.log(`${username} created solo room ${room.id}`);
-		socket.emit('join-room-success', room.id);
+		socket.emit('join-room-success', {roomId: room.id, solo: room.solo});
 
 		broadcastGame(room.id, state);
 	});

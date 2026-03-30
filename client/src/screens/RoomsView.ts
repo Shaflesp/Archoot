@@ -53,7 +53,7 @@ export class RoomsView implements View {
 		this.roomListHtml.innerHTML = '';
 	}
 
-	private onJoinRoomSuccess = () => {
+	private onJoinRoomSuccess = (_data: {roomId: number, solo: boolean}) => {
 		this.sm.show('game-screen');
 	};
 

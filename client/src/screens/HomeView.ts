@@ -25,11 +25,8 @@ export class HomeView implements View {
 		buttonSingleplayer.addEventListener('click', (event: MouseEvent) => {
 			event.preventDefault();
 
-			const username = this.pseudoInput.value.trim();
-			if (username.length < 2) {
-				this.usernamePopup.show();
-				return;
-			}
+			const username = this.validateUsername();
+			if (username.length == 0) return;
 
 			this.pendingDestination = 'game-screen';
 			socket.emit('register', { username });
@@ -41,11 +38,9 @@ export class HomeView implements View {
 		buttonMultiplayer.addEventListener('click', event => {
 			event.preventDefault();
 
-			const username = this.pseudoInput.value.trim();
-			if (username.length < 2) {
-				this.usernamePopup.show();
-				return;
-			}
+			const username = this.validateUsername();
+			if (username.length == 0) return;
+
 			this.pendingDestination = 'search-room';
 			socket.emit('register', { username });
 		});
@@ -112,4 +107,13 @@ export class HomeView implements View {
 			this.pendingDestination = null;
 		}
 	};
+
+	private validateUsername(): string {
+		const username = this.pseudoInput.value.replace(/[^a-zA-Z0-9_ -'. ]/g, '').trim();
+		if (username.length < 2 || username.length > 26) {
+			this.usernamePopup.show();
+			return '';
+		}
+		return username;
+	}
 }
