@@ -57,7 +57,9 @@ export default class Galinette extends Entite {
 	reset(): void {
 		this.x = 0;
 		this.y = Math.random() * (this.boundHeight - this.height);
-		this.health = 10;
+		this.health = 7;
+		this.maxHp = this.health;
+
 		this.active = true;
 
 		this.speed = this.baseSpeed;

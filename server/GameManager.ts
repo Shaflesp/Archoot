@@ -107,6 +107,11 @@ export default class GameManager {
 		const boss = this.bossPoolMap.get(name)?.acquire();
 		if (!boss) return;
 
+		boss.speed = boss.baseSpeed * this.difficulty;
+		boss.movementSpeed = boss.baseMovementSpeed * this.difficulty;
+		boss.health = boss.health * this.difficulty;
+		boss.maxHp = boss.health;
+
 		this.bossSpawn = true;
 		this.io.to(this.roomKey).emit('boss-warning', {
 			x: boss.x,
@@ -201,6 +206,8 @@ export default class GameManager {
 
 		mob.speed = mob.baseSpeed * this.difficulty;
 		mob.movementSpeed = mob.baseMovementSpeed * this.difficulty;
+		mob.health = mob.health * this.difficulty;
+		mob.maxHp = mob.health;
 
 		const activePlayers = Array.from(this.state.players.values()).filter(
 			p => p.active

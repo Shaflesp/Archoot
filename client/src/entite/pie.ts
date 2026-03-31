@@ -42,7 +42,9 @@ export default class Pie extends Entite {
 	reset(): void {
 		this.x = Math.random() * 1600;
 		this.y = Math.random() * 700;
-		this.health = 30;
+		this.health = 15;
+		this.maxHp = this.health;
+
 		this.active = true;
 
 		this.speed = this.baseSpeed;

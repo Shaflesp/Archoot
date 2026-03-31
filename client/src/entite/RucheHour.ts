@@ -75,23 +75,6 @@ export default class RucheHour extends Entite {
 		return vectors;
 	}
 
-	takeDamage(amount: number): void {
-		this.health -= amount;
-		if (this.health < 0) this.health = 0;
-	}
-
-	reset(): void {
-		this.width = 400;
-		this.height = 400;
-		this.x = -this.width + 1;
-		this.y = this.boundHeight / 4;
-		this.health = 150;
-		this.active = true;
-
-		this.speed = this.baseSpeed;
-		this.movementSpeed = this.baseMovementSpeed;
-	}
-
 	shoot(_acquireBullet: () => Bullet | null): void {
 		if (this.x !== 0) return;
 		if (this.phase !== 'green' && this.phase !== 'orange') return;
@@ -114,6 +97,25 @@ export default class RucheHour extends Entite {
 				4
 			);
 		});
+	}
+
+	takeDamage(amount: number): void {
+		this.health -= amount;
+		if (this.health < 0) this.health = 0;
+	}
+
+	reset(): void {
+		this.width = 400;
+		this.height = 400;
+		this.x = -this.width + 1;
+		this.y = this.boundHeight / 4;
+		this.health = 150;
+		this.maxHp = this.health;
+
+		this.active = true;
+
+		this.speed = this.baseSpeed;
+		this.movementSpeed = this.baseMovementSpeed;
 	}
 
 	getAsJson() {

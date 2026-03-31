@@ -128,6 +128,8 @@ export default class LeTyrus extends Entite {
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight - this.height;
 		this.health = 500;
+		this.maxHp = this.health;
+
 		this.active = true;
 
 		this.phase = 'idle';

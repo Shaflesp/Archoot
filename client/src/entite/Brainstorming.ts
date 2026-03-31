@@ -131,6 +131,7 @@ export default class Brainstorming extends Entite {
 		this.x = this.boundWidth / 2 - this.width / 2;
 		this.y = this.boundHeight / 2 - this.height / 2;
 		this.health = 300;
+		this.maxHp = this.health;
 		this.active = true;
 
 		this.speed = this.baseSpeed;

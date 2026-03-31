@@ -49,6 +49,8 @@ export default class Spider extends Entite {
 		this.x = Math.random() * 1600;
 		this.y = 0;
 		this.health = 5;
+		this.maxHp = this.health;
+
 		this.active = true;
 		this.climbing = false;
 
