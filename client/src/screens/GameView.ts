@@ -699,7 +699,15 @@ export class GameView extends CanvasView implements View {
 		}
 
 		this.bulletInfo.forEach((b: BulletData) => {
-			const angle = Math.atan2(b.dy, b.dx) + Math.PI / 4;
+			let angle = Math.atan2(b.dy, b.dx) ;
+
+			if (b.ownerId === 'Ruche Hour') {
+				angle += Math.PI/4 ;
+			} else if (b.ownerId === 'Le Tyrus') {
+				angle += 0;
+			} else {
+				angle += Math.PI / 4;
+			}
 			const centerX = b.x + b.width / 2;
 			const centerY = b.y + b.height / 2;
 
