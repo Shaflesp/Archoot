@@ -57,5 +57,13 @@ h1 {
         transform:scale(1.1);
 }
 
+@media (max-width: 768px) {
+    .back-button {
+        left: 20px;
+        top: 20px;
+        width: 150px;
+    }
+}
+
 
 

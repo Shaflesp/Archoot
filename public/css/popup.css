@@ -151,3 +151,16 @@
 	from { transform: translateY(60px); }
 	to { transform: translateY(0); }
 }
+
+@media (max-width: 768px) {
+    .popup .popupContent {
+        margin: 0 5%;
+        padding: 20px;
+        width: 90%;
+        box-sizing: border-box;
+    }
+
+    .death-popup .popupContent .death-buttons {
+        flex-wrap: wrap;
+    }
+}

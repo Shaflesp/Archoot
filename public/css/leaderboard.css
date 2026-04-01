@@ -11,8 +11,8 @@
 
 .last {
     background-color: lightgray;
-
-    width: 800px;
+    width: 90%;
+    max-width: 800px;
     padding: 20px;
     border-radius: 30px;
     opacity: 75%;
@@ -26,7 +26,8 @@
 
 .podium {
     background-image: url("../images/leaderboard/leaderboard.png");
-    width: 800px;
+    width: 90%;
+    max-width: 800px;
     height: 450px;
     background-size: contain;
     background-repeat: no-repeat;
@@ -45,7 +46,7 @@
 }
 
 .first {
-    bottom: 310px; 
+    bottom: 68%;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -55,8 +56,8 @@
 }
 
 .second {
-    bottom: 220px;
-    left: -1%;
+    bottom: 48%;
+    left: 0;
 }
 
 .second p {
@@ -64,10 +65,17 @@
 }
 
 .third {
-    bottom: 160px;
-    right: -1%;
+    bottom: 35%;
+    right: 0;
 }
 
 .third p {
     font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .first p { font-size: 1.5rem; }
+    .second p { font-size: 1.2rem; }
+    .third p { font-size: 1rem; }
+    .place { width: 33%; }
 }

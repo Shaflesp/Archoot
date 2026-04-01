@@ -10,9 +10,8 @@
     display: block;
     max-width: 200px;
     height: auto;
-    margin: 0%;
     z-index: 2;
-    margin-top: -50px;
+    margin: -50px 0 0;
 }
 
 .parchemin {
@@ -53,11 +52,16 @@ h2{
     margin-bottom:5px;
     color: #451110;
     font-size: 1.4rem;
-    margin-bottom: 5px;
 }
 
 p{
     margin:2px;
     font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .liste-personnes {
+        grid-template-columns: 1fr;
+    }
 }
 
