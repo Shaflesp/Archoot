@@ -129,6 +129,8 @@ export class GameView extends CanvasView implements View {
 	private deathPopup: HTMLElement;
 	private escPopup: HTMLElement;
 	private replayButton: HTMLElement;
+	private startButton: HTMLElement;
+	private announcementEl: HTMLElement;
 
 	private flashDuration: number = 0;
 	private lastLives: number | null = null;
@@ -258,6 +260,8 @@ export class GameView extends CanvasView implements View {
 		this.deathPopup = this.element.querySelector<HTMLElement>('.death-popup')!;
 		this.escPopup = this.element.querySelector<HTMLElement>('.esc-popup')!;
 		this.replayButton = this.element.querySelector<HTMLElement>('.replay-button')!;
+		this.startButton = document.getElementById('start-game-btn')!;
+		this.announcementEl = document.getElementById('game-announcement')!;
 
 		this.element
 			.querySelector<HTMLElement>('.spectate-button')
@@ -288,8 +292,19 @@ export class GameView extends CanvasView implements View {
 			socket.emit('player-leave');
 			socket.emit('create-room', 1);
 		})
-
 		this.socket.on('join-room-success', this.onJoinRoomSuccess);
+
+		this.startButton?.addEventListener('click', () => {
+			this.socket.emit('force-start-game');
+			this.startButton.style.display = 'none';
+		});
+
+		this.socket.on('game-announcement', this.onAnnouncement);
+
+		this.socket.on('game-started', () => {
+			if (this.startButton) this.startButton.style.display = 'none';
+			if (this.announcementEl) this.announcementEl.style.display = 'none';
+		});
 	}
 
 	private gameLoop = () => {
@@ -386,9 +401,29 @@ export class GameView extends CanvasView implements View {
 		this.bonusInfo = [];
 	}
 
-	private onJoinRoomSuccess = (data: {roomId: number, solo: boolean}) => {
+	private onJoinRoomSuccess = (data: {roomId: number, solo: boolean, isCreator:boolean}) => {
 		this.replayButton.style.display = data.solo ? 'inline-block' : 'none';
+
+		if (this.startButton) {
+			if (!data.solo && data.isCreator) {
+				this.startButton.style.display = 'block';
+			} else {
+				this.startButton.style.display = 'none';
+			}
+		}
 	};
+
+	private onAnnouncement = (msg:string) => {
+		if (this.announcementEl) {
+			this.announcementEl.innerText = msg;
+			this.announcementEl.style.display = 'block';
+
+			this.announcementEl.style.animation = 'none';
+			void this.announcementEl.offsetWidth;
+			this.announcementEl.style.animation =
+				'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
+		}
+	}
 
 	private openPopup(popup: HTMLElement) {
 		popup.style.display = 'flex';

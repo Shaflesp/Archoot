@@ -5,4 +5,9 @@ export interface RoomServer {
 	players: Set<string>;
 	solo: boolean;
 	pvp: boolean;
+
+	status: 'waiting' | 'playing';
+	creatorId: string;
+
+	autoStartTimeout?: ReturnType<typeof setTimeout>;
 }

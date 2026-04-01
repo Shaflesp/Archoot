@@ -40,7 +40,8 @@ function createRoom(
 	name: string,
 	capacityMax: number,
 	solo: boolean = false,
-	pvp: boolean = false
+	pvp: boolean = false,
+	creatorId: string
 ): RoomServer {
 	const r: RoomServer = {
 		id: ++roomIdCpt,
@@ -49,6 +50,8 @@ function createRoom(
 		players: new Set(),
 		solo,
 		pvp,
+		status: solo ? 'playing' : 'waiting',
+		creatorId
 	};
 
 	const state = new RoomState(boundWidth, boundHeight);
@@ -59,14 +62,12 @@ function createRoom(
 	return r;
 }
 
-createRoom('Coconut [DO NOT DELETE]', 4);
-
 function broadcastRooms(
 	target: { emit: (event: string, data: object) => void } = io,
 	bannedRooms: Set<number> = new Set()
 ) {
 	const roomList = Array.from(rooms.values())
-		.filter(r => !r.solo && !bannedRooms.has(r.id))
+		.filter(r => !r.solo && r.status === 'waiting' && !bannedRooms.has(r.id))
 		.map(r => ({
 			roomId: r.id,
 			roomName: r.name,
@@ -107,6 +108,33 @@ function broadcastBonuses(roomId:number){
 	io.to(getRoomKey(roomId)).emit('bonusInfo', {bonuses : bonusData});
 }
 
+function startGame(roomId: number) {
+	const room = rooms.get(roomId);
+	if (!room || room.status === 'playing') return;
+
+	let count = 3;
+
+	io.to(getRoomKey(roomId)).emit('game-announcement', count.toString());
+
+	const countdownInterval = setInterval(() => {
+		count--;
+
+		if (count > 0) {
+			io.to(getRoomKey(roomId)).emit('game-announcement', count.toString());
+		} else if (count === 0) {
+			io.to(getRoomKey(roomId)).emit('game-announcement', 'Start !');
+
+			if (rooms.has(roomId)) {
+				room.status = 'playing';
+				broadcastRooms();
+			}
+		} else {
+			clearInterval(countdownInterval);
+			io.to(getRoomKey(roomId)).emit('game-started');
+		}
+	}, 1000);
+}
+
 io.on('connection', socket => {
 	broadcastRooms();
 
@@ -145,6 +173,11 @@ io.on('connection', socket => {
 		const room = rooms.get(roomId);
 		const state = roomStates.get(roomId);
 
+		if (room && room.status === 'playing') {
+			socket.emit('room_error', 'Cette partie a déjà commencé.');
+			return;
+		}
+
 		if (bannedRooms.has(roomId)) {
 			socket.emit('room_error', 'You cannot rejoin a room you have left.');
 			return;
@@ -181,13 +214,28 @@ io.on('connection', socket => {
 		console.log(`${socket.id} joined room ${room.name}`);
 
 		broadcastRooms();
-		socket.emit('join-room-success', {roomId: room.id, solo: room.solo});
+		socket.emit('join-room-success', {
+			roomId: room.id,
+			solo: room.solo,
+			isCreator: false,
+		});
 		broadcastGame(roomId, state);
+	});
+
+	socket.on('force-start-game', () => {
+		if (currentRoomId === null) return;
+		const room = rooms.get(currentRoomId);
+
+		if (room && room.creatorId === socket.id && room.status === 'waiting') {
+			if (room.autoStartTimeout) clearTimeout(room.autoStartTimeout);
+			startGame(room.id);
+		}
 	});
 
 	socket.on(
 		'create-room',
 		(capacity: number, name: string = '', pvp: boolean = false) => {
+
 			const username = socket.data.username as string | undefined;
 			if (!username) {
 				socket.emit('room_error', 'You must register first.');
@@ -199,7 +247,13 @@ io.on('connection', socket => {
 			const roomName = capacity == 1 ? `${username}'s game` : name;
 			const solo = capacity == 1;
 
-			const room = createRoom(roomName, capacity, solo, pvp);
+			const room = createRoom(roomName, capacity, solo, pvp, socket.id);
+			if (!solo) {
+				room.autoStartTimeout = setTimeout(() => {
+					startGame(room.id);
+				}, 90000);
+			}
+
 			const state = roomStates.get(room.id)!;
 
 			currentRoomId = room.id;
@@ -211,7 +265,7 @@ io.on('connection', socket => {
 			);
 
 			console.log(`${username} created solo room ${room.id}`);
-			socket.emit('join-room-success', { roomId: room.id, solo: room.solo });
+			socket.emit('join-room-success', { roomId: room.id, solo: room.solo, isCreator: true });
 
 			broadcastGame(room.id, state);
 		}
@@ -471,7 +525,11 @@ setInterval(() => {
 }, 1000 / 60);
 
 setInterval(() => {
-	gameManagers.forEach(manager => {
-		manager.spawnMob();
+	gameManagers.forEach((manager, roomId) => {
+		const room = rooms.get(roomId);
+
+		if (room) {
+			manager.spawnMob(room.status);
+		}
 	});
 }, 2000);

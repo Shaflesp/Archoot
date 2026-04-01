@@ -42,9 +42,13 @@ export default class GameManager {
 		return total;
 	}
 
-	spawnMob() {
+	spawnMob(roomStatus: 'waiting' | 'playing' = 'playing') {
 		if (this.state.players.size === 0) return; // si aucun joueur, on ff
 		if (this.bossSpawn) return;
+
+		if (roomStatus === 'waiting') {
+			return;
+		}
 
 		const cycleScore = this.getTotalScore() - this.cycleStartScore;
 		const scale = this.difficulty;
