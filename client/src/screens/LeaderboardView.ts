@@ -63,7 +63,9 @@ export class LeaderboardView implements View {
 
 		this.element.style.display = 'flex';
 		try {
-			const response = await fetch('/server/leaderboard.json');
+			const response = await fetch(
+				'https://archoot.onrender.com/api/leaderboard'
+			);
 			if (response.ok) {
 				const scores = await response.json();
 				this.render(scores);

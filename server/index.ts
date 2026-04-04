@@ -18,7 +18,7 @@ const httpServer = http.createServer((req, res) => {
 	res.setHeader('Access-Control-Allow-Methods', 'GET');
 
 	if (req.url === '/api/leaderboard') {
-		const lbPath = path.join(__dirname, 'leaderboard.json');
+		const lbPath = path.join(import.meta.dirname, 'leaderboard.json');
 
 		if (fs.existsSync(lbPath)) {
 			res.writeHead(200, { 'Content-Type': 'application/json' });
