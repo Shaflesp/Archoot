@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 
 interface ScoreEntry {
 	username: string;
@@ -9,7 +10,7 @@ interface ScoreEntry {
 export class Leaderboard {
 	private scores: ScoreEntry[] = [];
 	private readonly MAX: number = 10;
-	private FILE_PATH: string = 'server/leaderboard.json';
+	private FILE_PATH: string = path.join(__dirname, 'leaderboard.json');
 
 	public load(): void {
 		try {

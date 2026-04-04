@@ -373,6 +373,11 @@ export class GameView extends CanvasView implements View {
 		this.closePopup(this.deathPopup);
 		this.closePopup(this.escPopup);
 
+		if (this.announcementEl) {
+			this.announcementEl.style.display = 'none';
+			this.announcementEl.innerText = '';
+		}
+
 		this.socket.off('playerInfo', this.onPlayerInfo);
 		this.socket.off('mobsInfo', this.onMobsInfo);
 		this.socket.off('bonusInfo', this.onBonusInfo);

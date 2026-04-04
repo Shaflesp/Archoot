@@ -1,4 +1,6 @@
 import http from 'http';
+import fs from 'fs';
+
 import { Server as IOServer } from 'socket.io';
 import { Player } from '../shared/Entity/Player.ts';
 
@@ -9,8 +11,25 @@ import type { Entite } from '../shared/Mob/Entite.ts';
 import RucheHour from '../shared/Mob/RucheHour.ts';
 import type { PlayerData } from '../shared/Entity/PlayerData.ts';
 import { Leaderboard } from './Leaderboard.ts';
+import * as path from 'node:path';
 
-const httpServer = http.createServer((_req, res) => {
+const httpServer = http.createServer((req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.setHeader('Access-Control-Allow-Methods', 'GET');
+
+	if (req.url === '/api/leaderboard') {
+		const lbPath = path.join(__dirname, 'leaderboard.json');
+
+		if (fs.existsSync(lbPath)) {
+			res.writeHead(200, { 'Content-Type': 'application/json' });
+			res.end(fs.readFileSync(lbPath, 'utf8'));
+			return;
+		} else {
+			res.writeHead(404);
+			res.end(JSON.stringify({ error: 'Leaderboard not found' }));
+			return;
+		}
+	}
 	res.statusCode = 200;
 });
 
@@ -123,6 +142,11 @@ function startGame(roomId: number) {
 	io.to(getRoomKey(roomId)).emit('game-announcement', count.toString());
 
 	const countdownInterval = setInterval(() => {
+		if (!rooms.has(roomId)) {
+			clearInterval(countdownInterval);
+			return;
+		}
+
 		count--;
 
 		if (count > 0) {
