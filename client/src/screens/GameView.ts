@@ -341,7 +341,7 @@ export class GameView extends CanvasView implements View {
 
 	show(): void {
 		const body = document.body;
-		body.style.backgroundImage = 'url(`' + `${import.meta.env.BASE_URL}images/fondJeu.gif`+')';
+		body.style.backgroundImage = `url('${import.meta.env.BASE_URL}images/fondJeu.gif')`;
 
 		body.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
 		body.style.backgroundBlendMode = 'darken';
