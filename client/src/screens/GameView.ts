@@ -142,34 +142,34 @@ export class GameView extends CanvasView implements View {
 	private readonly MOVE_RATE = 1000 / 60;
 
 	private readonly playerSrcs: string[] = [
-		'images/sprites/John_Up.png',
-		'images/sprites/John_Down.png',
-		'images/sprites/John_Side.png',
+		`${import.meta.env.BASE_URL}images/sprites/John_Up.png`,
+		`${import.meta.env.BASE_URL}images/sprites/John_Down.png`,
+		`${import.meta.env.BASE_URL}images/sprites/John_Side.png`,
 	];
 
 	private readonly mobsSrcs: string[] = [
-		'/images/sprites/pie_sheet.png',
-		'/images/sprites/galinette.png',
-		'/images/sprites/spider1.png',
-		'/images/sprites/spider2.png',
-		'/images/sprites/spider3.png',
-		'/images/sprites/spider4.png',
-		'/images/sprites/Mygalomane.png', // 6
-		'/images/sprites/Brainstorming.png',
-		'/images/sprites/LeTyrus.png', // à changer pour tyrus
+		`${import.meta.env.BASE_URL}images/sprites/pie_sheet.png`,
+		`${import.meta.env.BASE_URL}images/sprites/galinette.png`,
+		`${import.meta.env.BASE_URL}images/sprites/spider1.png`,
+		`${import.meta.env.BASE_URL}images/sprites/spider2.png`,
+		`${import.meta.env.BASE_URL}images/sprites/spider3.png`,
+		`${import.meta.env.BASE_URL}images/sprites/spider4.png`,
+		`${import.meta.env.BASE_URL}images/sprites/Mygalomane.png`, // 6
+		`${import.meta.env.BASE_URL}images/sprites/Brainstorming.png`,
+		`${import.meta.env.BASE_URL}images/sprites/LeTyrus.png`, // à changer pour tyrus
 	];
 
 	private readonly rucheSrcs: string[] = [
-		'images/sprites/Ruche_Hour_Green.png',
-		'images/sprites/Ruche_Hour_Orange.png',
-		'images/sprites/Ruche_Hour_Red.png',
+		`${import.meta.env.BASE_URL}images/sprites/Ruche_Hour_Green.png`,
+		`${import.meta.env.BASE_URL}images/sprites/Ruche_Hour_Orange.png`,
+		`${import.meta.env.BASE_URL}images/sprites/Ruche_Hour_Red.png`,
 	];
 
 	private readonly bonusSrcs: string[] = [
-		'/images/bonus/bonusRouge.png',
-		'/images/bonus/bonusVert.png',
-		'/images/bonus/bonusBleu.png',
-		'/images/bonus/bonusJaune.png',
+		`${import.meta.env.BASE_URL}images/bonus/bonusRouge.png`,
+		`${import.meta.env.BASE_URL}images/bonus/bonusVert.png`,
+		`${import.meta.env.BASE_URL}images/bonus/bonusBleu.png`,
+		`${import.meta.env.BASE_URL}images/bonus/bonusJaune.png`,
 	];
 
 	private running: boolean = false;
@@ -189,13 +189,13 @@ export class GameView extends CanvasView implements View {
 		this.playerImages = { up, down, side };
 
 		this.coeurImage = new Image();
-		this.coeurImage.src = '/images/coeur.png';
+		this.coeurImage.src = `${import.meta.env.BASE_URL}images/coeur.png`;
 
 		this.bulletImage = new Image();
-		this.bulletImage.src = '/images/Arrow.png';
+		this.bulletImage.src = `${import.meta.env.BASE_URL}images/Arrow.png`;
 
 		this.rockImage = new Image();
-		this.rockImage.src = '/images/cailloutyrus.png';
+		this.rockImage.src = `${import.meta.env.BASE_URL}images/cailloutyrus.png`;
 
 		this.mobsImages = this.loadImages(this.mobsSrcs);
 		this.rucheImages = this.loadImages(this.rucheSrcs);
@@ -211,10 +211,10 @@ export class GameView extends CanvasView implements View {
 				5
 			);
 		};
-		this.pieSheet.src = '/images/sprites/pie_sheet.png';
+		this.pieSheet.src = `${import.meta.env.BASE_URL}images/sprites/pie_sheet.png`;
 
 		this.poofSheet = new Image();
-		this.poofSheet.src = '/images/sprites/poof_sheet.png';
+		this.poofSheet.src = `${import.meta.env.BASE_URL}images/sprites/poof_sheet.png`;
 
 		this.beeSheet = new Image();
 		this.beeSheet.onload = () => {
@@ -226,7 +226,7 @@ export class GameView extends CanvasView implements View {
 				2
 			);
 		};
-		this.beeSheet.src = '/images/sprites/bee_sheet.png';
+		this.beeSheet.src = `${import.meta.env.BASE_URL}images/sprites/bee_sheet.png`;
 
 		this.mobImageMap = new Map([
 			['pie', this.mobsImages[0]],
@@ -341,7 +341,7 @@ export class GameView extends CanvasView implements View {
 
 	show(): void {
 		const body = document.body;
-		body.style.backgroundImage = "url('/images/fondJeu.gif')";
+		body.style.backgroundImage = 'url(`' + `${import.meta.env.BASE_URL}images/fondJeu.gif`+')';
 
 		body.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
 		body.style.backgroundBlendMode = 'darken';

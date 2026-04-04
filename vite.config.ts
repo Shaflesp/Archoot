@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-	base: '/projects/archoot-game/',
+	base: '/project/archoot/game/',
 	build: {
 		rollupOptions: {
 			input: {

@@ -37,6 +37,7 @@ httpServer.listen(port, () => {
 //const io = new IOServer(httpServer, { cors: { origin: true } });
 const io = new IOServer(httpServer, {
 	cors: {
+		//origin: '*',
 		origin: 'https://nihileaf.dev',
 	},
 });
