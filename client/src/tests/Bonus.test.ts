@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { MockBonus } from './mocks/MockBonus.ts';
-import { Player } from '../../../server/Entity/Player.ts';
+import { Player } from '../../../shared/Entity/Player.ts';
 
 describe('Bonus', () => {
 	it('should initialize correctly', () => {

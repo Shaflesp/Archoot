@@ -1,4 +1,4 @@
-import { Entite } from '../../entite/Entite.ts';
+import { Entite } from '../../../../shared/Mob/Entite.ts';
 
 export class MockEntite extends Entite {
 	name = 'mock';

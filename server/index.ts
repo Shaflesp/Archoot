@@ -1,13 +1,13 @@
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
-import { Player } from './Entity/Player.ts';
+import { Player } from '../shared/Entity/Player.ts';
 
 import type { RoomServer } from './RoomServer.ts';
 import RoomState from './RoomState.ts';
 import GameManager from './GameManager.ts';
-import type { Entite } from '../client/src/entite/Entite.ts';
-import RucheHour from '../client/src/entite/RucheHour.ts';
-import type { PlayerData } from './Entity/PlayerData.ts';
+import type { Entite } from '../shared/Mob/Entite.ts';
+import RucheHour from '../shared/Mob/RucheHour.ts';
+import type { PlayerData } from '../shared/Entity/PlayerData.ts';
 import { Leaderboard } from './Leaderboard.ts';
 
 const httpServer = http.createServer((_req, res) => {
@@ -102,7 +102,7 @@ function broadcastBonuses(roomId:number){
 	if(!manager) return;
 
 	const bonusData = manager.activeBonuses
-		.filter(b => b.active === true)
+		.filter(b => b.active)
 		.map( b => (b.getAsJSON()));
 
 	io.to(getRoomKey(roomId)).emit('bonusInfo', {bonuses : bonusData});

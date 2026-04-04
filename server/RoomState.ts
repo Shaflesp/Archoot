@@ -1,14 +1,14 @@
-import Brainstorming from "../client/src/entite/Brainstorming.ts";
-import type { Entite } from "../client/src/entite/Entite.ts";
-import Galinette from "../client/src/entite/galinette.ts";
-import LeTyrus from "../client/src/entite/LeTyrus.ts";
-import Mygalomane from "../client/src/entite/Mygalomane.ts";
-import Pie from "../client/src/entite/pie.ts";
-import RucheHour from "../client/src/entite/RucheHour.ts";
-import Spider from "../client/src/entite/spider.ts";
-import { Bullet } from "./Entity/Bullet.ts";
-import type { Player } from "./Entity/Player.ts";
-import { Pool } from "./Entity/Pool.ts";
+import Brainstorming from "../shared/Mob/Brainstorming.ts";
+import type { Entite } from "../shared/Mob/Entite.ts";
+import Galinette from "../shared/Mob/galinette.ts";
+import LeTyrus from "../shared/Mob/LeTyrus.ts";
+import Mygalomane from "../shared/Mob/Mygalomane.ts";
+import Pie from "../shared/Mob/pie.ts";
+import RucheHour from "../shared/Mob/RucheHour.ts";
+import Spider from "../shared/Mob/spider.ts";
+import { Bullet } from "../shared/Entity/Bullet.ts";
+import type { Player } from "../shared/Entity/Player.ts";
+import { Pool } from "../shared/Entity/Pool.ts";
 
 export default class RoomState {
 	boundWidth: number;

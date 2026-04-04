@@ -1,13 +1,13 @@
 import type { Server } from 'socket.io';
 import type RoomState from "./RoomState";
-import type { Player } from './Entity/Player.ts';
-import type { Entite } from '../client/src/entite/Entite.ts';
-import type { Pool } from './Entity/Pool.ts';
-import Bonus from "../client/src/bonus/Bonus.ts";
-import PotionDegats from "../client/src/bonus/PotionDegats.ts";
-import PotionSoin from "../client/src/bonus/PotionSoin.ts";
-import PotionRapidite from "../client/src/bonus/PotionRapidite.ts";
-import PotionTirMultiple from "../client/src/bonus/PotionTirMultiple.ts";
+import type { Player } from '../shared/Entity/Player.ts';
+import type { Entite } from '../shared/Mob/Entite.ts';
+import type { Pool } from '../shared/Entity/Pool.ts';
+import Bonus from "../shared/Bonus/Bonus.ts";
+import PotionDegats from "../shared/Bonus/PotionDegats.ts";
+import PotionSoin from "../shared/Bonus/PotionSoin.ts";
+import PotionRapidite from "../shared/Bonus/PotionRapidite.ts";
+import PotionTirMultiple from "../shared/Bonus/PotionTirMultiple.ts";
 
 const boundWidth: number = 1680;
 const boundHeight: number = 800;

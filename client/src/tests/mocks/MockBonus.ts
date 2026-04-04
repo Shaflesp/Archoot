@@ -1,5 +1,5 @@
-import Bonus from '../../bonus/Bonus.ts';
-import type { Player } from '../../../../server/Entity/Player';
+import Bonus from '../../../../shared/Bonus/Bonus.ts';
+import type { Player } from '../../../../shared/Entity/Player';
 
 export class MockBonus extends Bonus {
 	name = 'mockBonus';

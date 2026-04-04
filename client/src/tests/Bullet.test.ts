@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { Bullet } from '../../../server/Entity/Bullet.ts';
-import { Player } from '../../../server/Entity/Player.ts';
+import { Bullet } from '../../../shared/Entity/Bullet.ts';
+import { Player } from '../../../shared/Entity/Player.ts';
 
 describe('Bullet', () => {
 	it('should fire correctly', () => {

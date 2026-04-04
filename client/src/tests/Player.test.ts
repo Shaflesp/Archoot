@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { Player } from '../../../server/Entity/Player.ts';
+import { Player } from '../../../shared/Entity/Player.ts';
 import { MockEntite } from './mocks/MockEntite.ts';
 
 describe('Player', () => {
