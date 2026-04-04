@@ -29,12 +29,17 @@ const registeredUsernames: Set<string> = new Set();
 const leaderboard = new Leaderboard();
 leaderboard.load();
 
-const port = 8080;
+const port = process.env.PORT || 8080;
 httpServer.listen(port, () => {
-	console.log(`Server is running at http://localhost:${port}.`);
+	console.log(`Server is running on port ${port}.`);
 });
 
-const io = new IOServer(httpServer, { cors: { origin: true } });
+//const io = new IOServer(httpServer, { cors: { origin: true } });
+const io = new IOServer(httpServer, {
+	cors: {
+		origin: 'https://nihileaf.dev',
+	},
+});
 
 function createRoom(
 	name: string,

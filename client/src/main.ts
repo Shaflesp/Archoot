@@ -9,7 +9,8 @@ import { CreateRoomView } from './screens/CreateRoomView.ts';
 
 const sm = new ViewManager();
 
-const socket = io(window.location.hostname + ':8080');
+//const socket = io(window.location.hostname + ':8080');
+const socket = io('https://archoot.onrender.com');
 
 const splash = document.getElementById('splash-screen')!;
 const splashText = document.querySelector<HTMLElement>('.splash-text')!;
