@@ -13,7 +13,7 @@ export class CreditsView implements View {
 
     show(): void {
         const body = document.body;
-		body.style.backgroundImage = "url('/images/fondAccueil.gif')";
+		body.style.backgroundImage = `url('${import.meta.env.BASE_URL}images/fondAccueil.gif')`;
 		body.style.backgroundColor = "transparent";
 		body.style.backgroundBlendMode = "normal";
         
