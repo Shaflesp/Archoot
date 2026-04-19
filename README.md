@@ -1,10 +1,10 @@
 # 🏹 Archoot (Equipe 5 - Groupe I)
 
 **Equipe :**
-* Lecnik Liam : [liam.lecnik.etu@univ-lille.fr](mailto:liam.lecnik.etu@univ-lille.fr)
-* Mangin Maxence : [maxence.mangin.etu@univ-lille.fr](mailto:maxence.mangin.etu@univ-lille.fr)
-* Martin Rémy : [remy.martin.etu@univ-lille.fr](mailto:remy.martin.etu@univ-lille.fr)
-* Vigneron Loïse : [loise.vigneron.etu@univ-lille.fr](mailto:loise.vigneron.etu@univ-lille.fr)
+* Lecnik Liam
+* Mangin Maxence
+* Martin Rémy 
+* Vigneron Loïse
 
 ## 📜 Présentation du projet 
 
