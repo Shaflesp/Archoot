@@ -42,4 +42,3 @@ Néanmoins, l'équipe a su se mobiliser efficacement pour faire avancer le proje
 ## 💭 Organisation de l'équipe
 
 * Issues Board de _GitLab_
-* https://docs.google.com/spreadsheets/d/167llkRf2gxNPeo8jfRlDnexuLY13bvpllJN2hl2ihes/edit?usp=sharing
